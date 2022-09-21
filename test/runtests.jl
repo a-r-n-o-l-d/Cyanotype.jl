@@ -1,6 +1,10 @@
 using Cyanotype
+using Flux
 using Test
 
-@testset "Cyanotype.jl" begin
-    # Write your tests here.
+@testset verbose = true "Cyanotype.jl" begin
+    
+    @testset "Config" begin
+        include("config.jl")
+    end
 end

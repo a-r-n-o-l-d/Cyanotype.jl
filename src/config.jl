@@ -24,20 +24,20 @@ field_types(km::KwargsMapping) = km.field_types
 
 field_defaults(km::KwargsMapping) = km.field_defaults
 
-each_option(km::KwargsMapping) = zip(
+each_kwargs(km::KwargsMapping) = zip(
     field_names(km),
     flux_names(km),
     field_types(km),
     field_defaults(km)
 )
 
-const mappings = Dict{Symbol, OptionMapping}()
+const mappings = Dict{Symbol, KwargsMapping}()
 
 function register_mapping!(map)
     haskey(mappings, first(map)) && error("Map $(first(map)) already exists in mappings.")
     push!(mappings, map)
 end
 
-const empty_map = OptionMapping((), (), (), ())
+const empty_map = KwargsMapping((), (), (), ())
 
 register_mapping!(:empty_map=>empty_map)
