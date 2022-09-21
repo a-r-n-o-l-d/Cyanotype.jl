@@ -1,3 +1,7 @@
+#=
+wrappers: Flux to Cyanotype
+modules: high level modules
+=#
 module Cyanotype
 
 import Flux

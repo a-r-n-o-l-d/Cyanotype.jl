@@ -42,12 +42,12 @@ const empty_map = KwargsMapping((), (), (), ())
 
 register_mapping!(:empty_map=>empty_map)
 
-macro config(mapping, expr)
-    esc(codegen_config(__module__, expr, mapping))
+macro config(kmap, expr)
+    esc(codegen_config(__module__, expr, kmap))
 end
 
-macro config(alias::String, mapping, expr)
-    esc(codegen_config(__module__, expr, mapping, alias))
+macro config(alias::String, kmap, expr)
+    esc(codegen_config(__module__, expr, kmap, alias))
 end
 
 macro config(expr)
@@ -58,10 +58,10 @@ macro config(alias::String, expr)
     esc(codegen_config(__module__, expr, :empty_map, alias))
 end
 
-function codegen_config(mod, expr, mapping::Symbol = :empty_map, type_alias = nothing)
+function codegen_config(mod, expr, kmap::Symbol = :empty_map, type_alias = nothing)
     expr = macroexpand(mod, expr)
     def = JLKwStruct(expr, type_alias)
-    for (name, _, T, default) ∈ each_kwargs(mappings[mapping])
+    for (name, _, T, default) ∈ each_kwargs(mappings[kmap])
         f = JLKwField(;name = name, type = T, default = default)
         #f.doc = ...generation auto... ou générer doc auto pour les accesseurs
         push!(def.fields, f)
@@ -76,9 +76,25 @@ function codegen_config(mod, expr, mapping::Symbol = :empty_map, type_alias = no
         # codegen_ast(a)
         push!(accessors, :($(f.name)(cfg::$(def.name)) = cfg.$(f.name)))
     end
-    mapfunc = :(mapping(cfg::$(def.name)) = $(mappings[mapping]))
+    mapfunc = :(mapping(cfg::$(def.name)) = $(mappings[kmap]))
     Expr(:block, 
         Configurations.codegen_option_type(mod, def),
         mapfunc,
         accessors...)
+end
+
+function currate_kwargs(cfg::AbstractCfg, kmap = mapping(cfg))
+    #km = mapping(cfg)
+    kwargs = str2sym(to_dict(cfg))
+    # Remove args that are not for Flux
+    filter!(k -> first(k) ∈ field_names(kmap), kwargs)
+    # Replace field_name by flux_name
+    for (field_name, flux_name) ∈ each_kwargs(kmap)
+        if haskey(kwargs, field_name) && field_name != flux_name
+            tmp = kwargs[field_name]
+            delete!(kwargs, field_name)
+            kwargs[flux_name] = tmp
+        end
+    end
+    kwargs
 end

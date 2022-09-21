@@ -2,7 +2,7 @@
 module ConfigTests
 
 using Test
-using Cyanotype: AbstractCfg, @config, KwargsMapping, each_kwargs, empty_map, mappings, register_mapping!
+using Cyanotype: AbstractCfg, @config, KwargsMapping, each_kwargs, empty_map, mappings, register_mapping!, currate_kwargs
 using Flux: relu, zeros32, ones32
 using Configurations: Reflect
 
@@ -22,7 +22,7 @@ bnmap2 = KwargsMapping(;
     field_defaults = (zeros32,      ones32, true,    true,         1f-5,     0.1f0) )
 register_mapping!(:bnmap2=>bnmap2)
 
-@config bnmap1 struct MyBatchNormCfg1{N <: Union{Float16, Float32, Float64}}
+@config bnmap1 struct MyBatchNormCfg1{N <: Union{Float16, Float32, Float64}} <: AbstractCfg
     activation::Function = relu
 end
 
@@ -65,5 +65,14 @@ end
 cfg = MyBatchNormCfg4()
 @test activation(cfg) isa Function
 @test activation(cfg) == relu
+
+cfg = MyBatchNormCfg1()
+@test mapping(cfg) == bnmap1
+#currate_kwargs(cfg, mapping(cfg)) |> println
+#mapping(cfg) |> println
+@test haskey(currate_kwargs(cfg, mapping(cfg)), :initβ)
+@test haskey(currate_kwargs(cfg, mapping(cfg)), :initγ)
+@test haskey(currate_kwargs(cfg, mapping(cfg)), :ϵ)
+@test !haskey(currate_kwargs(cfg, mapping(cfg)), :activation)
 
 end # end module
