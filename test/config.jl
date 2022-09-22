@@ -74,8 +74,9 @@ cfg = MyBatchNormCfg1()
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :ϵ)
 @test !haskey(currate_kwargs(cfg, mapping(cfg)), :activation)
 
-# Check copy constructor
+# Check copy constructor generation
 cfg = MyBatchNormCfg1(cfg; affine = true)
-
+@test affine(cfg) == true
+@test hasmethod(MyBatchNormCfg1, (MyBatchNormCfg1,), (:activation, :affine))
 
 end # end module
