@@ -1,4 +1,6 @@
-abstract type AbstractCfg end
+using Configurations: codegen_option_type
+
+abstract type AbstractCfg end # AbstractCyano
 
 mapping(cfg::AbstractCfg) = error("pouet 404")
 
@@ -31,14 +33,14 @@ each_kwargs(km::KwargsMapping) = zip(
     field_defaults(km)
 )
 
-const mappings = Dict{Symbol, KwargsMapping}()
+const mappings = Dict{Symbol, KwargsMapping}() #__MAPPINGS__
 
 function register_mapping!(map)
     haskey(mappings, first(map)) && error("Map $(first(map)) already exists in mappings.")
     push!(mappings, map)
 end
 
-const empty_map = KwargsMapping((), (), (), ())
+const empty_map = KwargsMapping((), (), (), ()) # __EMPTY_MAP__
 
 register_mapping!(:empty_map=>empty_map)
 
@@ -61,30 +63,40 @@ end
 function codegen_config(mod, expr, kmap::Symbol = :empty_map, type_alias = nothing)
     expr = macroexpand(mod, expr)
     def = JLKwStruct(expr, type_alias)
+    cname = def.name
+    fields = def.fields
+    # Generate fields from kmap
     for (name, _, T, default) ∈ each_kwargs(mappings[kmap])
         f = JLKwField(;name = name, type = T, default = default)
         #f.doc = ...generation auto... ou générer doc auto pour les accesseurs
-        push!(def.fields, f)
+        #f.doc(@doc """pouet""")
+        push!(fields, f)
     end
+    # If alias is defined add field config
     if !isnothing(type_alias)
         f = JLKwField(;name = :config, type = Reflect)
-        push!(def.fields, f)
+        push!(fields, f)
     end
+    # Generate accessor (getter) functions
     accessors = []
-    for f in def.fields
-        #a = JLFunction(;) # ajout docstring
-        # codegen_ast(a)
-        push!(accessors, :($(f.name)(cfg::$(def.name)) = cfg.$(f.name)))
+    for f in fields
+        d = "Access to the field '$(f.name)' of a '$cname' object."
+        a = JLFunction(;name = f.name, args = [:(cfg::$(cname))], body = :(cfg.$(f.name)), doc = d)
+        #println(typeof(codegen_ast(b)))
+        #a = :($(f.name)(cfg::$(def.name)) = cfg.$(f.name))
+        #println(typeof(a))
+        push!(accessors, codegen_ast(a))
     end
-    mapfunc = :(mapping(cfg::$(def.name)) = $(mappings[kmap]))
-    Expr(:block, 
-        Configurations.codegen_option_type(mod, def),
-        mapfunc,
-        accessors...)
+    mapfunc = :(mapping(cfg::$(cname)) = $(mappings[kmap]))
+    # Copy constructor cname(cfg::$cname; kwargs...)
+    copycons = quote
+        
+    end
+    Expr(:block, codegen_option_type(mod, def), mapfunc, accessors...)
 end
 
 function currate_kwargs(cfg::AbstractCfg, kmap = mapping(cfg))
-    #km = mapping(cfg)
+    #kmap = mapping(cfg)
     kwargs = str2sym(to_dict(cfg))
     # Remove args that are not for Flux
     filter!(k -> first(k) ∈ field_names(kmap), kwargs)

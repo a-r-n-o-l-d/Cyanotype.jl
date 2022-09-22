@@ -68,8 +68,6 @@ cfg = MyBatchNormCfg4()
 
 cfg = MyBatchNormCfg1()
 @test mapping(cfg) == bnmap1
-#currate_kwargs(cfg, mapping(cfg)) |> println
-#mapping(cfg) |> println
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :initβ)
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :initγ)
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :ϵ)
