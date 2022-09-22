@@ -23,7 +23,7 @@ bnmap2 = KwargsMapping(;
     field_defaults = (zeros32,      ones32, true,    true,         1f-5,     0.1f0) )
 register_mapping!(:bnmap2=>bnmap2)
 
-@config bnmap1 struct MyBatchNormCfg1{N <: Union{Float16, Float32, Float64}} <: AbstractCyano
+@config bnmap1 struct BatchNormCyano1{N <: Union{Float16, Float32, Float64}} <: AbstractCyano
     activation::Function = relu
 end
 
@@ -32,11 +32,11 @@ end
     activation::Function = relu
 end
 
-@config "alias" struct MyBatchNormCfg3 <: AbstractCyano
+@config "alias" struct BatchNormCyano3 <: AbstractCyano
     activation::Function = relu
 end
 
-@config struct MyBatchNormCfg4 <: AbstractCyano
+@config struct BatchNormCyano4 <: AbstractCyano
     activation::Function = relu
 end
 
@@ -46,15 +46,15 @@ end
 
 # Check the correcness of fields declaration
 for (k, _, _, _) ∈ each_kwargs(bnmap1)
-    @test k ∈ fieldnames(MyBatchNormCfg1)
+    @test k ∈ fieldnames(BatchNormCyano1)
 end
 
 # Check alias construction and config accessor
 @test :config ∈ fieldnames(BatchNormCyano2)
 cfg = BatchNormCyano2()
 @test config(cfg) isa Reflect
-@test :config ∈ fieldnames(MyBatchNormCfg3)
-cfg = MyBatchNormCfg3()
+@test :config ∈ fieldnames(BatchNormCyano3)
+cfg = BatchNormCyano3()
 @test config(cfg) isa Reflect
 
 # Check fields, accessors and default values
@@ -64,12 +64,12 @@ for (field, _, T, def) ∈ each_kwargs(bnmap2)
     @test eval(:($field($cfg) == $def))
     @test eval(:($field($cfg) isa $T))
 end
-cfg = MyBatchNormCfg4()
+cfg = BatchNormCyano4()
 @test activation(cfg) isa Function
 @test activation(cfg) == relu
 
 # Check currate_kwargs function
-cfg = MyBatchNormCfg1()
+cfg = BatchNormCyano1()
 @test mapping(cfg) == bnmap1
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :initβ)
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :initγ)
@@ -77,8 +77,8 @@ cfg = MyBatchNormCfg1()
 @test !haskey(currate_kwargs(cfg, mapping(cfg)), :activation)
 
 # Check copy constructor generation
-cfg = MyBatchNormCfg1(cfg; affine = true)
+cfg = BatchNormCyano1(cfg; affine = true)
 @test affine(cfg) == true
-@test hasmethod(MyBatchNormCfg1, (MyBatchNormCfg1,), (:activation, :affine))
+@test hasmethod(BatchNormCyano1, (BatchNormCyano1,), (:activation, :affine))
 
 end # end module
