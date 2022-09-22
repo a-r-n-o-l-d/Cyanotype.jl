@@ -2,6 +2,7 @@
 module ConfigTests
 
 using Test
+using Cyanotype
 using Cyanotype: AbstractCfg, @config, KwargsMapping, each_kwargs, empty_map, mappings, register_mapping!, currate_kwargs
 using Flux: relu, zeros32, ones32
 using Configurations: Reflect
@@ -72,5 +73,9 @@ cfg = MyBatchNormCfg1()
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :initγ)
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :ϵ)
 @test !haskey(currate_kwargs(cfg, mapping(cfg)), :activation)
+
+# Check copy constructor
+cfg = MyBatchNormCfg1(cfg; affine = true)
+
 
 end # end module

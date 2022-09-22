@@ -7,6 +7,7 @@ version = "0.1.0"
 Configurations = "5218b696-f38b-4ac9-8b61-a12ec717816d"
 ExproniconLite = "55351af7-c7e9-48d6-89ff-24e801d99491"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 julia = "1.8"

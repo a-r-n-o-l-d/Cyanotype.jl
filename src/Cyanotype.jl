@@ -7,6 +7,9 @@ module Cyanotype
 import Flux
 using ExproniconLite
 using Configurations
+using Reexport
+
+@reexport using Configurations: to_dict, from_dict
 
 include("utilities.jl")
 

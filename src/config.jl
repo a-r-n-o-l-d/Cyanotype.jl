@@ -90,9 +90,15 @@ function codegen_config(mod, expr, kmap::Symbol = :empty_map, type_alias = nothi
     mapfunc = :(mapping(cfg::$(cname)) = $(mappings[kmap]))
     # Copy constructor cname(cfg::$cname; kwargs...)
     copycons = quote
-        
+        function $cname(cfg::$cname; kwargs...)
+            new_cfg = to_dict(cfg)
+            for k ∈ keys(kwargs)
+                new_cfg[string(k)] = kwargs[k]
+            end
+            from_dict(typeof(cfg), new_cfg)
+        end
     end
-    Expr(:block, codegen_option_type(mod, def), mapfunc, accessors...)
+    Expr(:block, codegen_option_type(mod, def), copycons, mapfunc, accessors...)
 end
 
 function currate_kwargs(cfg::AbstractCfg, kmap = mapping(cfg))
