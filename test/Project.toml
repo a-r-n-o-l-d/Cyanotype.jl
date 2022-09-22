@@ -1,0 +1,13 @@
+[deps]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Configurations = "5218b696-f38b-4ac9-8b61-a12ec717816d"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+Aqua = "0.5.5"
+Configurations = "0.17.4"
+Flux = "0.13.6"
+JET = "0.6.4"
+julia = "1.8"

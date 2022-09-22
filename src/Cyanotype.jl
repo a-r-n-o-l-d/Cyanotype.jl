@@ -4,7 +4,7 @@ modules: high level modules
 =#
 module Cyanotype
 
-import Flux
+using Flux
 using ExproniconLite
 using Configurations
 using Reexport
