@@ -28,7 +28,7 @@ register_mapping!(:bnmap2=>bnmap2)
 end
 
 # Alias is only available for concrete types in Configurations.jl
-@config "alias" bnmap2 struct MyBatchNormCfg2 <: AbstractCyano
+@config "alias" bnmap2 struct BatchNormCyano2 <: AbstractCyano
     activation::Function = relu
 end
 
@@ -50,15 +50,15 @@ for (k, _, _, _) ∈ each_kwargs(bnmap1)
 end
 
 # Check alias construction and config accessor
-@test :config ∈ fieldnames(MyBatchNormCfg2)
-cfg = MyBatchNormCfg2()
+@test :config ∈ fieldnames(BatchNormCyano2)
+cfg = BatchNormCyano2()
 @test config(cfg) isa Reflect
 @test :config ∈ fieldnames(MyBatchNormCfg3)
 cfg = MyBatchNormCfg3()
 @test config(cfg) isa Reflect
 
 # Check fields, accessors and default values
-cfg = MyBatchNormCfg2()
+cfg = BatchNormCyano2()
 @test activation(cfg) isa Function
 for (field, _, T, def) ∈ each_kwargs(bnmap2)
     @test eval(:($field($cfg) == $def))
