@@ -67,6 +67,7 @@ cfg = MyBatchNormCfg4()
 @test activation(cfg) isa Function
 @test activation(cfg) == relu
 
+# Check currate_kwargs function
 cfg = MyBatchNormCfg1()
 @test mapping(cfg) == bnmap1
 @test haskey(currate_kwargs(cfg, mapping(cfg)), :initβ)
