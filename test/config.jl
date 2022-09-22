@@ -3,7 +3,7 @@ module ConfigTests
 
 using Test
 using Cyanotype
-using Cyanotype: AbstractCfg, @config, KwargsMapping, each_kwargs, empty_map, mappings, register_mapping!, currate_kwargs
+using Cyanotype: AbstractCyano, @config, KwargsMapping, each_kwargs, empty_map, mappings, register_mapping!, currate_kwargs
 using Flux: relu, zeros32, ones32
 using Configurations: Reflect
 
@@ -23,19 +23,20 @@ bnmap2 = KwargsMapping(;
     field_defaults = (zeros32,      ones32, true,    true,         1f-5,     0.1f0) )
 register_mapping!(:bnmap2=>bnmap2)
 
-@config bnmap1 struct MyBatchNormCfg1{N <: Union{Float16, Float32, Float64}} <: AbstractCfg
+@config bnmap1 struct MyBatchNormCfg1{N <: Union{Float16, Float32, Float64}} <: AbstractCyano
     activation::Function = relu
 end
 
-@config "alias" bnmap2 struct MyBatchNormCfg2 # Alias is only available for concrete types in Configurations.jl
+# Alias is only available for concrete types in Configurations.jl
+@config "alias" bnmap2 struct MyBatchNormCfg2 <: AbstractCyano
     activation::Function = relu
 end
 
-@config "alias" struct MyBatchNormCfg3
+@config "alias" struct MyBatchNormCfg3 <: AbstractCyano
     activation::Function = relu
 end
 
-@config struct MyBatchNormCfg4
+@config struct MyBatchNormCfg4 <: AbstractCyano
     activation::Function = relu
 end
 

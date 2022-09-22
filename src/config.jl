@@ -1,10 +1,10 @@
 using Configurations: codegen_option_type
 
-abstract type AbstractCfg end # AbstractCyano
+abstract type AbstractCyano end
 
-mapping(cfg::AbstractCfg) = error("pouet 404")
+mapping(cfg::AbstractCyano) = error("pouet 404")
 
-build(cfg::AbstractCfg) = error("pouet 404")
+build(cfg::AbstractCyano) = error("pouet 404")
 
 struct KwargsMapping{N, T1 <: NTuple{N, Symbol}, T2 <: NTuple{N, Any}}
     # flux_function
@@ -68,8 +68,6 @@ function codegen_config(mod, expr, kmap::Symbol = :empty_map, type_alias = nothi
     # Generate fields from kmap
     for (name, _, T, default) ∈ each_kwargs(mappings[kmap])
         f = JLKwField(;name = name, type = T, default = default)
-        #f.doc = ...generation auto... ou générer doc auto pour les accesseurs
-        #f.doc(@doc """pouet""")
         push!(fields, f)
     end
     # If alias is defined add field config
@@ -82,9 +80,6 @@ function codegen_config(mod, expr, kmap::Symbol = :empty_map, type_alias = nothi
     for f in fields
         d = "Access to the field '$(f.name)' of a '$cname' object."
         a = JLFunction(;name = f.name, args = [:(cfg::$(cname))], body = :(cfg.$(f.name)), doc = d)
-        #println(typeof(codegen_ast(b)))
-        #a = :($(f.name)(cfg::$(def.name)) = cfg.$(f.name))
-        #println(typeof(a))
         push!(accessors, codegen_ast(a))
     end
     mapfunc = :(mapping(cfg::$(cname)) = $(mappings[kmap]))
@@ -101,7 +96,7 @@ function codegen_config(mod, expr, kmap::Symbol = :empty_map, type_alias = nothi
     Expr(:block, codegen_option_type(mod, def), copycons, mapfunc, accessors...)
 end
 
-function currate_kwargs(cfg::AbstractCfg, kmap = mapping(cfg))
+function currate_kwargs(cfg::AbstractCyano, kmap = mapping(cfg))
     #kmap = mapping(cfg)
     kwargs = str2sym(to_dict(cfg))
     # Remove args that are not for Flux
