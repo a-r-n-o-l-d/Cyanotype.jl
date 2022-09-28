@@ -5,17 +5,20 @@ modules: high level modules
 module Cyanotype
 
 using Flux
-using ExproniconLite
-using Configurations
-using Reexport
+using Markdown: MD
 
-@reexport using Configurations: to_dict, from_dict
+export CyanoFloat
 
 const CyanoFloat = Union{Float16, Float32, Float64}
 
 include("utilities.jl")
 
+#include("kwmapping.jl")
+include("cyano.jl")
 #export register_mapping!
-include("config.jl")
+#include("config.jl")
+
+export CyanoIdentityNorm, CyanoBatchNorm, CyanoGroupNorm
+include("norm.jl")
 
 end
