@@ -1,6 +1,6 @@
-str2sym(d) = Dict(Symbol(k) => v for (k,v) in d)
+#str2sym(d) = Dict(Symbol(k) => v for (k,v) in d)
 
-sym2str(d) = Dict(String(k) => v for (k,v) in d)
+#sym2str(d) = Dict(String(k) => v for (k,v) in d)
 
 function flatten_layers(layers...)
     result = []
@@ -33,3 +33,5 @@ function autogen_build(T, with_channels, with_kernelsize)
         build(cya::$T)
     "
 end
+
+const VOLUMETRIC_FIELD = :(volumetric::Bool = false)

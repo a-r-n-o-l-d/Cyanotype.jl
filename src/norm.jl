@@ -21,7 +21,9 @@ field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F
 field_defaults = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0)
 )
 
-register_mapping!(:bnmap=>KwargsMapping(; flux_function  = :BatchNorm, _NORMKW...))
+register_mapping!(:bnmap=>KwargsMapping(; flux_function  = :BatchNorm, _NORMKW...,
+additional_doc = "pouet pouet"
+))
 
 @cyano bnmap struct CyanoBatchNorm{F <: CyanoFloat} <: AbstractCyanoNorm
     """
