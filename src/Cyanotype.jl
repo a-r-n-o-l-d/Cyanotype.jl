@@ -7,7 +7,7 @@ module Cyanotype
 using Flux
 using Markdown: MD
 
-export CyanoFloat
+export build, CyanoFloat
 
 const CyanoFloat = Union{Float16, Float32, Float64}
 

@@ -23,3 +23,13 @@ function _flatten_layers!(buffer, layers)
         push!(buffer, layers)
     end
 end
+
+activation_doc(func = relu) = "`activation`: activation function, by default [`$func`](@ref Flux.$func)"
+
+const ACTIVATION_DOC_RELU = activation_doc()
+
+function autogen_build(T, with_channels, with_kernelsize)
+    "
+        build(cya::$T)
+    "
+end

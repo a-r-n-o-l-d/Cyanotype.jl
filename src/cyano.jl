@@ -107,6 +107,9 @@ function _cyano_struct(kmap, head, body)
             continue
         elseif f isa String
             tmpdoc = f
+        elseif f isa Expr && f.head === :string
+            #println(f.args)
+            tmpdoc = eval(f.args[1]) # beurk
         else
             _push_field!(fields, kwargs, fnames, fdocs, _parse_body_field(f, tmpdoc)...)
             tmpdoc = ""
@@ -115,7 +118,7 @@ function _cyano_struct(kmap, head, body)
 
     # Adds fields defined by kmap
     for (name, flname, T, def) in eachkwargs(Cyanotype.MAPPINGS[kmap])
-        doc = "'$name' corresponds to '$flname' in $flref with a default value '$def'"
+        doc = "`$name` corresponds to `$flname` in $flref with a default value `$def`"
         _push_field!(fields, kwargs, fnames, fdocs, name, T, def, doc)
     end
 
@@ -175,6 +178,7 @@ function _parse_body_field(field::Expr, doc = "")
     # Block
     # It seems this part is dead code, but I keep it for now
     elseif field.head === :block
+        # println(dump(field))
         # Documentation block
         if field.args[2].head === :call && field.args[2].args[1] === Base.Docs.doc!
             doc = field.args[2].args[4].args[2].args[2]
@@ -185,7 +189,7 @@ function _parse_body_field(field::Expr, doc = "")
         end
     end
     if isempty(doc)
-        doc = "'$name' is not documented"
+        doc = "`$name` is not documented"
     end
     name, T, def, doc
 end

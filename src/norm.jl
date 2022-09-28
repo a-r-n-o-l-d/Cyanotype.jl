@@ -1,27 +1,24 @@
 abstract type AbstractCyanoNorm <: AbstractCyano end
 
-@cyano struct CyanoIdentityNorm  end #<: AbstractCyanoNorm
+@cyano struct CyanoIdentityNorm end
 
+"""$(autogen_build(CyanoIdentityNorm, true, false))"""
 build(channels, cfg::CyanoIdentityNorm) = Flux.identity
 
-#=const BNMAP = KwargsMapping(;
-flux_function  = :BatchNorm,
+const _NORMKW = (
 field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum),
 flux_names     = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
 field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F),
-field_defaults = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0))
-register_mapping!(:BNMAP=>BNMAP)=#
+field_defaults = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0)
+)
 
-register_mapping!(:bnmap=>KwargsMapping(;
-flux_function  = :BatchNorm,
-field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum),
-flux_names     = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F),
-field_defaults = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0)))
+register_mapping!(:bnmap=>KwargsMapping(; flux_function  = :BatchNorm, _NORMKW...))
 
 @cyano bnmap struct CyanoBatchNorm{F <: CyanoFloat} <: AbstractCyanoNorm
-    """ Activation function, by default ['relu'](@ref Flux.relu) """
-    activation::Function = relu
+    """
+    $ACTIVATION_DOC_RELU
+    """
+    activation = relu
 end
 
 # auto generation doc for build
@@ -30,27 +27,28 @@ function build(channels, cya::CyanoBatchNorm)
     BatchNorm(channels, cya.activation; kwargs...)
 end
 
-#=const GNMAP = KwargsMapping(;
-flux_function  = :GroupNorm,
-field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum),
-flux_names     = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F),
-field_defaults = (Flux.zeros32, Flux.ones32, true,    false,        1f-5,     0.1f0))
-register_mapping!(:GNMAP=>GNMAP)=#
-register_mapping!(:gnmap=>KwargsMapping(;
-flux_function  = :GroupNorm,
-field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum),
-flux_names     = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F),
-field_defaults = (Flux.zeros32, Flux.ones32, true,    false,        1f-5,     0.1f0)))
+register_mapping!(:gnmap=>KwargsMapping(; flux_function  = :GroupNorm, _NORMKW...))
 
 @cyano gnmap struct CyanoGroupNorm{F <: CyanoFloat} <: AbstractCyanoNorm
-    activation::Function = relu
-    """ groups is the number of groups """
+    """
+    $ACTIVATION_DOC_RELU
+    """
+    activation = relu
+    """
+    `groups`: the number of groups passed to [`GroupNorm`](@ref Flux.GroupNorm) constructor
+    """
     groups::Int
 end
 
 function build(channels, cya::CyanoGroupNorm)
     kwargs = curate(cya)
     GroupNorm(channels, cya.groups, cya.activation; kwargs...)
+end
+
+
+@cyano gnmap struct CyanoGroupNormTmp{F <: CyanoFloat} <: AbstractCyanoNorm
+    """$(activation_doc())"""
+    activation = relu
+    """'groups' is the number of groups."""
+    groups::Int
 end
