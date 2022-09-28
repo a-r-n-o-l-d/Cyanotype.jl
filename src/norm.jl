@@ -10,10 +10,11 @@ CyanoIdentityNorm
 @cyano struct CyanoIdentityNorm end
 
 """
-$(autogen_build(CyanoIdentityNorm, true, false))
+$(autogen_build(CyanoIdentityNorm, false, true))
 """
 build(channels, cfg::CyanoIdentityNorm) = Flux.identity
 
+#
 const _NORMKW = (
 field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum),
 flux_names     = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
