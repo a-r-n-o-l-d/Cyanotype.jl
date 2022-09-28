@@ -28,9 +28,17 @@ activation_doc(func = relu) = "`activation`: activation function, by default [`$
 
 const ACTIVATION_DOC_RELU = activation_doc()
 
-function autogen_build(T, with_kernel_size, with_channels)
+function autogen_build_doc(T, with_kernel_size, with_channels)
+    doc = "build("
+    if with_kernel_size
+        doc = doc * "kernel_size, "
+    end
+    if with_channels
+        doc = doc * "channels, "
+    end
+    doc = doc * "cya::$T)"
     "
-        build(cya::$T)
+        $doc
     "
 end
 
