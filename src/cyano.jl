@@ -123,16 +123,29 @@ function _cyano_struct(kmap, head, body)
     end
 
     # Generates the struct and its associated functions
-    quote
-        """$($(_generate_documentation(cyaname, fdocs, flname, flref, fldoc, adddoc)))"""
-        struct $head
-            $(fields...)
+    if isempty(fdocs) && isempty(adddoc)
+        quote
+            struct $head
+                $(fields...)
+            end
+            $(_kwargs_constructor(cyaname, fnames, kwargs))
+            $(_copy_constructor(cyaname))
+            $(_mapping_func1(cyaname, kmap))
+            $(_mapping_func2(cyaname, kmap))
+            $(_getfields_func(cyaname, fnames))
         end
-        $(_kwargs_constructor(cyaname, fnames, kwargs))
-        $(_copy_constructor(cyaname))
-        $(_mapping_func1(cyaname, kmap))
-        $(_mapping_func2(cyaname, kmap))
-        $(_getfields_func(cyaname, fnames))
+    else
+        quote
+            """$($(_generate_documentation(cyaname, fdocs, flname, flref, fldoc, adddoc)))"""
+            struct $head
+                $(fields...)
+            end
+            $(_kwargs_constructor(cyaname, fnames, kwargs))
+            $(_copy_constructor(cyaname))
+            $(_mapping_func1(cyaname, kmap))
+            $(_mapping_func2(cyaname, kmap))
+            $(_getfields_func(cyaname, fnames))
+        end
     end
 end
 

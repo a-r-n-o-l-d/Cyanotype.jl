@@ -1,8 +1,17 @@
 abstract type AbstractCyanoNorm <: AbstractCyano end
 
+"""
+    CyanoIdentityNorm()
+
+Tagging `struct` indicating that no normalisation layer should be used in a building process.
+"""
+CyanoIdentityNorm
+
 @cyano struct CyanoIdentityNorm end
 
-"""$(autogen_build(CyanoIdentityNorm, true, false))"""
+"""
+$(autogen_build(CyanoIdentityNorm, true, false))
+"""
 build(channels, cfg::CyanoIdentityNorm) = Flux.identity
 
 const _NORMKW = (
@@ -43,12 +52,4 @@ end
 function build(channels, cya::CyanoGroupNorm)
     kwargs = curate(cya)
     GroupNorm(channels, cya.groups, cya.activation; kwargs...)
-end
-
-
-@cyano gnmap struct CyanoGroupNormTmp{F <: CyanoFloat} <: AbstractCyanoNorm
-    """$(activation_doc())"""
-    activation = relu
-    """'groups' is the number of groups."""
-    groups::Int
 end
