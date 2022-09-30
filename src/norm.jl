@@ -16,9 +16,9 @@ build(channels, cfg::CyanoIdentityNorm) = Flux.identity
 
 # Defines kwargs for Flux normalisation layers
 const _NORMKW = (
-field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum),
+field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum), #init_bias => init_shift
 flux_names     = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F),
+field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F), # Function => type instbility, wrap in CyFunc => curate doit etre modifee
 field_defaults = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0)
 )
 

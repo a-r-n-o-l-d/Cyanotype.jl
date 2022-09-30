@@ -1,4 +1,9 @@
-abstract type AbstractCyano end
+abstract type AbstractCyano end # AbstractCy AbstractCyanotype
+
+#function new_cyanotype(cy::AbstractCyano; kwargs...)
+#    typeof(cy)(cy; kwargs...)
+#end
+
 
 struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Any}}
     flux_function::Symbol
@@ -51,19 +56,19 @@ end
 
 macro cyano(expr)
     expr = macroexpand(__module__, expr)
-    esc(_cyano_struct(__module__, :empty_map, expr.args[2], expr.args[3]))
+    esc(_cyano_struct(:empty_map, expr.args[2], expr.args[3]))
 end
 
 macro cyano(kmap, expr)
     expr = macroexpand(__module__, expr)
-    esc(_cyano_struct(__module__, kmap, expr.args[2], expr.args[3]))
+    esc(_cyano_struct(kmap, expr.args[2], expr.args[3]))
 end
 
 ############################################################################################
-#                                  INTERNAL FUNCTIONS                                      #
+#                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
-function _cyano_struct(mod, kmap, head, body)
+function _cyano_struct(kmap, head, body)
     # Forces the struct to inherit from AbstractCyano
     if head isa Symbol || head.head === :curly
         # It is not type stable to do that, since the head type is changed, but at this
@@ -153,6 +158,7 @@ function _cyano_struct(mod, kmap, head, body)
             end
             $(_kwargs_constructor(cyaname, fnames, kwargs))
             $(_copy_constructor(cyaname))
+            $(_new_func(cyaname))
             $(_mapping_func1(cyaname, kmap))
             $(_mapping_func2(cyaname, kmap))
             $(_getfields_func(cyaname, fnames))
@@ -165,6 +171,7 @@ function _cyano_struct(mod, kmap, head, body)
             end
             $(_kwargs_constructor(cyaname, fnames, kwargs))
             $(_copy_constructor(cyaname))
+            $(_new_func(cyaname))
             $(_mapping_func1(cyaname, kmap))
             $(_mapping_func2(cyaname, kmap))
             $(_getfields_func(cyaname, fnames))
@@ -292,6 +299,23 @@ function _copy_constructor(sname)
                 end
             end
             typeof(cya)(args...)
+        end
+    end
+end
+
+function _new_func(sname)
+    quote
+        function new_cyanotype(cy::$sname; kwargs...)
+            args = []
+            fields = getfields(cy)
+            for k in keys(fields)
+                if haskey(kwargs, k)
+                    push!(args, kwargs[k])
+                else
+                    push!(args, fields[k])
+                end
+            end
+            $sname(args...)
         end
     end
 end

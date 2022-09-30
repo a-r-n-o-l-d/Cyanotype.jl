@@ -1,5 +1,5 @@
 using Cyanotype
-#using Flux
+using Flux
 using Test
 using Aqua
 
