@@ -11,6 +11,8 @@ export build, CyanoFloat
 
 const CyanoFloat = Union{Float16, Float32, Float64}
 
+const CyPad = Union{SamePad,Int}
+
 include("utilities.jl")
 
 #include("kwmapping.jl")
@@ -20,5 +22,8 @@ include("cyano.jl")
 
 export CyanoIdentityNorm, CyanoBatchNorm, CyanoGroupNorm
 include("norm.jl")
+
+export CyConv
+include("conv.jl")
 
 end

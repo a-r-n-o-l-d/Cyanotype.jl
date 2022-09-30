@@ -39,7 +39,22 @@ function autogen_build_doc(T, with_kernel_size, with_channels)
     doc = doc * "cya::$T)"
     "
         $doc
+        See [`$T`](@ref)
     "
 end
 
-const VOLUMETRIC_FIELD = :(volumetric::Bool = false)
+const VOLUMETRIC_FIELD = :(volumetric::Bool = false) # pas encore test
+
+macro volumetric()
+    quote
+        """`volumetric`: indicates if it handle three-dimensionnal data, by default `false`"""
+        volumetric::Bool = false
+    end
+end
+
+macro activation(func)
+    esc(quote
+        """`activation`: activation function, by default [`$($func)`](@ref Flux.$($func))"""
+        activation = relu
+    end)
+end

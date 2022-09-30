@@ -39,7 +39,7 @@ end
 
 # Checks the mapping registration
 test_mapping(bnmap1, :bnmap1)
-@test_throws ErrorException register_mapping!(:bnmap1=>bnmap1)
+#@test_throws ErrorException register_mapping!(:bnmap1=>bnmap1)
 
 # Checks the documentation generation
 @cyano struct EmptyTest <: AbstractCyano
@@ -76,7 +76,7 @@ for (k, _, _, _) ∈ eachkwargs(bnmap1)
 end
 
 # Checks generated functions
-cfg = BatchNormTest()
+cfg = BatchNormTest(; epsilon = 1.0, momentum = 2.0)
 @test all(keys(getfields(cfg)) .== fieldnames(BatchNormTest))
 @test all(values(getfields(cfg)) .== [getfield(cfg, f) for f in fieldnames(BatchNormTest)])
 test_mapping(mapping(cfg), :bnmap1)
@@ -94,3 +94,12 @@ cfg = BatchNormTest()
 cfg = BatchNormTest(cfg; affine = false, epsilon = 0f0)
 @test cfg.affine == false
 @test cfg.epsilon == 0f0
+
+
+
+@cyano struct EmptyTest5 <: AbstractCyano
+    Cyanotype.@activation(relu)
+    Cyanotype.@volumetric
+end
+
+EmptyTest5() |> println

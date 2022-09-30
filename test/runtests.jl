@@ -20,4 +20,6 @@ using Aqua
     @testset "Cyano" begin
         include("cyano.jl")
     end
+
+    include("conv.jl")
 end

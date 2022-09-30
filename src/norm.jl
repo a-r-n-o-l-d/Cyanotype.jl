@@ -7,7 +7,7 @@ Tagging `struct` indicating that no normalisation layer should be used in a buil
 """
 CyanoIdentityNorm
 
-@cyano struct CyanoIdentityNorm end
+@cyano struct CyanoIdentityNorm <: AbstractCyanoNorm end
 
 """
 $(autogen_build_doc(CyanoIdentityNorm, false, true))
@@ -22,15 +22,10 @@ field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F
 field_defaults = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0)
 )
 
-register_mapping!(:bnmap=>KwargsMapping(; flux_function  = :BatchNorm, _NORMKW...,
-additional_doc = "pouet pouet"
-))
+register_mapping!(:bnmap=>KwargsMapping(; flux_function  = :BatchNorm, _NORMKW...))
 
 @cyano bnmap struct CyanoBatchNorm{F <: CyanoFloat} <: AbstractCyanoNorm
-    """
-    $ACTIVATION_DOC_RELU
-    """
-    activation = relu
+    @activation(relu)
 end
 
 # auto generation doc for build
@@ -42,10 +37,8 @@ end
 register_mapping!(:gnmap=>KwargsMapping(; flux_function  = :GroupNorm, _NORMKW...))
 
 @cyano gnmap struct CyanoGroupNorm{F <: CyanoFloat} <: AbstractCyanoNorm
-    """
-    $ACTIVATION_DOC_RELU
-    """
-    activation = relu
+    @activation(relu)
+
     """
     `groups`: the number of groups passed to [`GroupNorm`](@ref Flux.GroupNorm) constructor
     """
