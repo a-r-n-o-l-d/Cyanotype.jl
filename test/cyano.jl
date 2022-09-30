@@ -1,6 +1,6 @@
 using Cyanotype: KwargsMapping, register_mapping!
 using Flux: zeros32, ones32, relu
-using Cyanotype: @cyano, AbstractCyano, eachkwargs, curate
+using Cyanotype: @cyano, AbstractCyanotype, eachkwargs, curate
 
 # Mapping for Flux.BatchNorm kwargs
 bnmap1 = KwargsMapping(;
@@ -42,7 +42,7 @@ test_mapping(bnmap1, :bnmap1)
 #@test_throws ErrorException register_mapping!(:bnmap1=>bnmap1)
 
 # Checks the documentation generation
-@cyano struct EmptyTest <: AbstractCyano
+@cyano struct EmptyTest <: AbstractCyanotype
     """Activation function."""
     activation
 end
@@ -54,18 +54,18 @@ end
 end
 @test EmptyTest2().activation isa Function
 
-# Checks the default inheritance from AbstractCyano
+# Checks the default inheritance from AbstractCyanotype
 @cyano struct EmptyTest3
     activation = relu
 end
-@test EmptyTest3() isa AbstractCyano
+@test EmptyTest3() isa AbstractCyanotype
 
 # Checks the declaration and construction of a tagging struct
 @cyano struct EmptyTest4 end
-@test EmptyTest4() isa AbstractCyano
+@test EmptyTest4() isa AbstractCyanotype
 
 # A more complete use case: wraps Flux.BatchNorm
-@cyano bnmap1 struct BatchNormTest{N <: Union{Float16, Float32, Float64}} <: AbstractCyano
+@cyano bnmap1 struct BatchNormTest{N <: Union{Float16, Float32, Float64}} <: AbstractCyanotype
     """activation function for BatchNorm layer"""
     activation = relu
 end
@@ -97,7 +97,7 @@ cfg = BatchNormTest(cfg; affine = false, epsilon = 0f0)
 
 
 
-@cyano struct EmptyTest5 <: AbstractCyano
+@cyano struct EmptyTest5 <: AbstractCyanotype
     Cyanotype.@activation(relu)
     Cyanotype.@volumetric
 end

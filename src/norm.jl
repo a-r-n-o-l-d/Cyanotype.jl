@@ -1,4 +1,4 @@
-abstract type AbstractCyanoNorm <: AbstractCyano end
+abstract type AbstractCyanoNorm <: AbstractCyanotype end
 
 """
     CyanoIdentityNorm()

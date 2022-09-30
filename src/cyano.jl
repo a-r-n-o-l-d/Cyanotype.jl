@@ -1,4 +1,4 @@
-abstract type AbstractCyano end # AbstractCy AbstractCyanotype
+abstract type AbstractCyanotype end # AbstractCy AbstractCyanotype
 
 #function new_cyanotype(cy::AbstractCyano; kwargs...)
 #    typeof(cy)(cy; kwargs...)
@@ -37,7 +37,7 @@ function register_mapping!(mapping)
     push!(MAPPINGS, mapping)
 end
 
-function curate(cfg::AbstractCyano, mod = @__MODULE__)
+function curate(cfg::AbstractCyanotype, mod = @__MODULE__)
     kmap = mod.mapping(cfg)
     fields = mod.getfields(cfg)
     kwargs = Dict(pairs(fields))
@@ -73,7 +73,7 @@ function _cyano_struct(kmap, head, body)
     if head isa Symbol || head.head === :curly
         # It is not type stable to do that, since the head type is changed, but at this
         # stage performance is not a big deal.
-        head = Expr(:<:, head, AbstractCyano)
+        head = Expr(:<:, head, Cyanotype.AbstractCyanotype)
     end
 
     # Flux name

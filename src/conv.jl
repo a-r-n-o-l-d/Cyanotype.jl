@@ -1,4 +1,4 @@
-abstract type AbstractCyConv <: AbstractCyano end
+abstract type AbstractCyConv <: AbstractCyanotype end
 
 register_mapping!(:convmap=>KwargsMapping(;
 flux_function  = :Conv,
