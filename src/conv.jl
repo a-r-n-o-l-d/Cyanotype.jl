@@ -31,29 +31,18 @@ additional_doc =
     use_bias::Bool = normalization isa CyanoIdentityNorm
 end
 
-#=
-reverse_norm => mets Batchnorm avant Conv
-pre_activation => mets relu avant Conv
-
-Si reverse_norm
-    Si pre_activation
-        BatchNorm(in_chs, relu), Conv(k, out_chs=>out_chs, identity, nobias)
-    Sinon
-        BatchNorm(in_chs, identity), Conv(k, out_chs=>out_chs, relu, nobias)
-Sinon
-    Si pre_activation
-        relu, Conv(k, in_chs=>out_chs, identity, nobias), BatchNorm(out_chs, identity)
-    Sinon
-        Conv(k, in_chs=>out_chs, identity, nobias), BatchNorm(out_chs, relu)
-=#
 function build(ksize, channels, cy::CyConv)
     k = cy.volumetric ? (ksize, ksize, ksize) : (ksize, ksize)
     kwargs = curate(cy)
+    # A regular convolutionnal layer
     if cy.normalization isa CyanoIdentityNorm
         layers = Conv(k, channels, cy.activation; kwargs...)
+    # Add a normalization layer
     else
         in_chs, out_chs = channels
+        # Normalization first
         if cy.reverse_norm
+            # Activation before convolution ?
             if cy.pre_activation
                 act_n = cy.activation
                 act_c = identity
@@ -64,11 +53,15 @@ function build(ksize, channels, cy::CyConv)
             norm = new_cyanotype(cy.normalization; activation = act_n)
             conv = Conv(k, out_chs=>out_chs, act_c; bias = cy.use_bias, kwargs...)
             layers = [build(in_chs, norm), conv]
+        # Convolution first
         else
+            # Activation before convolution ?
             if cy.pre_activation
+                # start by applying the activation function
                 preact = cy.activation
                 act_n = identity
             else
+                # just for convenience, will be removed by flatten_layers
                 preact = identity
                 act_n = cy.activation
             end
@@ -77,5 +70,6 @@ function build(ksize, channels, cy::CyConv)
             layers = [preact, conv, build(out_chs, norm)]
         end
     end #|> flatten_layers
+    # flatten and remove useless identity
     flatten_layers(layers)
 end
