@@ -1,18 +1,18 @@
-abstract type AbstractCyanoNorm <: AbstractCyanotype end
+abstract type AbstractCyNorm <: AbstractCyanotype end
 
 """
     CyanoIdentityNorm()
 
 Tagging `struct` indicating that no normalisation layer should be used in a building process.
 """
-CyanoIdentityNorm
+CyIdentityNorm
 
-@cyano struct CyanoIdentityNorm <: AbstractCyanoNorm end
+@cyano struct CyIdentityNorm <: AbstractCyNorm end
 
 """
-$(autogen_build_doc(CyanoIdentityNorm, false, true))
+$(autogen_build_doc(CyIdentityNorm, false, true))
 """
-build(channels, cfg::CyanoIdentityNorm) = Flux.identity
+build(::Any, ::CyIdentityNorm) = Flux.identity
 
 # Defines kwargs for Flux normalisation layers
 const _NORMKW = (
@@ -24,19 +24,19 @@ field_defaults = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.
 
 register_mapping!(:bnmap=>KwargsMapping(; flux_function  = :BatchNorm, _NORMKW...))
 
-@cyano bnmap struct CyanoBatchNorm{F <: CyanoFloat} <: AbstractCyanoNorm
+@cyano bnmap struct CyBatchNorm{F <: CyanoFloat} <: AbstractCyNorm
     @activation(relu)
 end
 
 # auto generation doc for build
-function build(channels, cya::CyanoBatchNorm)
+function build(channels, cya::CyBatchNorm)
     kwargs = curate(cya)
     BatchNorm(channels, cya.activation; kwargs...)
 end
 
 register_mapping!(:gnmap=>KwargsMapping(; flux_function  = :GroupNorm, _NORMKW...))
 
-@cyano gnmap struct CyanoGroupNorm{F <: CyanoFloat} <: AbstractCyanoNorm
+@cyano gnmap struct CyGroupNorm{F <: CyanoFloat} <: AbstractCyNorm
     @activation(relu)
 
     """
@@ -45,7 +45,7 @@ register_mapping!(:gnmap=>KwargsMapping(; flux_function  = :GroupNorm, _NORMKW..
     groups::Int
 end
 
-function build(channels, cya::CyanoGroupNorm)
+function build(channels, cya::CyGroupNorm)
     kwargs = curate(cya)
     GroupNorm(channels, cya.groups, cya.activation; kwargs...)
 end

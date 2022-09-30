@@ -44,14 +44,18 @@ end
 
 macro volumetric()
     esc(quote
-        """`volumetric`: indicates if handling three-dimensionnal data, by default `false`"""
+        """
+        `volumetric`: indicates if handling three-dimensionnal data, by default `false`
+        """
         volumetric::Bool = false
     end)
 end
 
 macro activation(func)
     esc(quote
-        """`activation`: activation function, by default `$func`"""
+        """
+        `activation`: activation function, by default `$func`
+        """
         activation = relu
     end)
 end

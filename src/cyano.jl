@@ -305,7 +305,7 @@ end
 
 function _new_func(sname)
     quote
-        function new_cyanotype(cy::$sname; kwargs...)
+        function new_cyanotype(cy::$sname; kwargs...)::$sname
             args = []
             fields = getfields(cy)
             for k in keys(fields)

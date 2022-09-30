@@ -10,13 +10,13 @@ additional_doc =
 """pouet pouet"""
 ))
 
-@cyano convmap struct CyConv{N<:AbstractCyanoNorm} <: AbstractCyConv
+@cyano convmap struct CyConv{N<:AbstractCyNorm} <: AbstractCyConv
     @activation(relu)
     @volumetric
     """
     `normalization`:
     """
-    normalization::N = CyanoIdentityNorm()
+    normalization::N = CyIdentityNorm()
     """
     `reverse_norm`:
     """
@@ -28,15 +28,15 @@ additional_doc =
     """
     `use_bias`:
     """
-    use_bias::Bool = normalization isa CyanoIdentityNorm
+    use_bias::Bool = normalization isa CyIdentityNorm
 end
 
 function build(ksize, channels, cy::CyConv)
     k = cy.volumetric ? (ksize, ksize, ksize) : (ksize, ksize)
     kwargs = curate(cy)
     # A regular convolutionnal layer
-    if cy.normalization isa CyanoIdentityNorm
-        layers = Conv(k, channels, cy.activation; kwargs...)
+    if cy.normalization isa CyIdentityNorm
+        layers = [Conv(k, channels, cy.activation; kwargs...)]
     # Add a normalization layer
     else
         in_chs, out_chs = channels

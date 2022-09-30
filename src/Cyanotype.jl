@@ -20,7 +20,7 @@ include("cyano.jl")
 #export register_mapping!
 #include("config.jl")
 
-export CyanoIdentityNorm, CyanoBatchNorm, CyanoGroupNorm
+export CyIdentityNorm, CyBatchNorm, CyGroupNorm
 include("norm.jl")
 
 export CyConv
