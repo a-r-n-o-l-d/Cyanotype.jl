@@ -109,6 +109,7 @@ end
 
 build(cy::CyDoubleConv; ksize, channels) = build(cy, ksize, channels)
 
+# Peut-etre inutile
 @cyanotype (
 """
 Template describing a module with N `CyConv` repeated.
@@ -149,15 +150,12 @@ end=#
 aka Hybrid Dilated Convolution
 [paper](@ref https://doi.org/10.1109/WACV.2018.00163)
 [example](@ref https://doi.org/10.1016/j.image.2019.115664)
-https://doi-org.sid2nomade-1.grenet.fr/10.1109/ICMA54519.2022.9855903
+[example](@ref https://doi-org.sid2nomade-1.grenet.fr/10.1109/ICMA54519.2022.9855903)
 """
 ) (
 struct CyHybridAtrouConv{N,C<:CyConv} <: AbstractCyConv
-    #@activation(relu)
-    #@volumetric
     dilation_rates::NTuple{N,Int} = (1, 2, 3)
-    #nconv = N
-    convolution::C = CyConv(; normalization = CyBatchNorm())  # = ntuple(i -> CyConv(; normalization = CyBatchNorm(), dilation = i), 3)
+    convolution::C = CyConv(; normalization = CyBatchNorm())
 end
 )
 
