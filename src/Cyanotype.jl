@@ -11,8 +11,6 @@ export build, CyFloat
 
 const CyFloat = Union{Float16, Float32, Float64}
 
-const CyPad = Union{SamePad,Int}
-
 include("utilities.jl")
 
 include("cyanotype.jl")
@@ -23,9 +21,9 @@ include("cyanotype.jl")
 #include("config.jl")
 
 export CyIdentityNorm, CyBatchNorm, CyGroupNorm
-#include("norm.jl")
+include("norm.jl")
 
 export CyConv
-#include("conv.jl")
+include("conv.jl")
 
 end

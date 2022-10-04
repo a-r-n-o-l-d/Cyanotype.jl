@@ -12,12 +12,13 @@ def_values  = (Flux.zeros32, Flux.ones32, true, true, 1f-5, 0.1f0)
 
 register_mapping!(:bnmap1=>bnmap1)
 
-"""
-pouet pouet
-"""
-BatchNormTest1
-
-@cyanotype bnmap1 struct BatchNormTest1{N <: CyFloat} <: Cyanotype.AbstractCyanotype
+@cyanotype bnmap1 """
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
+voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+""" struct BatchNormTest1{N <: CyFloat} <: Cyanotype.AbstractCyanotype
     """activation function for BatchNorm layer"""
     activation
 end

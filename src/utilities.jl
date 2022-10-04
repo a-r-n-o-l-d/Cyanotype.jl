@@ -58,6 +58,6 @@ macro activation(func)
         """
         `activation`: activation function, by default `$func`
         """
-        activation = relu
+        activation::A = relu
     end)
 end

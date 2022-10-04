@@ -34,22 +34,21 @@ func(cf::CyFunc) = cf.func
 
 def(x::Function) = :(CyFunc($x))=#
 
-macro cyanotype(expr)
+macro cyanotype(doc, expr)
     expr = macroexpand(__module__, expr)
-    esc(_cyanotype(__module__, :empty_map, expr.args[2], expr.args[3]))
+    esc(_cyanotype(doc, :empty_map, expr.args[2], expr.args[3]))
 end
 
-macro cyanotype(kmap, expr)
-
+macro cyanotype(kmap, doc, expr)
     expr = macroexpand(__module__, expr)
-    esc(_cyanotype(__module__, kmap, expr.args[2], expr.args[3]))
+    esc(_cyanotype(doc, kmap, expr.args[2], expr.args[3]))
 end
 
 ############################################################################################
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
-function _cyanotype(mod, kmap, head, body)
+function _cyanotype(doc, kmap, head, body)
     # Forces the struct to inherit from AbstractCyano
     if head isa Symbol || head.head === :curly
         # It is not type stable to do that, since the head type is changed, but at this
@@ -66,7 +65,7 @@ function _cyanotype(mod, kmap, head, body)
     # Cyanotype name
     cyname = _struct_name(head)
 
-    cydoc = eval(macroexpand(mod, :(@doc $cyname)))
+    #cydoc = eval(macroexpand(mod, :(@doc $cyname)))
     #println(cydoc)
 
     # Field names
@@ -111,14 +110,14 @@ function _cyanotype(mod, kmap, head, body)
 
     # Adds fields defined by kmap
     for (name, flarg, T, def) in eachkwargs(Cyanotype.MAPPINGS[kmap]) #Cyanotype.
-        doc = "`$name`: see [`$flarg`](@ref Flux.$flname) (default value `$def`)"
-        _push_field!(fields, kwargs, fnames, fdocs, name, T, def, doc)
+        fdoc = "`$name`: see [`$flarg`](@ref Flux.$flname) (default value `$def`)"
+        _push_field!(fields, kwargs, fnames, fdocs, name, T, def, fdoc)
         #push!(flnames, flname)
     end
 
     # Generates the struct and its associated functions
     quote
-        """$($(_generate_documentation(cyname, fdocs, cydoc)))"""
+        """$($(_generate_documentation(cyname, fdocs, doc)))"""
         struct $head
             $(fields...)
         end
@@ -184,7 +183,7 @@ function _parse_body_field(field::Expr, doc = "")
         # Other kind of block
         else
             #println(_parse_body_field(field.args[1]))
-            println(dump(field))
+            #println(dump(field))
             error("Blocks are not allowed in body definition.")
         end
     end
@@ -210,7 +209,7 @@ function _push_field!(fields, kwargs, fnames, fdocs, name, T, def, doc)
 end
 
 function _generate_documentation(cyname, fdocs, doc)
-    println(doc)
+    #println(doc)
     docs = """
         $cyname(; kwargs...)
     $doc
@@ -244,7 +243,7 @@ end
 
 function _cyanotype_func(cyname)
     quote
-        function cyanotype(cy::$cyname; kwargs...) #::$cyname
+        function cyanotype(cy::$cyname; kwargs...)#::$cyname
             args = []
             fields = getfields(cy)
             for k in keys(fields)
@@ -264,8 +263,10 @@ function _kwargs_func(cyname)
         function kwargs(cy::$cyname)
             kmap = mapping(cy)
             kwargs = Dict()
+            fields = getfields(cy)
             for (i, arg) in enumerate(kmap.flux_kwargs)
-                push!(kwargs, arg=>getfield(cy, kmap.field_names[i]))
+                push!(kwargs, arg=>fields[kmap.field_names[i]])
+                #push!(kwargs, arg=>getfield(cy, kmap.field_names[i]))
             end
             kwargs
         end
