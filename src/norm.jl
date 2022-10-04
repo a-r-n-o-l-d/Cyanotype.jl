@@ -21,12 +21,6 @@ Tagging `struct` indicating that no normalisation layer should be used in a buil
 process.
 """ struct CyNoNorm <: AbstractCyNorm end
 
-#="""
-$(autogen_build_doc(CyIdentityNorm, false, true))
-"""
-build(::Any, ::CyIdentityNorm) = Flux.identity #inutile=#
-
-
 register_mapping!(:bnmap=>KwargsMapping(; flux_function = :BatchNorm,
     field_names = (:init_shift,  :init_scale, :affine, :track_stats, :epsilon, :momentum),
     flux_kwargs = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
@@ -67,7 +61,6 @@ end
 
 # build(cy::CyGroupNorm; channels)
 function build(cy::CyGroupNorm, channels)
-    #kwargs = curate(cy)
     GroupNorm(channels, cy.groups, cy.activation; kwargs(cy)...)
 end
 

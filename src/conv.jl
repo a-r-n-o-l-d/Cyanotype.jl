@@ -33,51 +33,47 @@ register_mapping!(:convmap=>KwargsMapping(;
     use_bias::Bool = normalization isa CyNoNorm
 end
 
-# build(cy::CyConv; ksize, channels)
 function build(cy::CyConv, ksize, channels)
     k = cy.volumetric ? (ksize, ksize, ksize) : (ksize, ksize)
-    #kwargs = curate(cy)
-    layers = []
-    # A regular convolutionnal layer
-    if cy.normalization isa CyNoNorm
-        #layers = [Conv(k, channels, cy.activation; kwargs...)]
-        push!(layers, Conv(k, channels, cy.activation; kwargs(cy)...))
-    # Add a normalization layer
-    else
-        in_chs, out_chs = channels
-        # Normalization first
-        if cy.reverse_norm
-            # Activation before convolution ?
-            if cy.pre_activation
-                act_n = cy.activation
-                act_c = identity
-            else
-                act_n = identity
-                act_c = cy.activation
-            end
-            norm = cyanotype(cy.normalization; activation = act_n)
-            conv = Conv(k, in_chs=>out_chs, act_c; bias = cy.use_bias, kwargs(cy)...)
-            #layers = [build(in_chs, norm), conv]
-            push!(layers, build(norm, in_chs), conv)
-        # Convolution first
-        else
-            # Activation before convolution ?
-            if cy.pre_activation
-                # start by applying the activation function
-                #preact = cy.activation
-                act_n = identity
-                push!(layers, cy.activation)
-            else
-                act_n = cy.activation
-            end
-            norm = cyanotype(cy.normalization; activation = act_n)
-            conv = Conv(k, in_chs=>out_chs; bias = cy.use_bias, kwargs(cy)...)
-            #layers = [preact, conv, build(out_chs, norm)]
-            push!(layers, conv, build(norm, out_chs))
-        end
-    end #|> flatten_layers
-    # flatten and remove useless identity
-    flatten_layers(layers)
+    _build_conv(cy.normalization, cy, k, channels) #|> flatten_layers
 end
 
 build(cy::CyConv; ksize, channels) = build(cy, ksize, channels)
+
+# A regular convolutionnal layer
+function _build_conv(::CyNoNorm, cy, k, chs)
+    [Conv(k, chs, cy.activation; kwargs(cy)...)]
+end
+
+# Convolutionnal module: convolutionnal layer & normalization layer
+function _build_conv(nm, cy, k, chs)
+    layers = []
+    in_chs, out_chs = chs
+    # Normalization first
+    if cy.reverse_norm
+        # Activation before convolution ?
+        if cy.pre_activation
+            act_n = cy.activation
+            act_c = identity
+        else
+            act_n = identity
+            act_c = cy.activation
+        end
+        norm = cyanotype(nm; activation = act_n)
+        conv = Conv(k, chs, act_c; bias = cy.use_bias, kwargs(cy)...)
+        push!(layers, build(norm, in_chs), conv)
+    # Convolution first
+    else
+        # Activation before convolution ?
+        if cy.pre_activation
+            act_n = identity
+            push!(layers, cy.activation)
+        else
+            act_n = cy.activation
+        end
+        norm = cyanotype(nm; activation = act_n)
+        conv = Conv(k, chs; bias = cy.use_bias, kwargs(cy)...)
+        push!(layers, conv, build(norm, out_chs))
+    end
+    layers
+end
