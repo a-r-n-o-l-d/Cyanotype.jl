@@ -12,13 +12,13 @@ CyIdentityNorm
 """
 $(autogen_build_doc(CyIdentityNorm, false, true))
 """
-build(::Any, ::CyIdentityNorm) = Flux.identity
+build(::Any, ::CyIdentityNorm) = Flux.identity #inutile
 
 # Defines kwargs for Flux normalisation layers
 const _NORMKW = (
-field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum), #init_bias => init_shift
+field_names    = (:init_shift,   :init_scale, :affine, :track_stats, :epsilon, :momentum), #init_bias => init_shift
 flux_names     = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-field_types    = (:Function,    :Function,   :Bool,   :Bool,        :F,       :F), # Function => type instbility, wrap in CyFunc => curate doit etre modifee
+field_types    = (:Any,         :Any,        :Bool,   :Bool,        :F,       :F), # Function => type instbility, wrap in CyFunc => curate doit etre modifee
 field_defaults = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0)
 )
 

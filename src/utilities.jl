@@ -43,7 +43,8 @@ end
 #const VOLUMETRIC_FIELD = :(volumetric::Bool = false) # pas encore test
 
 macro volumetric()
-    esc(quote
+    esc(
+    quote
         """
         `volumetric`: indicates if handling three-dimensionnal data, by default `false`
         """
@@ -52,7 +53,8 @@ macro volumetric()
 end
 
 macro activation(func)
-    esc(quote
+    esc(
+    quote
         """
         `activation`: activation function, by default `$func`
         """

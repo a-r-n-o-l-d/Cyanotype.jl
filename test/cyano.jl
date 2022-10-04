@@ -7,7 +7,7 @@ bnmap1 = KwargsMapping(;
     flux_function = :BatchNorm,
     field_names    = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum),
     flux_names     = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-    field_types    = (:Function,    :Function,   :Bool,   :Bool,        :N,       :N),
+    field_types    = (:Any,    :Any,   :Bool,   :Bool,        :N,       :N),
     field_defaults = (zeros32,      ones32, true,    true,         1f-5,     0.1f0)
 )
 try

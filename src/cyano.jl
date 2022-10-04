@@ -5,7 +5,7 @@ abstract type AbstractCyanotype end # AbstractCy AbstractCyanotype
 #end
 
 
-struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Any}}
+struct KwargsMapping{N,T1<:NTuple{N,Symbol}, T2<:NTuple{N,Any}} #
     flux_function::Symbol
     field_names::T1
     flux_names::T1
@@ -18,13 +18,15 @@ end
 function KwargsMapping(; flux_function = :notflux, field_names = (), flux_names = (),
                          field_types = (), field_defaults = (), additional_doc = "")
     # Generate flux documentation if necessary
-    if flux_function == :notflux
+    #=if flux_function == :notflux
         flux_doc = MD()
     else
         flux_doc = eval(macroexpand(Flux, :(@doc $flux_function)))
     end
     KwargsMapping(flux_function, field_names, flux_names, field_types, field_defaults,
-                  flux_doc, additional_doc)
+                  flux_doc, additional_doc)=#
+    KwargsMapping(flux_function, field_names, flux_names, field_types, field_defaults,
+                    MD(), additional_doc)
 end
 
 eachkwargs(km::KwargsMapping) = zip(km.field_names, km.flux_names, km.field_types,
@@ -37,7 +39,8 @@ function register_mapping!(mapping)
     push!(MAPPINGS, mapping)
 end
 
-function curate(cfg::AbstractCyanotype, mod = @__MODULE__)
+# Not type stable, try to generate for each cyanotype
+function curate(cfg::T, mod = @__MODULE__) where T <: AbstractCyanotype
     kmap = mod.mapping(cfg)
     fields = mod.getfields(cfg)
     kwargs = Dict(pairs(fields))
@@ -162,6 +165,7 @@ function _cyano_struct(kmap, head, body)
             $(_mapping_func1(cyaname, kmap))
             $(_mapping_func2(cyaname, kmap))
             $(_getfields_func(cyaname, fnames))
+            $(_curate_func(cyaname))
         end
     else
         quote
@@ -175,6 +179,7 @@ function _cyano_struct(kmap, head, body)
             $(_mapping_func1(cyaname, kmap))
             $(_mapping_func2(cyaname, kmap))
             $(_getfields_func(cyaname, fnames))
+            $(_curate_func(cyaname))
         end
     end
 end
@@ -328,4 +333,25 @@ function _getfields_func(sname, fnames)
     gf = [:($f = cya.$f) for f in fnames]
     #kwf = Expr(:parameters, gf...)
     :(getfields(cya::$(sname)) = (; $(gf...),))
+end
+
+function _curate_func(sname)
+quote
+    function curate2(cy::$sname) #where T <: AbstractCyanotype
+        kmap = mapping(cy)
+        fields = getfields(cy)
+        kwargs = Dict(pairs(fields))
+        # Remove args that are not for Flux
+        filter!(k -> first(k) ∈ kmap.field_names, kwargs)
+        # Replace field_name by flux_name
+        for (field_name, flux_name) ∈ eachkwargs(kmap)
+            #if haskey(kwargs, field_name) && field_name != flux_name
+                #tmp = kwargs[field_name]
+                #delete!(kwargs, field_name)
+                #kwargs[flux_name] = tmp
+            #end
+        end
+        kwargs
+    end
+end
 end

@@ -7,23 +7,25 @@ module Cyanotype
 using Flux
 using Markdown: MD
 
-export build, CyanoFloat
+export build, CyFloat
 
-const CyanoFloat = Union{Float16, Float32, Float64}
+const CyFloat = Union{Float16, Float32, Float64}
 
 const CyPad = Union{SamePad,Int}
 
 include("utilities.jl")
 
+include("cyanotype.jl")
+
 #include("kwmapping.jl")
-include("cyano.jl")
+#include("cyano.jl")
 #export register_mapping!
 #include("config.jl")
 
 export CyIdentityNorm, CyBatchNorm, CyGroupNorm
-include("norm.jl")
+#include("norm.jl")
 
 export CyConv
-include("conv.jl")
+#include("conv.jl")
 
 end
