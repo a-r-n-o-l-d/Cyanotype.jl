@@ -2,18 +2,29 @@ abstract type AbstractCyConv <: AbstractCyanotype end
 
 const CyPad = Union{SamePad,Int}
 
-register_mapping!(:convmap=>KwargsMapping(;
+#=register_mapping!(:convmap=>KwargsMapping(;
     flux_function  = :Conv,
     field_names    = (:init,               :pad,      :dilation, :groups),
     flux_kwargs    = (:init,               :pad,      :dilation, :groups),
     field_types    = (:I,                  :P,        :Int,      :Int),
     def_values     = (Flux.glorot_uniform, Flux.SamePad(), 1,         1)
+))=#
+
+register_mapping!(:convmap=>KwargsMapping(;
+    flux_function  = :Conv,
+    field_names    = (:init,               :pad,      :dilation, :groups),
+    flux_kwargs    = (:init,               :pad,      :dilation, :groups),
+    field_types    = (:I,                  :P,        Int,      Int),
+    def_values     = (Flux.glorot_uniform, Flux.SamePad(), 1,         1)
 ))
 
 @cyanotype convmap """
-
+    CyConv(; kwargs)
+Describes a convolutionnal module or layer depending om the value of `normalization`
+argument.
 """ struct CyConv{N<:AbstractCyNorm,A<:Function,I<:Function,P<:CyPad} <: AbstractCyConv
     @activation(relu)
+    #activation = Flux.relu
     @volumetric
     """
     `normalization`:
@@ -77,3 +88,22 @@ function _build_conv(nm, cy, k, chs)
     end
     layers
 end
+
+
+@cyanotype """
+    CyDoubleConv(; kwargs)
+Describes a convolutionnal module formed by two successive convolutionnal modules.
+""" struct CyDoubleConv{C1<:AbstractCyConv,C2<:AbstractCyConv} <: AbstractCyConv
+    @volumetric
+    conv1::C1
+    conv2::C2
+end
+
+function build(cy::CyDoubleConv, ksize, channels)
+    c1 = cyanotype(cy.conv1; volumetric = cy.volumetric)
+    c2 = cyanotype(cy.conv2; volumetric = cy.volumetric)
+    in_chs, mid_chs, out_chs = channels
+    [build(c1, ksize, in_chs=>mid_chs)..., build(c2, ksize, mid_chs=>out_chs)...]
+end
+
+build(cy::CyDoubleConv; ksize, channels) = build(cy, ksize, channels)

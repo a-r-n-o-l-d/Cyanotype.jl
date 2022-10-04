@@ -41,3 +41,8 @@ for n in norms, r in revs, p in pres
     #println(model)
     @test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 16, 16)
 end
+
+dc = CyDoubleConv(; conv1 = CyConv(), conv2 = CyConv(; normalization = CyBatchNorm()))
+
+model = Chain(build(dc; ksize = 3, channels = (8, 16, 32))...)
+@test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 32, 16)
