@@ -114,18 +114,21 @@ build(cy::CyDoubleConv; ksize, channels) = build(cy, ksize, channels)
 Template describing a module with N `CyConv` repeated.
 """
 ) (
-struct CyNConv{C<:CyConv} <: AbstractCyConv
+struct CyNConv{C<:AbstractCyConv} <: AbstractCyConv
     #@activation(relu)
     #@volumetric
     convolution::C # = CyConv() # = ntuple(i -> CyConv(), N)
     nrepeat::Int
+    #order::NTuple{N,Int}
 end
 )
+
+#CyNConv(convolution, nrepeat) = CyNConv{nrepeat}(convolution, nrepeat)
 
 function build(cy::CyNConv, ksize, channels)
     layers = []
     in_chs, out_chs = channels
-    for i in 1:cy.nrepeat
+    for _ in 1:cy.nrepeat
         push!(layers, build(cy.convolution, ksize, in_chs=>out_chs)...)
         in_chs = out_chs
     end
@@ -133,33 +136,47 @@ function build(cy::CyNConv, ksize, channels)
 end
 
 
-function nconv(n, conv = CyConv())
+#=function nconv(n, conv = CyConv())
     ntuple(i -> conv, n)
 end
 
-#=function CyNConv(; activation, volumetric, normalization, reverse_norm, pre_activation, use_bias, init, pad, dilation, groups)
+function CyNConv(; activation, volumetric, normalization, reverse_norm, pre_activation, use_bias, init, pad, dilation, groups)
 
 end=#
 
 @cyanotype (
 """
+aka Hybrid Dilated Convolution
+[paper](@ref https://doi.org/10.1109/WACV.2018.00163)
+[example](@ref https://doi.org/10.1016/j.image.2019.115664)
+https://doi-org.sid2nomade-1.grenet.fr/10.1109/ICMA54519.2022.9855903
 """
 ) (
-struct CyHybridAtrouConv{N,D<:NTuple{N,Int},C<:NTuple{N,CyConv}} <: AbstractCyConv
+struct CyHybridAtrouConv{N,C<:CyConv} <: AbstractCyConv
     #@activation(relu)
-    @volumetric
-    dilation_rates::D = (1, 2, 3)
-    nconv = N
-    convolutions::C  # = ntuple(i -> CyConv(; normalization = CyBatchNorm(), dilation = i), 3)
+    #@volumetric
+    dilation_rates::NTuple{N,Int} = (1, 2, 3)
+    #nconv = N
+    convolution::C = CyConv(; normalization = CyBatchNorm())  # = ntuple(i -> CyConv(; normalization = CyBatchNorm(), dilation = i), 3)
 end
 )
 
-
+function build(cy::CyHybridAtrouConv{N}, ksize, channels) where N
+    _check_dilation_rates(ksize, cy.dilation_rates) || error("Invalid diation rates.")
+    layers = []
+    in_chs, out_chs = channels
+    for dr in cy.dilation_rates
+        c = cyanotype(cy.convolution; dilation = dr)
+        push!(layers, build(c, ksize, in_chs=>out_chs)...)
+        in_chs = out_chs
+    end
+    layers
+end
 
 # hybrid dilated convolution : 10.1109/WACV.2018.00163
 # https://doi.org/10.1016/j.image.2019.115664
 # arg chain ?
-function hybrid_atrou_conv(k, chs, activation = relu; norm = BatchNorm, dilation_rates, pad = SamePad(), kwargs...) #hybrid_atrou_conv(k, ch, σ = identity; dilation_rates, norm_layer )
+#=function hybrid_atrou_conv(k, chs, activation = relu; norm = BatchNorm, dilation_rates, pad = SamePad(), kwargs...) #hybrid_atrou_conv(k, ch, σ = identity; dilation_rates, norm_layer )
     check_dilation_rates(first(k), dilation_rates) || error("Invalid diation rates.")
     in_chs, out_chs = chs
     layers = []
@@ -168,7 +185,7 @@ function hybrid_atrou_conv(k, chs, activation = relu; norm = BatchNorm, dilation
         in_chs = out_chs
     end
     flatten_layers(layers)
-end
+end=#
 
 #https://arxiv.org/pdf/1702.08502.pdf
 # DOI 10.1109/WACV.2018.00163
