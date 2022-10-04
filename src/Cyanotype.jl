@@ -24,7 +24,7 @@ include("cyanotype.jl")
 export CyNoNorm, CyBatchNorm, CyGroupNorm, CyInstanceNorm
 include("norm.jl")
 
-export CyConv, CyDoubleConv
+export CyConv, CyDoubleConv, CyNConv
 include("conv.jl")
 
 end

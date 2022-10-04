@@ -15,11 +15,15 @@ Tagging `struct` indicating that no normalisation layer should be used in a buil
 """
 CyIdentityNorm=#
 
-@cyanotype """
+@cyanotype (
+"""
     CyNoNorm()
 Tagging `struct` indicating that no normalisation layer should be used in a building
 process.
-""" struct CyNoNorm <: AbstractCyNorm end
+"""
+) (
+struct CyNoNorm <: AbstractCyNorm end
+)
 
 register_mapping!(:bnmap=>KwargsMapping(; flux_function = :BatchNorm,
     field_names = (:init_shift,  :init_scale, :affine, :track_stats, :epsilon, :momentum),
@@ -27,11 +31,15 @@ register_mapping!(:bnmap=>KwargsMapping(; flux_function = :BatchNorm,
     field_types = (:I1,          :I2,         Bool,    Bool,         :F,       :F),
     def_values  = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0)))
 
-@cyanotype bnmap """
+@cyanotype bnmap (
+"""
 Wraps a Flux.Batchnorm
-""" struct CyBatchNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
+"""
+) (
+struct CyBatchNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
     @activation(Flux.relu)
 end
+)
 
 # auto generation doc for build
 function build(cy::CyBatchNorm, channels)
@@ -47,17 +55,21 @@ register_mapping!(:gnmap=>KwargsMapping(; flux_function = :GroupNorm,
     field_types = (:I1,          :I2,         Bool,    Bool,         :F,       :F),
     def_values  = (Flux.zeros32, Flux.ones32, true,    false,        1f-5,     0.1f0)))
 
-@cyanotype gnmap """
+@cyanotype gnmap (
+"""
     CyGroupNorm(; kwargs...)
 Describes a building process for a [`Groupnorm`](@ref Flux.Groupnorm) layer.
 build(channels, cy::CyGroupNorm)
-""" struct CyGroupNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
+"""
+) (
+struct CyGroupNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
     @activation(relu)
     """
     `groups`: the number of groups passed to [`GroupNorm`](@ref Flux.GroupNorm) constructor
     """
     groups::Int
 end
+)
 
 # build(cy::CyGroupNorm; channels)
 function build(cy::CyGroupNorm, channels)
@@ -73,13 +85,17 @@ register_mapping!(:inmap=>KwargsMapping(; flux_function = :GroupNorm,
     field_types = (:I1,          :I2,         Bool,    Bool,         :F,       :F),
     def_values  = (Flux.zeros32, Flux.ones32, false,    false,        1f-5,     0.1f0)))
 
-@cyanotype gnmap """
+@cyanotype gnmap (
+"""
     CyInstanceNorm(; kwargs...)
 Describes a building process for a [`InstanceNorm`](@ref Flux.InstanceNorm) layer.
 build(channels, cy::CyInstanceNorm)
-""" struct CyInstanceNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
+"""
+) (
+struct CyInstanceNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
     @activation(relu)
 end
+)
 
 function build(cy::CyInstanceNorm, channels)
     InstanceNorm(channels, cy.activation; kwargs(cy)...)

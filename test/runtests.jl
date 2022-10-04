@@ -18,8 +18,9 @@ using Aqua
     end
 
     @testset "Cyano" begin
-        #include("cyano.jl")
+        include("cyanotype.jl")
     end
-    #include("cyanotype.jl")
-    include("conv.jl")
+    @testset "Conv" begin
+        include("conv.jl")
+    end
 end
