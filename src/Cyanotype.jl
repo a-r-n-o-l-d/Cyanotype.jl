@@ -13,6 +13,7 @@ const CyFloat = Union{Float16, Float32, Float64}
 
 include("utilities.jl")
 
+export cyanotype
 include("cyanotype.jl")
 
 #include("kwmapping.jl")
@@ -20,7 +21,7 @@ include("cyanotype.jl")
 #export register_mapping!
 #include("config.jl")
 
-export CyIdentityNorm, CyBatchNorm, CyGroupNorm
+export CyNoNorm, CyBatchNorm, CyGroupNorm, CyInstanceNorm
 include("norm.jl")
 
 export CyConv

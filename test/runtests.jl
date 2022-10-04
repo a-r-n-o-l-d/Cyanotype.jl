@@ -20,6 +20,6 @@ using Aqua
     @testset "Cyano" begin
         #include("cyano.jl")
     end
-    include("cyanotype.jl")
-    #include("conv.jl")
+    #include("cyanotype.jl")
+    include("conv.jl")
 end

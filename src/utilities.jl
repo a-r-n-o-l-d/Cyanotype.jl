@@ -46,18 +46,20 @@ macro volumetric()
     esc(
     quote
         """
-        `volumetric`: indicates if handling three-dimensionnal data, by default `false`
+        `volumetric`: indicates a building process for three-dimensionnal data (default `false`)
         """
         volumetric::Bool = false
     end)
 end
 
 macro activation(func)
+    ref = "[`$func`](@ref $func)"
+    doc = "`activation`: activation function (default [`$func`](@ref Flux.$func))"
     esc(
     quote
         """
-        `activation`: activation function, by default `$func`
+        $($(doc))
         """
-        activation::A = relu
+        activation::A = $func
     end)
 end

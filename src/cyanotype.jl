@@ -110,7 +110,7 @@ function _cyanotype(doc, kmap, head, body)
 
     # Adds fields defined by kmap
     for (name, flarg, T, def) in eachkwargs(Cyanotype.MAPPINGS[kmap]) #Cyanotype.
-        fdoc = "`$name`: see [`$flarg`](@ref Flux.$flname) (default value `$def`)"
+        fdoc = "`$name`: see [`$flarg`](@ref Flux.$flname) (default `$def`)"
         _push_field!(fields, kwargs, fnames, fdocs, name, T, def, fdoc)
         #push!(flnames, flname)
     end
@@ -209,12 +209,8 @@ function _push_field!(fields, kwargs, fnames, fdocs, name, T, def, doc)
 end
 
 function _generate_documentation(cyname, fdocs, doc)
-    #println(doc)
-    docs = """
-        $cyname(; kwargs...)
-    $doc
-
-    See also [`build`](@ref)
+    #$cyname(; kwargs...)
+    docs = """$doc
 
     Keyword arguments:\n
     """
