@@ -2,6 +2,7 @@ module CynotypeTest
 using Cyanotype
 using Flux
 using Cyanotype: KwargsMapping, register_mapping!, @cyanotype
+#import Cyanotype: mapping
 
 bnmap1 = KwargsMapping(; # @code_warntype => OK
 flux_function = :BatchNorm,
@@ -28,12 +29,12 @@ struct BatchNormTest1{N <: CyFloat} <: Cyanotype.AbstractCyanotype
 end
 )
 
-methods(BatchNormTest1) |> println
+#methods(BatchNormTest1) |> println
 
-println(eval(macroexpand(Main, :(@doc BatchNormTest1)) ) )
+#println(eval(macroexpand(__module__, :(@doc BatchNormTest1)) ) )
 
-cya = BatchNormTest1(; activation = relu)
-cya |> println
+#cya = BatchNormTest1(; activation = relu)
+#cya |> println
 
-cyanotype(cya; affine = false) |> println
+#cyanotype(cya; affine = false) |> println
 end

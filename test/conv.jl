@@ -56,12 +56,14 @@ model = Chain(build(CyNConv(; convolution = CyConv(), nrepeat = 3), 3, 4=>16)...
 
 CyHybridAtrouConv() |> println
 build(CyHybridAtrouConv(), 3, 4=>16) |> println
-model = Chain(build(CyHybridAtrouConv(), 3, 4=>16))
+model = Chain(build(CyHybridAtrouConv(), 3, 4=>16)...)
 println(model)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
 
 hac = CyHybridAtrouConv()
 cyanotype(hac; convolution = cyanotype(hac.convolution; activation = leakyrelu)) |> println
-model = Chain(build(hac, 3, 4=>16))
+model = Chain(build(hac, 3, 4=>16)...)
 println(model)
+
+CyDoubleConv(; convolution1 = hac) |> println

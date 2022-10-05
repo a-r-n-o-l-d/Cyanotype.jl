@@ -36,19 +36,19 @@ def(x::Function) = :(CyFunc($x))=#
 
 macro cyanotype(doc, expr)
     expr = macroexpand(__module__, expr)
-    esc(_cyanotype(doc, :empty_map, expr.args[2], expr.args[3]))
+    esc(_cyanotype(__module__, doc, :empty_map, expr.args[2], expr.args[3]))
 end
 
 macro cyanotype(kmap, doc, expr)
     expr = macroexpand(__module__, expr)
-    esc(_cyanotype(doc, kmap, expr.args[2], expr.args[3]))
+    esc(_cyanotype(__module__, doc, kmap, expr.args[2], expr.args[3]))
 end
 
 ############################################################################################
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
-function _cyanotype(doc, kmap, head, body)
+function _cyanotype(mod, doc, kmap, head, body)
     # Forces the struct to inherit from AbstractCyano
     if head isa Symbol || head.head === :curly
         # It is not type stable to do that, since the head type is changed, but at this
@@ -122,10 +122,10 @@ function _cyanotype(doc, kmap, head, body)
             $(fields...)
         end
         $(_kwargs_constructor(cyname, fnames, kwargs))
-        $(_mapping_func1(cyname, kmap))
-        $(_getfields_func(cyname, fnames))
-        $(_cyanotype_func(cyname))
-        $(_kwargs_func(cyname))
+        $(_mapping_func1(mod, cyname, kmap))
+        $(_getfields_func(mod, cyname, fnames))
+        $(_cyanotype_func(mod, cyname))
+        $(_kwargs_func(mod, cyname))
         #$(_getfields_func(cyaname, fnames))
         #$(_getfluxfields_func(cyaname, fnames, flnames))
         #=$(_copy_constructor(cyaname))
@@ -230,18 +230,24 @@ function _kwargs_constructor(cyname, fnames, kwargs)
     end
 end
 
-_mapping_func1(cyname, kmap) = :(mapping(::$cyname) = $(Cyanotype.MAPPINGS[kmap]))
-
-function _getfields_func(cyname, fnames)
-    gf = [:($f = cya.$f) for f in fnames]
-    :(getfields(cya::$(cyname)) = (; $(gf...),))
+function _mapping_func1(mod, cyname, kmap)
+    func = mod === Cyanotype ? :(mapping) : :(Cyanotype.mapping)
+    :($func(::$cyname) = $(Cyanotype.MAPPINGS[kmap]))
 end
 
-function _cyanotype_func(cyname)
+function _getfields_func(mod, cyname, fnames)
+    func = mod === Cyanotype ? :(getfields) : :(Cyanotype.getfields)
+    gf = [:($f = cya.$f) for f in fnames]
+    :($func(cya::$(cyname)) = (; $(gf...),))
+end
+
+function _cyanotype_func(mod, cyname)
+    func = mod === Cyanotype ? :(cyanotype) : :(Cyanotype.cyanotype)
     quote
-        function cyanotype(cy::$cyname; kwargs...)#::$cyname
+        function $func(cy::$cyname; kwargs...)#::$cyname #Cyanotype.cyanotype si en dehors du module
             args = []
             fields = getfields(cy)
+            # verifier la validite des kwargs ?
             for k in keys(fields)
                 if haskey(kwargs, k)
                     push!(args, kwargs[k])
@@ -254,9 +260,10 @@ function _cyanotype_func(cyname)
     end
 end
 
-function _kwargs_func(cyname)
+function _kwargs_func(mod, cyname)
+    func = mod === Cyanotype ? :(kwargs) : :(Cyanotype.kwargs)
     quote
-        function kwargs(cy::$cyname)
+        function $func(cy::$cyname)
             kmap = mapping(cy)
             kwargs = Dict()
             fields = getfields(cy)

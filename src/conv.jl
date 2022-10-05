@@ -23,7 +23,7 @@ struct CyConv{N<:AbstractCyNorm,A<:Function,I<:Function,P<:CyPad} <: AbstractCyC
     """
     `normalization`:
     """
-    normalization::N = CyNoNorm()
+    normalization::N = CyNoNorm() #mettre activation dans CyNoNorm? ou mettre activation dans build de batchnorm etc...
     """
     `reverse_norm`:
     """
@@ -92,7 +92,7 @@ Describes a convolutionnal module formed by two successive convolutionnal module
 """
 ) (
 struct CyDoubleConv{C1<:AbstractCyConv,C2<:AbstractCyConv} <: AbstractCyConv
-    @volumetric
+    @volumetric #enlever
     convolution1::C1
     convolution2::C2 = convolution1
 end
@@ -101,6 +101,7 @@ end
 # channels::Pair in_chs=>out_chs out_chs=>out_chs
 # channels::NTuple{3} in_chs=>mid_chs mid_chs=>out_chs
 function build(cy::CyDoubleConv, ksize, channels)
+    # convolution1.volumetric == convolution2.volumetric || error("")
     c1 = cyanotype(cy.convolution1; volumetric = cy.volumetric)
     c2 = cyanotype(cy.convolution2; volumetric = cy.volumetric)
     in_chs, mid_chs, out_chs = channels
@@ -150,7 +151,7 @@ end=#
 aka Hybrid Dilated Convolution
 [paper](@ref https://doi.org/10.1109/WACV.2018.00163)
 [example](@ref https://doi.org/10.1016/j.image.2019.115664)
-[example](@ref https://doi-org.sid2nomade-1.grenet.fr/10.1109/ICMA54519.2022.9855903)
+[example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
 """
 ) (
 struct CyHybridAtrouConv{N,C<:CyConv} <: AbstractCyConv
@@ -159,8 +160,8 @@ struct CyHybridAtrouConv{N,C<:CyConv} <: AbstractCyConv
 end
 )
 
-function build(cy::CyHybridAtrouConv{N}, ksize, channels) where N
-    _check_dilation_rates(ksize, cy.dilation_rates) || error("Invalid diation rates.")
+function build(cy::CyHybridAtrouConv, ksize, channels)
+    _check_dilation_rates(ksize, cy.dilation_rates) || error("Invalid dilation rates.")
     layers = []
     in_chs, out_chs = channels
     for dr in cy.dilation_rates
@@ -170,20 +171,6 @@ function build(cy::CyHybridAtrouConv{N}, ksize, channels) where N
     end
     layers
 end
-
-# hybrid dilated convolution : 10.1109/WACV.2018.00163
-# https://doi.org/10.1016/j.image.2019.115664
-# arg chain ?
-#=function hybrid_atrou_conv(k, chs, activation = relu; norm = BatchNorm, dilation_rates, pad = SamePad(), kwargs...) #hybrid_atrou_conv(k, ch, σ = identity; dilation_rates, norm_layer )
-    check_dilation_rates(first(k), dilation_rates) || error("Invalid diation rates.")
-    in_chs, out_chs = chs
-    layers = []
-    for r ∈ dilation_rates
-        push!(layers, conv(k, in_chs=>out_chs, activation; dilation = r, norm = norm, pad = pad, kwargs...))
-        in_chs = out_chs
-    end
-    flatten_layers(layers)
-end=#
 
 #https://arxiv.org/pdf/1702.08502.pdf
 # DOI 10.1109/WACV.2018.00163
