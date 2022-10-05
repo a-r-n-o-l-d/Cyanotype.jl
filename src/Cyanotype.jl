@@ -11,6 +11,9 @@ export build, CyFloat
 
 const CyFloat = Union{Float16, Float32, Float64}
 
+abstract type AbstractCyanotype end #AbstrctCyanotypeBlueprint
+
+export spread
 include("utilities.jl")
 
 export cyanotype

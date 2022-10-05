@@ -1,4 +1,4 @@
-abstract type AbstractCyanotype end
+
 
 struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},T3<:NTuple{N,Any}} #
     flux_function::Symbol
