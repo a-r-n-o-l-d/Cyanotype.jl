@@ -24,10 +24,22 @@ Automatically generated functions:
 the `Flux` function or constructor, it can be used as follow:
 `flux_function(arg1, arg2; kwargs(bp)...)`
 
-
 ```julia
-
+using Cyanotype: @cyanotype
+@cyanotype (
+\"""
+A FooBluePrint as example.
+\"""
+) (
+struct FooBluePrint{A<:Function}
+    \"""`activation`: activation function\"""
+    activation::A = relu
+end
+)
 ```
+
+For the keyword arguments mapping usage, see [`KwargsMapping`](@see KwargsMapping)
+documentation.
 """
 macro cyanotype(doc, expr)
     expr = macroexpand(__module__, expr)
