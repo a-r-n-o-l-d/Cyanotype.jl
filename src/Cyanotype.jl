@@ -5,7 +5,7 @@ modules: high level modules
 module Cyanotype
 
 using Flux
-using Markdown: MD
+#using Markdown: MD
 
 export make, CyFloat
 
