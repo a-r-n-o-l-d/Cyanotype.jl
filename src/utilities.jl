@@ -1,7 +1,7 @@
 """
-    spread(cy; kwargs...)
+    spread(bp; kwargs...)
 
-Return a new cyanotype blueprint with `kwargs` spreaded over all fields of `cy`. This
+Return a new cyanotype blueprint with `kwargs` spreaded over all fields of `bp`. This
 function allows to modify all nested cyanotypes at once.
 
 ```julia
@@ -23,19 +23,19 @@ pprint(conv2)
 spread(conv2; activation = leakyrelu) |> pprint
 ```
 """
-function spread(cy; kwargs...)
-    stack = _parse_cyanotype!([], :top, cy; kwargs...)
-    _cyanotype_gen(stack)
+function spread(bp; kwargs...)
+    stack = _parse_blueprint!([], :top, bp; kwargs...)
+    _blueprint_gen(stack)
 end
 
-# Shortcut that do nothing if x is not an AbstractCyanotype
-_parse_cyanotype!(::Any, ::Any, ::Any; kwargs...) = nothing
+# Shortcut that do nothing if not an AbstractBlueprint
+_parse_blueprint!(::Any, ::Any, ::Any; kwargs...) = nothing
 
-# Parses a AbstractCyanotype blueprint and returns a stack
-function _parse_cyanotype!(stack, name, cy::AbstractCyanotype; kwargs...) #_parse_cyanotype
-    fields = Dict(pairs(getfields(cy)))
-    # stack records the AbstractCyanotype object, its fields and name
-    push!(stack, (cy, fields, name))
+# Parses a AbstractBlueprint blueprint and returns a stack
+function _parse_blueprint!(stack, name, bp::AbstractBlueprint; kwargs...)
+    fields = Dict(pairs(getfields(bp)))
+    # stack records the AbstractBlueprint object, its fields and name
+    push!(stack, (bp, fields, name))
     # Rename fields according to kwargs
     for (k, a) in kwargs
         if haskey(fields, k)
@@ -44,30 +44,30 @@ function _parse_cyanotype!(stack, name, cy::AbstractCyanotype; kwargs...) #_pars
     end
     # Reccursive parsing of each field
     for (n, f) in fields
-        _parse_cyanotype!(stack, n, f; kwargs...)
+        _parse_blueprint!(stack, n, f; kwargs...)
     end
     stack
 end
 
 # Generate a new blueprint from a stack
-function _cyanotype_gen(stack)
-    # Store cyanotypes generated from the stack
-    cyanotypes = Dict()
-    # Interpret stack from bottom to top
-    for (cy, kw, n) in reverse(stack)
+function _blueprint_gen(stack)
+    # Store blueprints generated from the stack
+    blueprints = Dict()
+    # Evaluate stack from bottom to top
+    for (bp, kw, n) in reverse(stack)
         for k in keys(kw)
-            # Modify kw if k is in cyanotypes dictionnary and is actually an
-            # AbstractCyanotype
-            if haskey(cyanotypes, k) && kw[k] isa AbstractCyanotype
-                # Consume this cyanotype
-                kw[k] = cyanotypes[k]
-                delete!(cyanotypes, k)
+            # Modify kw if k is in blueprints dictionnary and is actually an
+            # AbstractBlueprint
+            if haskey(blueprints, k) && kw[k] isa AbstractBlueprint
+                # Consume this blueprint
+                kw[k] = blueprints[k]
+                delete!(blueprints, k)
             end
         end
-        # Generate a new blueprint from kw and record it for the further iterations
-        cyanotypes[n] = cyanotype(cy; kw...)
+        # Generate a new blueprint from kw and store it for the further iterations
+        blueprints[n] = cyanotype(bp; kw...)
     end
-    cyanotypes[:top]
+    blueprints[:top]
 end
 
 #str2sym(d) = Dict(Symbol(k) => v for (k,v) in d)

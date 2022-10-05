@@ -32,38 +32,38 @@ model = Chain(build(3, 3=>4, conv)...)
 
 @test Flux.outputsize(model, (32, 32, 3, 16)) == (32, 32, 4, 16)=#
 
-conv = CyConv()
-norms = [CyNoNorm(), CyBatchNorm(), CyGroupNorm(; groups = 2), CyInstanceNorm()]
+conv = ConvBp()
+norms = [NoNormBp(), BatchNormBp(), GroupNormBp(; groups = 2), InstanceNormBp()]
 revs = pres = [true, false]
 for n in norms, r in revs, p in pres
     c = cyanotype(conv; normalization = n, pre_activation = p, reverse_norm = r)
-    model = Chain(build(c; ksize = 3, channels = 8=>16)...)
+    model = Chain(make(c; ksize = 3, channels = 8=>16)...)
     #println(model)
     @test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 16, 16)
 end
 
-dc = CyDoubleConv(; convolution1 = CyConv(), convolution2 = CyConv(; normalization = CyBatchNorm()))
+dc = DoubleConvBp(; convolution1 = ConvBp(), convolution2 = ConvBp(; normalization = BatchNormBp()))
 
-model = Chain(build(dc; ksize = 3, channels = (8, 16, 32))...)
+model = Chain(make(dc; ksize = 3, channels = (8, 16, 32))...)
 @test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 32, 16)
 
 
-CyNConv(; convolution = CyConv(), nrepeat = 3) |> println
-build(CyNConv(; convolution = CyConv(), nrepeat = 3), 3, 4=>16) |> println
-model = Chain(build(CyNConv(; convolution = CyConv(), nrepeat = 3), 3, 4=>16)...)
+NConvBp(; convolution = ConvBp(), nrepeat = 3) |> println
+make(NConvBp(; convolution = ConvBp(), nrepeat = 3), 3, 4=>16) |> println
+model = Chain(make(NConvBp(; convolution = ConvBp(), nrepeat = 3), 3, 4=>16)...)
 
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
-CyHybridAtrouConv() |> println
-build(CyHybridAtrouConv(), 3, 4=>16) |> println
-model = Chain(build(CyHybridAtrouConv(), 3, 4=>16)...)
+HybridAtrouConvBp() |> println
+make(HybridAtrouConvBp(), 3, 4=>16) |> println
+model = Chain(make(HybridAtrouConvBp(), 3, 4=>16)...)
 println(model)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
 
-hac = CyHybridAtrouConv()
+hac = HybridAtrouConvBp()
 cyanotype(hac; convolution = cyanotype(hac.convolution; activation = leakyrelu)) |> println
-model = Chain(build(hac, 3, 4=>16)...)
+model = Chain(make(hac, 3, 4=>16)...)
 println(model)
 
-CyDoubleConv(; convolution1 = hac) |> println
+DoubleConvBp(; convolution1 = hac) |> println

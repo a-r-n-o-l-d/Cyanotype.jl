@@ -7,11 +7,11 @@ module Cyanotype
 using Flux
 using Markdown: MD
 
-export build, CyFloat
+export make, CyFloat
 
 const CyFloat = Union{Float16, Float32, Float64}
 
-abstract type AbstractCyanotype end #AbstrctCyanotypeBlueprint
+abstract type AbstractBlueprint end
 
 export spread
 include("utilities.jl")
@@ -24,10 +24,10 @@ include("cyanotype.jl")
 #export register_mapping!
 #include("config.jl")
 
-export CyNoNorm, CyBatchNorm, CyGroupNorm, CyInstanceNorm
+export NoNormBp, BatchNormBp, GroupNormBp, InstanceNormBp
 include("norm.jl")
 
-export CyConv, CyDoubleConv, CyNConv, CyHybridAtrouConv
+export ConvBp, DoubleConvBp, NConvBp, HybridAtrouConvBp
 include("conv.jl")
 
 end

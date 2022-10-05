@@ -1,5 +1,4 @@
 
-
 struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},T3<:NTuple{N,Any}} #
     flux_function::Symbol
     field_names::T1
@@ -53,7 +52,7 @@ function _cyanotype(mod, doc, kmap, head, body)
     if head isa Symbol || head.head === :curly
         # It is not type stable to do that, since the head type is changed, but at this
         # stage performance is not a big deal.
-        head = Expr(:<:, head, Cyanotype.AbstractCyanotype)
+        head = Expr(:<:, head, Cyanotype.AbstractBlueprint)
     end
 
     # Flux name
@@ -62,10 +61,10 @@ function _cyanotype(mod, doc, kmap, head, body)
     # Flux ref for documentation
     #flref = "[`$flname`](@ref Flux.$flname)"
 
-    # Cyanotype name
-    cyname = _struct_name(head)
+    # Blueprint name
+    name = _struct_name(head)
 
-    #cydoc = eval(macroexpand(mod, :(@doc $cyname)))
+    #cydoc = eval(macroexpand(mod, :(@doc $name)))
     #println(cydoc)
 
     # Field names
@@ -109,23 +108,23 @@ function _cyanotype(mod, doc, kmap, head, body)
     end
 
     # Adds fields defined by kmap
-    for (name, flarg, T, def) in eachkwargs(Cyanotype.MAPPINGS[kmap]) #Cyanotype.
-        fdoc = "`$name`: see [`$flarg`](@ref Flux.$flname) (default `$def`)"
-        _push_field!(fields, kwargs, fnames, fdocs, name, T, def, fdoc)
+    for (fname, flarg, T, def) in eachkwargs(Cyanotype.MAPPINGS[kmap]) #Cyanotype.
+        fdoc = "`$fname`: see [`$flarg`](@ref Flux.$flname) (default `$def`)"
+        _push_field!(fields, kwargs, fnames, fdocs, fname, T, def, fdoc)
         #push!(flnames, flname)
     end
 
     # Generates the struct and its associated functions
     quote
-        """$($(_generate_documentation(cyname, fdocs, doc)))"""
+        """$($(_generate_documentation(name, fdocs, doc)))"""
         struct $head
             $(fields...)
         end
-        $(_kwargs_constructor(cyname, fnames, kwargs))
-        $(_mapping_func1(mod, cyname, kmap))
-        $(_getfields_func(mod, cyname, fnames))
-        $(_cyanotype_func(mod, cyname))
-        $(_kwargs_func(mod, cyname))
+        $(_kwargs_constructor(name, fnames, kwargs))
+        $(_mapping_func1(mod, name, kmap))
+        $(_getfields_func(mod, name, fnames))
+        $(_cyanotype_func(mod, name))
+        $(_kwargs_func(mod, name))
         #$(_getfields_func(cyaname, fnames))
         #$(_getfluxfields_func(cyaname, fnames, flnames))
         #=$(_copy_constructor(cyaname))
@@ -208,8 +207,8 @@ function _push_field!(fields, kwargs, fnames, fdocs, name, T, def, doc)
     push!(fdocs, doc)
 end
 
-function _generate_documentation(cyname, fdocs, doc)
-    #$cyname(; kwargs...)
+function _generate_documentation(name, fdocs, doc)
+    #$name(; kwargs...)
     docs = """$doc
 
     Keyword arguments:\n
@@ -220,33 +219,33 @@ function _generate_documentation(cyname, fdocs, doc)
     docs
 end
 
-function _kwargs_constructor(cyname, fnames, kwargs)
+function _kwargs_constructor(name, fnames, kwargs)
     # If there is no field in the struct, no kwargs constructor
     if isempty(fnames) && isempty(kwargs)
         :()
     else
         kw = Expr(:parameters, kwargs...)
-        :($cyname($kw) = $cyname($(fnames...)))
+        :($name($kw) = $name($(fnames...)))
     end
 end
 
-function _mapping_func1(mod, cyname, kmap)
+function _mapping_func1(mod, name, kmap)
     func = mod === Cyanotype ? :(mapping) : :(Cyanotype.mapping)
-    :($func(::$cyname) = $(Cyanotype.MAPPINGS[kmap]))
+    :($func(::$name) = $(Cyanotype.MAPPINGS[kmap]))
 end
 
-function _getfields_func(mod, cyname, fnames)
+function _getfields_func(mod, name, fnames)
     func = mod === Cyanotype ? :(getfields) : :(Cyanotype.getfields)
     gf = [:($f = cya.$f) for f in fnames]
-    :($func(cya::$(cyname)) = (; $(gf...),))
+    :($func(cya::$(name)) = (; $(gf...),))
 end
 
-function _cyanotype_func(mod, cyname)
+function _cyanotype_func(mod, name)
     func = mod === Cyanotype ? :(cyanotype) : :(Cyanotype.cyanotype)
     quote
-        function $func(cy::$cyname; kwargs...)#::$cyname #Cyanotype.cyanotype si en dehors du module
+        function $func(bp::$name; kwargs...)#::$name #Cyanotype.cyanotype si en dehors du module
             args = []
-            fields = getfields(cy)
+            fields = getfields(bp)
             # verifier la validite des kwargs ?
             for k in keys(fields)
                 if haskey(kwargs, k)
@@ -255,21 +254,21 @@ function _cyanotype_func(mod, cyname)
                     push!(args, fields[k])
                 end
             end
-            $cyname(args...)
+            $name(args...)
         end
     end
 end
 
-function _kwargs_func(mod, cyname)
+function _kwargs_func(mod, name)
     func = mod === Cyanotype ? :(kwargs) : :(Cyanotype.kwargs)
     quote
-        function $func(cy::$cyname)
-            kmap = mapping(cy)
+        function $func(bp::$name)
+            kmap = mapping(bp)
             kwargs = Dict()
-            fields = getfields(cy)
+            fields = getfields(bp)
             for (i, arg) in enumerate(kmap.flux_kwargs)
                 push!(kwargs, arg=>fields[kmap.field_names[i]])
-                #push!(kwargs, arg=>getfield(cy, kmap.field_names[i]))
+                #push!(kwargs, arg=>getfield(bp, kmap.field_names[i]))
             end
             kwargs
         end

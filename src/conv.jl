@@ -1,4 +1,4 @@
-abstract type AbstractCyConv <: AbstractCyanotype end
+abstract type AbstractConvBp <: AbstractBlueprint end
 
 const CyPad = Union{SamePad,Int}
 
@@ -12,18 +12,18 @@ register_mapping!(:convmap=>KwargsMapping(;
 
 @cyanotype convmap (
 """
-    CyConv(; kwargs)
-Describes a convolutionnal module or layer depending om the value of `normalization`
-argument.
+    ConvBp(; kwargs)
+
+A cyanotype blueprint describing a convolutionnal module or layer depending om the value of
+`normalization` argument.
 """
 ) (
-struct CyConv{N<:AbstractCyNorm,A<:Function,I<:Function,P<:CyPad} <: AbstractCyConv
-    @activation(relu)
+struct ConvBp{N<:AbstractNormBp,I<:Function,P<:CyPad} <: AbstractConvBp
     @volumetric
     """
     `normalization`:
     """
-    normalization::N = CyNoNorm() #mettre activation dans CyNoNorm? ou mettre activation dans build de batchnorm etc...
+    normalization::N = NoNormBp()
     """
     `reverse_norm`:
     """
@@ -35,63 +35,24 @@ struct CyConv{N<:AbstractCyNorm,A<:Function,I<:Function,P<:CyPad} <: AbstractCyC
     """
     `use_bias`:
     """
-    use_bias::Bool = normalization isa CyNoNorm
+    use_bias::Bool = normalization isa NoNormBp
 end
 )
 
-function build(cy::CyConv, ksize, channels)
-    k = cy.volumetric ? (ksize, ksize, ksize) : (ksize, ksize)
-    _build_conv(cy.normalization, cy, k, channels) #|> flatten_layers
+function make(bp::ConvBp, ksize, channels)
+    k = bp.volumetric ? (ksize, ksize, ksize) : (ksize, ksize)
+    _build_conv(bp.normalization, bp, k, channels) #|> flatten_layers
 end
 
-build(cy::CyConv; ksize, channels) = build(cy, ksize, channels)
-
-# A regular convolutionnal layer
-function _build_conv(::CyNoNorm, cy, k, chs)
-    [Conv(k, chs, cy.activation; kwargs(cy)...)]
-end
-
-# Convolutionnal module: convolutionnal layer & normalization layer
-function _build_conv(nm, cy, k, chs)
-    layers = []
-    in_chs, out_chs = chs
-    # Normalization first
-    if cy.reverse_norm
-        # Activation before convolution ?
-        if cy.pre_activation
-            act_n = cy.activation
-            act_c = identity
-        else
-            act_n = identity
-            act_c = cy.activation
-        end
-        norm = cyanotype(nm; activation = act_n)
-        conv = Conv(k, chs, act_c; bias = cy.use_bias, kwargs(cy)...)
-        push!(layers, build(norm, in_chs), conv)
-    # Convolution first
-    else
-        # Activation before convolution ?
-        if cy.pre_activation
-            act_n = identity
-            push!(layers, cy.activation)
-        else
-            act_n = cy.activation
-        end
-        norm = cyanotype(nm; activation = act_n)
-        conv = Conv(k, chs; bias = cy.use_bias, kwargs(cy)...)
-        push!(layers, conv, build(norm, out_chs))
-    end
-    layers
-end
-
+make(bp::ConvBp; ksize, channels) = make(bp, ksize, channels)
 
 @cyanotype (
 """
-    CyDoubleConv(; kwargs)
+    DoubleConvBp(; kwargs)
 Describes a convolutionnal module formed by two successive convolutionnal modules.
 """
 ) (
-struct CyDoubleConv{C1<:AbstractCyConv,C2<:AbstractCyConv} <: AbstractCyConv
+struct DoubleConvBp{C1<:AbstractConvBp,C2<:AbstractConvBp} <: AbstractConvBp
     @volumetric #enlever
     convolution1::C1
     convolution2::C2 = convolution1
@@ -100,23 +61,23 @@ end
 
 # channels::Pair in_chs=>out_chs out_chs=>out_chs
 # channels::NTuple{3} in_chs=>mid_chs mid_chs=>out_chs
-function build(cy::CyDoubleConv, ksize, channels)
+function make(bp::DoubleConvBp, ksize, channels)
     # convolution1.volumetric == convolution2.volumetric || error("")
-    c1 = cyanotype(cy.convolution1; volumetric = cy.volumetric)
-    c2 = cyanotype(cy.convolution2; volumetric = cy.volumetric)
+    c1 = cyanotype(bp.convolution1; volumetric = bp.volumetric)
+    c2 = cyanotype(bp.convolution2; volumetric = bp.volumetric)
     in_chs, mid_chs, out_chs = channels
-    [build(c1, ksize, in_chs=>mid_chs)..., build(c2, ksize, mid_chs=>out_chs)...]
+    [make(c1, ksize, in_chs=>mid_chs)..., make(c2, ksize, mid_chs=>out_chs)...]
 end
 
-build(cy::CyDoubleConv; ksize, channels) = build(cy, ksize, channels)
+make(bp::DoubleConvBp; ksize, channels) = make(bp, ksize, channels)
 
 # Peut-etre inutile
 @cyanotype (
 """
-Template describing a module with N `CyConv` repeated.
+Template describing a module with N `NConvBp` repeated.
 """
 ) (
-struct CyNConv{C<:AbstractCyConv} <: AbstractCyConv
+struct NConvBp{C<:AbstractConvBp} <: AbstractConvBp
     #@activation(relu)
     #@volumetric
     convolution::C # = CyConv() # = ntuple(i -> CyConv(), N)
@@ -127,11 +88,11 @@ end
 
 #CyNConv(convolution, nrepeat) = CyNConv{nrepeat}(convolution, nrepeat)
 
-function build(cy::CyNConv, ksize, channels)
+function make(bp::NConvBp, ksize, channels)
     layers = []
     in_chs, out_chs = channels
-    for _ in 1:cy.nrepeat
-        push!(layers, build(cy.convolution, ksize, in_chs=>out_chs)...)
+    for _ in 1:bp.nrepeat
+        push!(layers, make(bp.convolution, ksize, in_chs=>out_chs)...)
         in_chs = out_chs
     end
     layers
@@ -154,20 +115,69 @@ aka Hybrid Dilated Convolution
 [example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
 """
 ) (
-struct CyHybridAtrouConv{N,C<:CyConv} <: AbstractCyConv
+struct HybridAtrouConvBp{N,C<:ConvBp} <: AbstractConvBp
     dilation_rates::NTuple{N,Int} = (1, 2, 3)
-    convolution::C = CyConv(; normalization = CyBatchNorm())
+    convolution::C = ConvBp(; normalization = BatchNormBp())
 end
 )
 
-function build(cy::CyHybridAtrouConv, ksize, channels)
-    _check_dilation_rates(ksize, cy.dilation_rates) || error("Invalid dilation rates.")
+function make(bp::HybridAtrouConvBp, ksize, channels)
+    _check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")
     layers = []
     in_chs, out_chs = channels
-    for dr in cy.dilation_rates
-        c = cyanotype(cy.convolution; dilation = dr)
-        push!(layers, build(c, ksize, in_chs=>out_chs)...)
+    for dr in bp.dilation_rates
+        c = cyanotype(bp.convolution; dilation = dr)
+        push!(layers, make(c, ksize, in_chs=>out_chs)...)
         in_chs = out_chs
+    end
+    layers
+end
+
+
+
+#_check_dilation_rates(3, [1, 2, 3])
+#_check_dilation_rates(3, [1, 2, 9]) || println("pouet")
+#_check_dilation_rates(3, [3, 2, 1])
+
+############################################################################################
+#                                   INTERNAL FUNCTIONS                                     #
+############################################################################################
+
+# A usual convolutionnal layer
+function _build_conv(::NoNormBp, bp, k, chs)
+    [Conv(k, chs, bp.normalization.activation; kwargs(bp)...)]
+end
+
+# Convolutionnal module: convolutionnal layer & normalization layer
+function _build_conv(nm, bp, k, chs)
+    layers = []
+    in_chs, out_chs = chs
+    activation = bp.normalization.activation
+    # Normalization first
+    if bp.reverse_norm
+        # Activation before convolution ?
+        if bp.pre_activation
+            act_n = activation
+            act_c = identity
+        else
+            act_n = identity
+            act_c = activation
+        end
+        norm = cyanotype(nm; activation = act_n)
+        conv = Conv(k, chs, act_c; bias = bp.use_bias, kwargs(bp)...)
+        push!(layers, make(norm, in_chs), conv)
+    # Convolution first
+    else
+        # Activation before convolution ?
+        if bp.pre_activation
+            act_n = identity
+            push!(layers, activation)
+        else
+            act_n = activation
+        end
+        norm = cyanotype(nm; activation = act_n)
+        conv = Conv(k, chs; bias = bp.use_bias, kwargs(bp)...)
+        push!(layers, conv, make(norm, out_chs))
     end
     layers
 end
@@ -184,7 +194,3 @@ function _check_dilation_rates(k, dr)
     end
     M <= k
 end
-
-#_check_dilation_rates(3, [1, 2, 3])
-#_check_dilation_rates(3, [1, 2, 9]) || println("pouet")
-#_check_dilation_rates(3, [3, 2, 1])

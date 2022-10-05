@@ -1,4 +1,4 @@
-abstract type AbstractCyNorm <: AbstractCyanotype end
+abstract type AbstractNormBp <: AbstractBlueprint end
 
 # Defines kwargs for Flux normalisation layers
 #=const _NORMKW = (
@@ -17,12 +17,14 @@ CyIdentityNorm=#
 
 @cyanotype (
 """
-    CyNoNorm()
+    NoNormBp()
 Tagging `struct` indicating that no normalisation layer should be used in a building
 process.
 """
 ) (
-struct CyNoNorm <: AbstractCyNorm end
+struct NoNormBp{A} <: AbstractNormBp
+    @activation(Flux.relu)
+end
 )
 
 register_mapping!(:bnmap=>KwargsMapping(; flux_function = :BatchNorm,
@@ -36,17 +38,17 @@ register_mapping!(:bnmap=>KwargsMapping(; flux_function = :BatchNorm,
 Wraps a Flux.Batchnorm
 """
 ) (
-struct CyBatchNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
-    @activation(Flux.relu)
+struct BatchNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractNormBp
+    @activation(relu)
 end
 )
 
-# auto generation doc for build
-function build(cy::CyBatchNorm, channels)
-    BatchNorm(channels, cy.activation; kwargs(cy)...)
+# auto generation doc for make
+function make(bp::BatchNormBp, channels)
+    BatchNorm(channels, bp.activation; kwargs(bp)...)
 end
 
-build(cy::CyBatchNorm; channels) = build(cy, channels)
+make(bp::BatchNormBp; channels) = make(bp, channels)
 
 # !!!! `track_stats=true` will be removed from GroupNorm in Flux 0.14.
 register_mapping!(:gnmap=>KwargsMapping(; flux_function = :GroupNorm,
@@ -57,12 +59,12 @@ register_mapping!(:gnmap=>KwargsMapping(; flux_function = :GroupNorm,
 
 @cyanotype gnmap (
 """
-    CyGroupNorm(; kwargs...)
+    GroupNormBp(; kwargs...)
 Describes a building process for a [`Groupnorm`](@ref Flux.Groupnorm) layer.
-build(channels, cy::CyGroupNorm)
+make(channels, bp::CyGroupNorm)
 """
 ) (
-struct CyGroupNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
+struct GroupNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractNormBp
     @activation(relu)
     """
     `groups`: the number of groups passed to [`GroupNorm`](@ref Flux.GroupNorm) constructor
@@ -71,12 +73,12 @@ struct CyGroupNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: Abstract
 end
 )
 
-# build(cy::CyGroupNorm; channels)
-function build(cy::CyGroupNorm, channels)
-    GroupNorm(channels, cy.groups, cy.activation; kwargs(cy)...)
+# make(bp::CyGroupNorm; channels)
+function make(bp::GroupNormBp, channels)
+    GroupNorm(channels, bp.groups, bp.activation; kwargs(bp)...)
 end
 
-build(cy::CyGroupNorm; channels) = build(cy, channels)
+make(bp::GroupNormBp; channels) = make(bp, channels)
 
 
 register_mapping!(:inmap=>KwargsMapping(; flux_function = :GroupNorm,
@@ -89,16 +91,16 @@ register_mapping!(:inmap=>KwargsMapping(; flux_function = :GroupNorm,
 """
     CyInstanceNorm(; kwargs...)
 Describes a building process for a [`InstanceNorm`](@ref Flux.InstanceNorm) layer.
-build(channels, cy::CyInstanceNorm)
+make(channels, bp::CyInstanceNorm)
 """
 ) (
-struct CyInstanceNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractCyNorm
+struct InstanceNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractNormBp
     @activation(relu)
 end
 )
 
-function build(cy::CyInstanceNorm, channels)
-    InstanceNorm(channels, cy.activation; kwargs(cy)...)
+function make(bp::InstanceNormBp, channels)
+    InstanceNorm(channels, bp.activation; kwargs(bp)...)
 end
 
-build(cy::CyInstanceNorm; channels) = build(cy, channels)
+make(bp::InstanceNormBp; channels) = make(bp, channels)

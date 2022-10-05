@@ -23,7 +23,7 @@ voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occa
 cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 """
 ) (
-struct BatchNormTest1{N <: CyFloat} <: Cyanotype.AbstractCyanotype
+struct BatchNormTest1{N <: CyFloat} <: Cyanotype.AbstractBlueprint
     """activation function for BatchNorm layer"""
     activation
 end
