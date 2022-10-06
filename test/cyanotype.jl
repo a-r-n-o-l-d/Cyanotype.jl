@@ -1,4 +1,5 @@
 module CynotypeTest
+
 using Cyanotype
 using Flux
 using Cyanotype: KwargsMapping, register_mapping!, @cyanotype

@@ -21,6 +21,6 @@ using Aqua
         include("cyanotype.jl")
     end
     @testset "Conv" begin
-        include("conv.jl")
+        #include("conv.jl")
     end
 end

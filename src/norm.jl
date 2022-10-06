@@ -60,6 +60,7 @@ register_mapping!(:gnmap=>KwargsMapping(; flux_function = :GroupNorm,
 @cyanotype gnmap (
 """
     GroupNormBp(; kwargs...)
+
 Describes a building process for a [`Groupnorm`](@ref Flux.Groupnorm) layer.
 make(channels, bp::CyGroupNorm)
 """
@@ -90,6 +91,7 @@ register_mapping!(:inmap=>KwargsMapping(; flux_function = :GroupNorm,
 @cyanotype gnmap (
 """
     CyInstanceNorm(; kwargs...)
+
 Describes a building process for a [`InstanceNorm`](@ref Flux.InstanceNorm) layer.
 make(channels, bp::CyInstanceNorm)
 """
