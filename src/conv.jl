@@ -78,15 +78,10 @@ Template describing a module with N `NConvBp` repeated.
 """
 ) (
 struct NConvBp{C<:AbstractConvBp} <: AbstractConvBp
-    #@activation(relu)
-    #@volumetric
-    convolution::C # = CyConv() # = ntuple(i -> CyConv(), N)
+    convolution::C
     nrepeat::Int
-    #order::NTuple{N,Int}
 end
 )
-
-#CyNConv(convolution, nrepeat) = CyNConv{nrepeat}(convolution, nrepeat)
 
 function make(bp::NConvBp, ksize, channels)
     layers = []
@@ -97,15 +92,6 @@ function make(bp::NConvBp, ksize, channels)
     end
     layers
 end
-
-
-#=function nconv(n, conv = CyConv())
-    ntuple(i -> conv, n)
-end
-
-function CyNConv(; activation, volumetric, normalization, reverse_norm, pre_activation, use_bias, init, pad, dilation, groups)
-
-end=#
 
 @cyanotype (
 """

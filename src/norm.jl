@@ -1,20 +1,5 @@
 abstract type AbstractNormBp <: AbstractBlueprint end
 
-# Defines kwargs for Flux normalisation layers
-#=const _NORMKW = (
-    field_names = (:init_shift,  :init_scale, :affine, :track_stats, :epsilon, :momentum), #init_bias => init_shift
-    flux_kwargs = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-    field_types = (:I1,          :I2,         Bool,    Bool,         :F,       :F), # Function => type instbility, wrap in CyFunc => curate doit etre modifee
-    def_values  = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0)
-)=#
-
-#="""
-    CyanoIdentityNorm()
-
-Tagging `struct` indicating that no normalisation layer should be used in a building process.
-"""
-CyIdentityNorm=#
-
 @cyanotype (
 """
     NoNormBp()
@@ -41,7 +26,6 @@ struct BatchNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: Abstract
 end
 )
 
-# auto generation doc for make
 function make(bp::BatchNormBp, channels)
     BatchNorm(channels, bp.activation; kwargs(bp)...)
 end
@@ -73,13 +57,11 @@ struct GroupNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: Abstract
 end
 )
 
-# make(bp::CyGroupNorm; channels)
 function make(bp::GroupNormBp, channels)
     GroupNorm(channels, bp.groups, bp.activation; kwargs(bp)...)
 end
 
 make(bp::GroupNormBp; channels) = make(bp, channels)
-
 
 @cyanotype (
 """
