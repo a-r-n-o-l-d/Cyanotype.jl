@@ -48,14 +48,12 @@ model = Chain(make(dc; ksize = 3, channels = (8, 16, 32))...)
 @test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 32, 16)
 
 
-NConvBp(; convolution = ConvBp(), nrepeat = 3) |> println
-make(NConvBp(; convolution = ConvBp(), nrepeat = 3), 3, 4=>16) |> println
 model = Chain(make(NConvBp(; convolution = ConvBp(), nrepeat = 3), 3, 4=>16)...)
 
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
 HybridAtrouConvBp() |> println
-make(HybridAtrouConvBp(), 3, 4=>16) |> println
+
 model = Chain(make(HybridAtrouConvBp(), 3, 4=>16)...)
 println(model)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)

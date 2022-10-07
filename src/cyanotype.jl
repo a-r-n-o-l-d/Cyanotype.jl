@@ -1,4 +1,27 @@
 """
+    KwargsMapping(; flux_function = :notflux, field_names = (), flux_kwargs = (),
+                    field_types = (), def_values = ())
+
+Define a mapping of keyword arguments mapping to interface a blueprint with a `Flux`
+function or constructor.
+"""
+struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},T3<:NTuple{N,Any}}
+    flux_function::Symbol
+    field_names::T1
+    flux_kwargs::T1
+    field_types::T2
+    def_values::T3
+end
+
+function KwargsMapping(; flux_function = :notflux, field_names = (), flux_kwargs = (),
+                         field_types = (), def_values = ())
+    KwargsMapping(flux_function, field_names, flux_kwargs, field_types, def_values)
+end
+
+@inline eachkwargs(km::KwargsMapping) = zip(km.field_names, km.flux_kwargs, km.field_types,
+                                    km.def_values) # dead code
+
+"""
     cyanotype(bp::AbstractBlueprint; kwargs...)
 
 Creates a new blueprint from `bp` with the modifications defined by `kwargs`. This method is
@@ -46,38 +69,17 @@ documentation.
 """
 macro cyanotype(doc, expr)
     expr = macroexpand(__module__, expr)
-    esc(_cyanotype(__module__, doc, :empty_map, expr.args[2], expr.args[3]))
+    esc(_cyanotype(__module__, doc, :(KwargsMapping()), expr.args[2], expr.args[3]))
 end
 
-macro cyanotype(kmap, doc, expr)
+macro cyanotype(doc, kmap, expr)
     expr = macroexpand(__module__, expr)
     esc(_cyanotype(__module__, doc, kmap, expr.args[2], expr.args[3]))
 end
 
-"""
-    KwargsMapping(; flux_function = :notflux, field_names = (), flux_kwargs = (),
-                    field_types = (), def_values = ())
 
-Define a mapping of keyword arguments mapping to interface a blueprint with a `Flux`
-function or constructor.
-"""
-struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},T3<:NTuple{N,Any}}
-    flux_function::Symbol
-    field_names::T1
-    flux_kwargs::T1
-    field_types::T2
-    def_values::T3
-end
 
-function KwargsMapping(; flux_function = :notflux, field_names = (), flux_kwargs = (),
-                         field_types = (), def_values = ())
-    KwargsMapping(flux_function, field_names, flux_kwargs, field_types, def_values)
-end
-
-@inline eachkwargs(km::KwargsMapping) = zip(km.field_names, km.flux_kwargs, km.field_types,
-                                    km.def_values) # dead code
-
-"""
+#="""
 
 """
 const MAPPINGS::Dict{Symbol,KwargsMapping} = Dict(:empty_map => KwargsMapping())
@@ -88,13 +90,13 @@ const MAPPINGS::Dict{Symbol,KwargsMapping} = Dict(:empty_map => KwargsMapping())
 function register_mapping!(mapping)
     haskey(MAPPINGS, first(mapping)) && @warn "Map $(first(mapping)) already exists in Cyanotype.MAPPINGS."
     push!(MAPPINGS, mapping)
-end
+end=#
 
 ############################################################################################
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
-function _cyanotype(mod, doc, kmap, head, body)
+function _cyanotype(mod, doc, kmexp, head, body)
     # Forces the struct to inherit from AbstractCyano
     if head isa Symbol || head.head === :curly
         # It is not type stable to do that, since the head type is changed, but at this
@@ -102,8 +104,10 @@ function _cyanotype(mod, doc, kmap, head, body)
         head = Expr(:<:, head, Cyanotype.AbstractBlueprint)
     end
 
+    kmap = eval(kmexp)
+
     # Flux name
-    flname = Cyanotype.MAPPINGS[kmap].flux_function #
+    flname = kmap.flux_function #
 
     # Flux ref for documentation
     #flref = "[`$flname`](@ref Flux.$flname)"
@@ -155,7 +159,7 @@ function _cyanotype(mod, doc, kmap, head, body)
     end
 
     # Adds fields defined by kmap
-    for (fname, flarg, T, def) in eachkwargs(Cyanotype.MAPPINGS[kmap]) #Cyanotype.
+    for (fname, flarg, T, def) in eachkwargs(kmap) #Cyanotype.
         fdoc = "`$fname`: see [`$flarg`](@ref Flux.$flname) (default `$def`)"
         _push_field!(fields, kwargs, fnames, fdocs, fname, T, def, fdoc)
         #push!(flnames, flname)
@@ -278,7 +282,7 @@ end
 
 function _mapping_func1(mod, name, kmap)
     func = mod === Cyanotype ? :(mapping) : :(Cyanotype.mapping)
-    :($func(::$name) = $(Cyanotype.MAPPINGS[kmap]))
+    :($func(::$name) = $(kmap))
 end
 
 function _getfields_func(mod, name, fnames)
