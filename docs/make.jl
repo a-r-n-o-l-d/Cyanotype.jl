@@ -1,6 +1,7 @@
 using Cyanotype
 using Documenter
 
+DocMeta.setdocmeta!(Flux, :DocTestSetup, :(using Flux); recursive = true)
 DocMeta.setdocmeta!(Cyanotype, :DocTestSetup, :(using Cyanotype); recursive=true)
 
 makedocs(;

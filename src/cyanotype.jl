@@ -42,7 +42,7 @@ documentation in `expr`, it is automatically appended to `doc`.
 Automatically generated functions:
 * `FooBluePrint(; kwargs...)`: keyword argument constructor for `FooBluePrint`
 * `mapping(::FooBluePrint)`: return, if defined, the mapping `kmap`
-* [`cyanotype(bp::FooBluePrint)`](@see cyanotype)
+* [`cyanotype(bp::FooBluePrint)`](@ref cyanotype)
 * `kwargs(bp::FooBluePrint)`: return, if defined, a `Dict` with the keyword arguments for
 the `Flux` function or constructor, it can be used as follow:
 `flux_function(arg1, arg2; kwargs(bp)...)`

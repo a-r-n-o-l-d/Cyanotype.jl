@@ -30,8 +30,6 @@ function make(bp::BatchNormBp; channels)
     BatchNorm(channels, bp.activation; kwargs(bp)...)
 end
 
-#make(bp::BatchNormBp; channels) = make(bp, channels)
-
 @cyanotype (
 """
     GroupNormBp(; kwargs...)
@@ -61,13 +59,11 @@ function make(bp::GroupNormBp; channels)
     GroupNorm(channels, bp.groups, bp.activation; kwargs(bp)...)
 end
 
-#make(bp::GroupNormBp; channels) = make(bp, channels)
-
 @cyanotype (
 """
 InstanceNormBp(; kwargs...)
 
-Describes a building process for a [`InstanceNorm`](@ref Flux.InstanceNorm) layer.
+Describes a building process for a [`InstanceNorm`](@ref) layer.
 make(channels, bp::CyInstanceNorm)
 """
 ) (
@@ -86,5 +82,3 @@ end
 function make(bp::InstanceNormBp; channels)
     InstanceNorm(channels, bp.activation; kwargs(bp)...)
 end
-
-#make(bp::InstanceNormBp; channels) = make(bp, channels)

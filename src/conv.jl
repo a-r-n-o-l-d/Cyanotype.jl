@@ -44,8 +44,6 @@ function make(bp::ConvBp; ksize, channels)
     _build_conv(bp.normalization, bp, k, channels) #|> flatten_layers
 end
 
-#make(bp::ConvBp; ksize, channels) = make(bp, ksize, channels)
-
 @cyanotype (
 """
     DoubleConvBp(; kwargs)
@@ -71,8 +69,6 @@ function make(bp::DoubleConvBp; ksize, channels)
         make(c2; ksize = ksize, channels = mid_chs=>out_chs)...
     ]
 end
-
-#make(bp::DoubleConvBp; ksize, channels) = make(bp, ksize, channels)
 
 # Peut-etre inutile
 @cyanotype (
