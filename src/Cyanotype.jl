@@ -6,7 +6,7 @@ module Cyanotype
 
 using Reexport
 @reexport using Flux
-using Flux: zeros32, ones32
+using Flux: zeros32, ones32, glorot_uniform
 
 export make, CyFloat
 

@@ -12,10 +12,10 @@ A cyanotype blueprint describing a convolutionnal module or layer depending om t
 ) (
 KwargsMapping(;
     flux_function  = :Conv,
-    field_names    = (:init,               :pad,      :dilation, :groups),
-    flux_kwargs    = (:init,               :pad,      :dilation, :groups),
-    field_types    = (:I,                  :P,        Int,      Int),
-    def_values     = (Flux.glorot_uniform, Flux.SamePad(), 1,         1)
+    field_names    = (:init,          :pad,      :dilation, :groups),
+    flux_kwargs    = (:init,          :pad,      :dilation, :groups),
+    field_types    = (:I,             :P,        Int,       Int),
+    def_values     = (glorot_uniform, SamePad(), 1,         1)
     )
 ) (
 struct ConvBp{N<:AbstractNormBp,I<:Function,P<:CyPad} <: AbstractConvBp

@@ -13,16 +13,13 @@ struct SqueezeExcite{A,GA}
 end
 )
 
-function make(bp::SqueezeExcite, channels)
-
-end
-
-function squeeze_and_excitation(chs; reduction, activation = relu, gate_activation = sigmoid)
+function make(bp::SqueezeExcite; channels)
+    mid_chs = channels ÷ reduction
     layers = Chain(GlobalMeanPool(),
-                    flatten,
-                    Dense(chs=>chs ÷ reduction, activation),
-                    Dense(chs ÷ reduction=>chs, gate_activation),
-                    unsqueeze(dims = 1) ∘ unsqueeze(dims = 1)) # Pour 3D : unsqueeze(dims = 1) ∘ unsqueeze(dims = 1) ∘ unsqueeze(dims = 1), plutot pipe
+                   flatten,
+                   Dense(channels=>mid_chs, bp.activation),
+                   Dense(mid_chs=>channels, bp.gate_activation),
+                   _unsqueeze(bp.volumetric))
     SkipConnection(layers, .*)
 end
 
