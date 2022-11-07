@@ -120,7 +120,6 @@ function make(bp::HybridAtrouConvBp, ksize, channels)
 end
 
 
-
 #_check_dilation_rates(3, [1, 2, 3])
 #_check_dilation_rates(3, [1, 2, 9]) || println("pouet")
 #_check_dilation_rates(3, [3, 2, 1])
@@ -150,7 +149,7 @@ function _build_conv(nm, bp, k, chs)
             act_c = activation
         end
         norm = cyanotype(nm; activation = act_n)
-        conv = Conv(k, chs, act_c; bias = bp.use_bias, kwargs(bp)...)
+        conv = Flux.Conv(k, chs, act_c; bias = bp.use_bias, kwargs(bp)...)
         push!(layers, make(norm, in_chs), conv)
     # Convolution first
     else
@@ -162,7 +161,7 @@ function _build_conv(nm, bp, k, chs)
             act_n = activation
         end
         norm = cyanotype(nm; activation = act_n)
-        conv = Conv(k, chs; bias = bp.use_bias, kwargs(bp)...)
+        conv = Flux.Conv(k, chs; bias = bp.use_bias, kwargs(bp)...)
         push!(layers, conv, make(norm, out_chs))
     end
     layers

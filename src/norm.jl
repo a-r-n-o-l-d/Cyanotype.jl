@@ -27,7 +27,7 @@ end
 )
 
 function make(bp::BatchNormBp, channels)
-    BatchNorm(channels, bp.activation; kwargs(bp)...)
+    Flux.BatchNorm(channels, bp.activation; kwargs(bp)...)
 end
 
 make(bp::BatchNormBp; channels) = make(bp, channels)

@@ -2,10 +2,11 @@
     KwargsMapping(; flux_function = :notflux, field_names = (), flux_kwargs = (),
                     field_types = (), def_values = ())
 
-Define a mapping of keyword arguments mapping to interface a blueprint with a `Flux`
-function or constructor.
+Define a mapping of keyword arguments to interface a blueprint with a `Flux` function or
+constructor.
 """
-struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},T3<:NTuple{N,Any}}
+struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},
+                     T3<:NTuple{N,Any}}
     flux_function::Symbol
     field_names::T1
     flux_kwargs::T1
@@ -31,7 +32,7 @@ cyanotype
 
 """
     @cyanotype(doc, expr)
-    @cyanotype(kmap, doc, expr)
+    @cyanotype(doc, kmap, expr)
 
 Defines a blueprint `DataType` with documentation `doc` and a struct declaration defined in
 `expr`. If the blueprint directly refers to a `Flux` function or constructor, `kmap` is the

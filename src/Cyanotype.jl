@@ -4,7 +4,8 @@ modules: high level modules
 =#
 module Cyanotype
 
-using Flux
+using Reexport
+@reexport using Flux
 #using Markdown: MD
 
 export make, CyFloat
@@ -23,11 +24,6 @@ include("utilities.jl")
 
 export cyanotype
 include("cyanotype.jl")
-
-#include("kwmapping.jl")
-#include("cyano.jl")
-#export register_mapping!
-#include("config.jl")
 
 export NoNormBp, BatchNormBp, GroupNormBp, InstanceNormBp
 include("norm.jl")

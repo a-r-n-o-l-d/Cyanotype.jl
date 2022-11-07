@@ -1,6 +1,19 @@
+@cyanotype (
+"""
 
+"""
+) (
+struct SqueezeExcite{GA}
+    @volumetric
+    @activation(Flux.relu)
+    gate_activation::GA = Flux.sigmoid
+    reduction::Int
+end
+)
 
+function make(bp::SqueezeExcite, channels)
 
+end
 
 function squeeze_and_excitation(chs; reduction, activation = relu, gate_activation = sigmoid)
     layers = Chain(GlobalMeanPool(),
