@@ -6,7 +6,7 @@ module Cyanotype
 
 using Reexport
 @reexport using Flux
-#using Markdown: MD
+using Flux: zeros32, ones32
 
 export make, CyFloat
 
@@ -30,5 +30,7 @@ include("norm.jl")
 
 export ConvBp, DoubleConvBp, NConvBp, HybridAtrouConvBp
 include("conv.jl")
+
+include("squeeze_excite.jl")
 
 end

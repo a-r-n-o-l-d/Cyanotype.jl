@@ -1,7 +1,5 @@
 #module CynotypeTest
 
-using Cyanotype
-using Flux
 using Cyanotype: KwargsMapping, @cyanotype
 #import Cyanotype: mapping
 
@@ -15,8 +13,13 @@ struct Foo
     b::Int = 2
     c = 3
     d
+    Cyanotype.@volumetric
 end
 )
+
+# Check the correctness of kwargs constructor
+f = Foo(; a = 42, b = 84, c = 666, d = 1.618, volumetric = false)
+
 
 # Checks the documentation generation
 @cyanotype (

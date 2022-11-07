@@ -39,12 +39,12 @@ struct ConvBp{N<:AbstractNormBp,I<:Function,P<:CyPad} <: AbstractConvBp
 end
 )
 
-function make(bp::ConvBp, ksize, channels)
+function make(bp::ConvBp; ksize, channels)
     k = bp.volumetric ? (ksize, ksize, ksize) : (ksize, ksize)
     _build_conv(bp.normalization, bp, k, channels) #|> flatten_layers
 end
 
-make(bp::ConvBp; ksize, channels) = make(bp, ksize, channels)
+#make(bp::ConvBp; ksize, channels) = make(bp, ksize, channels)
 
 @cyanotype (
 """
@@ -61,15 +61,18 @@ end
 
 # channels::Pair in_chs=>out_chs out_chs=>out_chs
 # channels::NTuple{3} in_chs=>mid_chs mid_chs=>out_chs
-function make(bp::DoubleConvBp, ksize, channels)
+function make(bp::DoubleConvBp; ksize, channels)
     # convolution1.volumetric == convolution2.volumetric || error("")
     c1 = cyanotype(bp.convolution1; volumetric = bp.volumetric)
     c2 = cyanotype(bp.convolution2; volumetric = bp.volumetric)
     in_chs, mid_chs, out_chs = channels
-    [make(c1, ksize, in_chs=>mid_chs)..., make(c2, ksize, mid_chs=>out_chs)...]
+    [
+        make(c1; ksize = ksize, channels = in_chs=>mid_chs)...,
+        make(c2; ksize = ksize, channels = mid_chs=>out_chs)...
+    ]
 end
 
-make(bp::DoubleConvBp; ksize, channels) = make(bp, ksize, channels)
+#make(bp::DoubleConvBp; ksize, channels) = make(bp, ksize, channels)
 
 # Peut-etre inutile
 @cyanotype (
@@ -87,7 +90,7 @@ function make(bp::NConvBp, ksize, channels)
     layers = []
     in_chs, out_chs = channels
     for _ in 1:bp.nrepeat
-        push!(layers, make(bp.convolution, ksize, in_chs=>out_chs)...)
+        push!(layers, make(bp.convolution; ksize = ksize, channels = in_chs=>out_chs)...)
         in_chs = out_chs
     end
     layers
@@ -113,7 +116,7 @@ function make(bp::HybridAtrouConvBp, ksize, channels)
     in_chs, out_chs = channels
     for dr in bp.dilation_rates
         c = cyanotype(bp.convolution; dilation = dr)
-        push!(layers, make(c, ksize, in_chs=>out_chs)...)
+        push!(layers, make(c; ksize = ksize, channels = in_chs=>out_chs)...)
         in_chs = out_chs
     end
     layers
@@ -149,8 +152,8 @@ function _build_conv(nm, bp, k, chs)
             act_c = activation
         end
         norm = cyanotype(nm; activation = act_n)
-        conv = Flux.Conv(k, chs, act_c; bias = bp.use_bias, kwargs(bp)...)
-        push!(layers, make(norm, in_chs), conv)
+        conv = Conv(k, chs, act_c; bias = bp.use_bias, kwargs(bp)...)
+        push!(layers, make(norm; channels = in_chs), conv)
     # Convolution first
     else
         # Activation before convolution ?
@@ -161,8 +164,8 @@ function _build_conv(nm, bp, k, chs)
             act_n = activation
         end
         norm = cyanotype(nm; activation = act_n)
-        conv = Flux.Conv(k, chs; bias = bp.use_bias, kwargs(bp)...)
-        push!(layers, conv, make(norm, out_chs))
+        conv = Conv(k, chs; bias = bp.use_bias, kwargs(bp)...)
+        push!(layers, conv, make(norm; channels =  out_chs))
     end
     layers
 end

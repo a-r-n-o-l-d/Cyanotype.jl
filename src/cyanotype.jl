@@ -130,7 +130,7 @@ function _cyanotype(mod, doc, kmexp, head, body)
 
     # Adds fields defined by kmap
     for (fname, flarg, T, def) in eachkwargs(kmap)
-        fdoc = "`$fname`: see [`$flarg`](@ref Flux.$flname) (default `$def`)"
+        fdoc = "`$fname`: see [`$flarg`](@ref ) (default `$def`)" #Flux.$flname
         _push_field!(fields, kwargs, fnames, fdocs, fname, T, def, fdoc)
     end
 
@@ -149,18 +149,18 @@ function _cyanotype(mod, doc, kmexp, head, body)
 end
 
 function _struct_name(head)
-    if head isa Symbol
-        sname = head
-    elseif head.head === :<:
+    #if head isa Symbol
+    #    sname = head
+    #elseif head.head === :<:
         # No parametric type
         if head.args[1] isa Symbol
             sname = head.args[1]
         else
             sname = head.args[1].args[1]
         end
-    else
-        sname = head.args[1]
-    end
+    #else
+    #    sname = head.args[1]
+    #end
 end
 
 _parse_body_field(field::Symbol, doc = "") = field, :Any, nothing, doc

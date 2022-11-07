@@ -16,21 +16,21 @@ Wraps a Flux.Batchnorm
 """
 ) (
 KwargsMapping(; flux_function = :BatchNorm,
-    field_names = (:init_shift,  :init_scale, :affine, :track_stats, :epsilon, :momentum),
-    flux_kwargs = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-    field_types = (:I1,          :I2,         Bool,    Bool,         :F,       :F),
-    def_values  = (Flux.zeros32, Flux.ones32, true,    true,         1f-5,     0.1f0))
+    field_names = (:init_shift, :init_scale, :affine, :track_stats, :epsilon, :momentum),
+    flux_kwargs = (:initβ,      :initγ,      :affine, :track_stats, :ϵ,       :momentum),
+    field_types = (:I1,         :I2,         Bool,    Bool,         :F,       :F),
+    def_values  = (zeros32,     ones32,      true,    true,         1f-5,     0.1f0))
 ) (
 struct BatchNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractNormBp
     @activation(relu)
 end
 )
 
-function make(bp::BatchNormBp, channels)
-    Flux.BatchNorm(channels, bp.activation; kwargs(bp)...)
+function make(bp::BatchNormBp; channels)
+    BatchNorm(channels, bp.activation; kwargs(bp)...)
 end
 
-make(bp::BatchNormBp; channels) = make(bp, channels)
+#make(bp::BatchNormBp; channels) = make(bp, channels)
 
 @cyanotype (
 """
@@ -43,10 +43,10 @@ make(channels, bp::CyGroupNorm)
 # !!!! `track_stats=true` will be removed from GroupNorm in Flux 0.14.
 KwargsMapping(;
     flux_function = :GroupNorm,
-    field_names = (:init_shift,  :init_scale, :affine, :track_stats, :epsilon, :momentum),
-    flux_kwargs = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-    field_types = (:I1,          :I2,         Bool,    Bool,         :F,       :F),
-    def_values  = (Flux.zeros32, Flux.ones32, true,    false,        1f-5,     0.1f0))
+    field_names = (:init_shift, :init_scale, :affine, :track_stats, :epsilon, :momentum),
+    flux_kwargs = (:initβ,      :initγ,      :affine, :track_stats, :ϵ,       :momentum),
+    field_types = (:I1,         :I2,         Bool,    Bool,         :F,       :F),
+    def_values  = (zeros32,     ones32,      true,    false,        1f-5,     0.1f0))
 ) (
 struct GroupNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractNormBp
     @activation(relu)
@@ -57,11 +57,11 @@ struct GroupNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: Abstract
 end
 )
 
-function make(bp::GroupNormBp, channels)
+function make(bp::GroupNormBp; channels)
     GroupNorm(channels, bp.groups, bp.activation; kwargs(bp)...)
 end
 
-make(bp::GroupNormBp; channels) = make(bp, channels)
+#make(bp::GroupNormBp; channels) = make(bp, channels)
 
 @cyanotype (
 """
@@ -73,18 +73,18 @@ make(channels, bp::CyInstanceNorm)
 ) (
 KwargsMapping(;
     flux_function = :InstanceNorm,
-    field_names = (:init_shift,  :init_scale, :affine, :track_stats, :epsilon, :momentum),
-    flux_kwargs = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-    field_types = (:I1,          :I2,         Bool,    Bool,         :F,       :F),
-    def_values  = (Flux.zeros32, Flux.ones32, false,    false,        1f-5,     0.1f0))
+    field_names = (:init_shift, :init_scale, :affine, :track_stats, :epsilon, :momentum),
+    flux_kwargs = (:initβ,      :initγ,      :affine, :track_stats, :ϵ,       :momentum),
+    field_types = (:I1,         :I2,         Bool,    Bool,         :F,       :F),
+    def_values  = (zeros32,     ones32,      false,   false,        1f-5,     0.1f0))
 ) (
 struct InstanceNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractNormBp
     @activation(relu)
 end
 )
 
-function make(bp::InstanceNormBp, channels)
+function make(bp::InstanceNormBp; channels)
     InstanceNorm(channels, bp.activation; kwargs(bp)...)
 end
 
-make(bp::InstanceNormBp; channels) = make(bp, channels)
+#make(bp::InstanceNormBp; channels) = make(bp, channels)

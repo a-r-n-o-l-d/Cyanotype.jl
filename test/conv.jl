@@ -52,16 +52,14 @@ model = Chain(make(NConvBp(; convolution = ConvBp(), nrepeat = 3), 3, 4=>16)...)
 
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
-HybridAtrouConvBp() |> println
+
 
 model = Chain(make(HybridAtrouConvBp(), 3, 4=>16)...)
-println(model)
+
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
 
 hac = HybridAtrouConvBp()
-cyanotype(hac; convolution = cyanotype(hac.convolution; activation = leakyrelu)) |> println
-model = Chain(make(hac, 3, 4=>16)...)
-println(model)
 
-DoubleConvBp(; convolution1 = hac) |> println
+model = Chain(make(hac, 3, 4=>16)...)
+@test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
