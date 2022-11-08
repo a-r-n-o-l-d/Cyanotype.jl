@@ -1,17 +1,16 @@
 using Flux: unsqueeze, flatten
 
-@cyanotype (
-"""
+@cyanotype begin
+    """
 
-"""
-) (
-struct SqueezeExciteBp{A,GA}
-    @volumetric
-    @activation(Flux.relu)
-    gate_activation::GA = Flux.sigmoid
-    reduction::Int
+    """
+    struct SqueezeExciteBp{A,GA}
+        @volumetric
+        @activation(Flux.relu)
+        gate_activation::GA = Flux.sigmoid
+        reduction::Int
+    end
 end
-)
 
 function make(bp::SqueezeExciteBp; channels)
     mid_chs = channels ÷ bp.reduction

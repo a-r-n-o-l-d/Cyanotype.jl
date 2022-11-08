@@ -1,85 +1,77 @@
 #module CynotypeTest
 
-using Cyanotype: KwargsMapping, @cyanotype
+#using Cyanotype: KwargsMapping, @cyanotype
 #import Cyanotype: mapping
 
-@cyanotype (
-"""
-Bla-bla
-"""
-) (
-struct Foo
-    a::Int = 1
-    b::Int
-    c = 3
-    d
-    Cyanotype.@volumetric
+@cyanotype begin
+    """
+    Bla-bla
+    """
+    struct Foo
+        a::Int = 1
+        b::Int
+        c = 3
+        d
+        Cyanotype.@volumetric
+    end
 end
-)
 
 # Check the correctness of kwargs constructor
 f = Foo(; a = 42, b = 84, c = 666, d = 1.618, volumetric = false)
 @test f.a == 42
 
 # Check the documentation generation
-@cyanotype (
-"""
-Bla-bla
-"""
-) (
-struct Foo1
-    """Activation function."""
-    activation
+@cyanotype begin
+    """
+    Bla-bla
+    """
+    struct Foo1
+        """Activation function."""
+        activation
+    end
 end
-)
 @test !isempty(eval(macroexpand(@__MODULE__, :(@doc $Foo1))))
 
 # Check the correctness of parametric type declaration
-@cyanotype (
-"""
-Bla-bla
-"""
-) (
-struct Foo2{F <: Function}
-    activation::F = relu
+@cyanotype begin
+    """
+    Bla-bla
+    """
+    struct Foo2{F <: Function}
+        activation::F = relu
+    end
 end
-)
 @test Foo2().activation isa Function
 
 # Check the default inheritance from AbstractBlueprint
-@cyanotype (
-"""
-Bla-bla
-"""
-) (
-struct Foo3
+@cyanotype begin
+    """
+    Bla-bla
+    """
+    struct Foo3
 
+    end
 end
-)
 @test Foo3() isa Cyanotype.AbstractBlueprint
 
-@cyanotype (
-"""
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-"""
-) (
-KwargsMapping(;
-    flux_function = :BatchNorm,
-    field_names = (:init_bias,   :init_scale, :affine, :track_stats, :epsilon, :momentum),
-    flux_kwargs = (:initβ,       :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-    field_types = (Any,         Any,   Bool,   Bool,        :N,       :N),
-    def_values  = (Flux.zeros32, Flux.ones32, true, true, 1f-5, 0.1f0)
+@cyanotype begin
+    KwargsMapping(;
+        flux_function = :BatchNorm,
+        field_names = (:init_bias, :init_scale, :affine, :track_stats, :epsilon, :momentum),
+        flux_kwargs = (:initβ,     :initγ,      :affine, :track_stats, :ϵ,       :momentum),
+        field_types = (Any,        Any,         Bool,     Bool,        :N,       :N),
+        def_values  = (Flux.zeros32, Flux.ones32, true, true, 1f-5, 0.1f0)
     )
-) (
-struct BatchNormTest{N <: CyFloat}
-    """activation function for BatchNorm layer"""
-    activation
+
+    """
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+    incididunt.
+    """
+    struct BatchNormTest{N <: CyFloat}
+        """activation function for BatchNorm layer"""
+        activation
+    end
 end
-)
 
 # Check the correctness of fields declaration
 for f in (:init_bias, :init_scale, :affine, :track_stats, :epsilon, :momentum)

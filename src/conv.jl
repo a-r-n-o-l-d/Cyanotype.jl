@@ -2,60 +2,58 @@ abstract type AbstractConvBp <: AbstractBlueprint end
 
 const CyPad = Union{SamePad,Int}
 
-@cyanotype (
-"""
-    ConvBp(; kwargs)
+@cyanotype begin
+    KwargsMapping(;
+        flux_function  = :Conv,
+        field_names    = (:init,          :pad,      :dilation, :groups),
+        flux_kwargs    = (:init,          :pad,      :dilation, :groups),
+        field_types    = (:I,             :P,        Int,       Int),
+        def_values     = (glorot_uniform, SamePad(), 1,         1)
+        )
 
-A cyanotype blueprint describing a convolutionnal module or layer depending om the value of
-`normalization` argument.
-"""
-) (
-KwargsMapping(;
-    flux_function  = :Conv,
-    field_names    = (:init,          :pad,      :dilation, :groups),
-    flux_kwargs    = (:init,          :pad,      :dilation, :groups),
-    field_types    = (:I,             :P,        Int,       Int),
-    def_values     = (glorot_uniform, SamePad(), 1,         1)
-    )
-) (
-struct ConvBp{N<:AbstractNormBp,I<:Function,P<:CyPad} <: AbstractConvBp
-    @volumetric
     """
-    `normalization`:
+        ConvBp(; kwargs)
+
+    A cyanotype blueprint describing a convolutionnal module or layer depending om the value
+    of `normalization` argument.
     """
-    normalization::N = NoNormBp()
-    """
-    `reverse_norm`:
-    """
-    reverse_norm::Bool = false
-    """
-    `pre_activation`:
-    """
-    pre_activation::Bool = false
-    """
-    `use_bias`:
-    """
-    use_bias::Bool = normalization isa NoNormBp
+    struct ConvBp{N<:AbstractNormBp,I<:Function,P<:CyPad} <: AbstractConvBp
+        @volumetric
+        """
+        `normalization`:
+        """
+        normalization::N = NoNormBp()
+        """
+        `reverse_norm`:
+        """
+        reverse_norm::Bool = false
+        """
+        `pre_activation`:
+        """
+        pre_activation::Bool = false
+        """
+        `use_bias`:
+        """
+        use_bias::Bool = normalization isa NoNormBp
+    end
 end
-)
 
 function make(bp::ConvBp; ksize, channels)
     k = bp.volumetric ? (ksize, ksize, ksize) : (ksize, ksize)
     _build_conv(bp.normalization, bp, k, channels) #|> flatten_layers
 end
 
-@cyanotype (
-"""
-    DoubleConvBp(; kwargs)
-Describes a convolutionnal module formed by two successive convolutionnal modules.
-"""
-) (
-struct DoubleConvBp{C1<:AbstractConvBp,C2<:AbstractConvBp} <: AbstractConvBp
-    @volumetric #enlever
-    convolution1::C1
-    convolution2::C2 = convolution1
+@cyanotype begin
+    """
+        DoubleConvBp(; kwargs)
+    Describes a convolutionnal module formed by two successive convolutionnal modules.
+    """
+    struct DoubleConvBp{C1<:AbstractConvBp,C2<:AbstractConvBp} <: AbstractConvBp
+        @volumetric #enlever
+        convolution1::C1
+        convolution2::C2 = convolution1
+    end
 end
-)
 
 # channels::Pair in_chs=>out_chs out_chs=>out_chs
 # channels::NTuple{3} in_chs=>mid_chs mid_chs=>out_chs
@@ -71,16 +69,15 @@ function make(bp::DoubleConvBp; ksize, channels)
 end
 
 # Peut-etre inutile
-@cyanotype (
-"""
-Template describing a module with N `NConvBp` repeated.
-"""
-) (
-struct NConvBp{C<:AbstractConvBp} <: AbstractConvBp
-    convolution::C
-    nrepeat::Int
+@cyanotype begin
+    """
+    Template describing a module with N `NConvBp` repeated.
+    """
+    struct NConvBp{C<:AbstractConvBp} <: AbstractConvBp
+        convolution::C
+        nrepeat::Int
+    end
 end
-)
 
 function make(bp::NConvBp, ksize, channels)
     layers = []
@@ -92,19 +89,18 @@ function make(bp::NConvBp, ksize, channels)
     layers
 end
 
-@cyanotype (
-"""
-aka Hybrid Dilated Convolution
-[paper](@ref https://doi.org/10.1109/WACV.2018.00163)
-[example](@ref https://doi.org/10.1016/j.image.2019.115664)
-[example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
-"""
-) (
-struct HybridAtrouConvBp{N,C<:ConvBp} <: AbstractConvBp
-    dilation_rates::NTuple{N,Int} = (1, 2, 3)
-    convolution::C = ConvBp(; normalization = BatchNormBp())
+@cyanotype begin
+    """
+    aka Hybrid Dilated Convolution
+    [paper](@ref https://doi.org/10.1109/WACV.2018.00163)
+    [example](@ref https://doi.org/10.1016/j.image.2019.115664)
+    [example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
+    """
+    struct HybridAtrouConvBp{N,C<:ConvBp} <: AbstractConvBp
+        dilation_rates::NTuple{N,Int} = (1, 2, 3)
+        convolution::C = ConvBp(; normalization = BatchNormBp())
+    end
 end
-)
 
 function make(bp::HybridAtrouConvBp; ksize, channels)
     _check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")

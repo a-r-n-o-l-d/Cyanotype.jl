@@ -22,7 +22,7 @@ make
 export spread, flatten_layers
 include("utilities.jl")
 
-export cyanotype
+export cyanotype, KwargsMapping, @cyanotype
 include("cyanotype.jl")
 
 export NoNormBp, BatchNormBp, GroupNormBp, InstanceNormBp
