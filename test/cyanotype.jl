@@ -10,7 +10,7 @@ Bla-bla
 ) (
 struct Foo
     a::Int = 1
-    b::Int = 2
+    b::Int
     c = 3
     d
     Cyanotype.@volumetric
@@ -19,9 +19,9 @@ end
 
 # Check the correctness of kwargs constructor
 f = Foo(; a = 42, b = 84, c = 666, d = 1.618, volumetric = false)
+@test f.a == 42
 
-
-# Checks the documentation generation
+# Check the documentation generation
 @cyanotype (
 """
 Bla-bla
@@ -34,7 +34,7 @@ end
 )
 @test !isempty(eval(macroexpand(@__MODULE__, :(@doc $Foo1))))
 
-# Checks the correctness of parametric type declaration
+# Check the correctness of parametric type declaration
 @cyanotype (
 """
 Bla-bla
@@ -46,7 +46,7 @@ end
 )
 @test Foo2().activation isa Function
 
-# Checks the default inheritance from AbstractBlueprint
+# Check the default inheritance from AbstractBlueprint
 @cyanotype (
 """
 Bla-bla
@@ -81,31 +81,20 @@ struct BatchNormTest{N <: CyFloat}
 end
 )
 
-# Checks the correctness of fields declaration
+# Check the correctness of fields declaration
 for f in (:init_bias, :init_scale, :affine, :track_stats, :epsilon, :momentum)
     @test hasfield(BatchNormTest, f)
 end
 
-# Checks cyanotype function
+# Check cyanotype function
 bn = BatchNormTest(; activation = relu)
 bn = cyanotype(bn; affine = false, epsilon = 0f0)
 @test bn.affine == false
 @test bn.epsilon == 0f0
 
-# Checks kwargs function, for now calling of the curate function
+# Check kwargs function
 bn = BatchNormTest(; activation = relu)
 @test haskey(Cyanotype.kwargs(bn), :initβ)
 @test haskey(Cyanotype.kwargs(bn), :initγ)
 @test haskey(Cyanotype.kwargs(bn), :ϵ)
 @test !haskey(Cyanotype.kwargs(bn), :activation)
-
-
-#methods(BatchNormTest1) |> println
-
-#println(eval(macroexpand(__module__, :(@doc BatchNormTest1)) ) )
-
-#cya = BatchNormTest1(; activation = relu)
-#cya |> println
-
-#cyanotype(cya; affine = false) |> println
-#end

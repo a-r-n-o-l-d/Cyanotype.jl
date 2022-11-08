@@ -1,8 +1,8 @@
 """
     spread(bp; kwargs...)
 
-Return a new cyanotype blueprint with `kwargs` spreaded over all fields of `bp`. This
-function allows to modify all nested cyanotypes at once.
+Return a new blueprint with `kwargs` spreaded over all fields of `bp`. This function allows
+to modify all nested cyanotypes at once.
 
 ```julia
 # Nice printing of large objects
@@ -100,6 +100,7 @@ end
 
 #const ACTIVATION_DOC_RELU = activation_doc()
 
+#=
 function autogen_build_doc(T, with_kernel_size, with_channels)
     doc = "build("
     if with_kernel_size
@@ -111,6 +112,7 @@ function autogen_build_doc(T, with_kernel_size, with_channels)
     doc = doc * "cya::$T)"
     "$doc See [`$T`](@ref)"
 end
+=#
 
 #const VOLUMETRIC_FIELD = :(volumetric::Bool = false) # pas encore test
 
