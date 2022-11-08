@@ -1,11 +1,11 @@
-using Flux: unsqueeze
+using Flux: unsqueeze, flatten
 
 @cyanotype (
 """
 
 """
 ) (
-struct SqueezeExcite{A,GA}
+struct SqueezeExciteBp{A,GA}
     @volumetric
     @activation(Flux.relu)
     gate_activation::GA = Flux.sigmoid
@@ -13,8 +13,8 @@ struct SqueezeExcite{A,GA}
 end
 )
 
-function make(bp::SqueezeExcite; channels)
-    mid_chs = channels ÷ reduction
+function make(bp::SqueezeExciteBp; channels)
+    mid_chs = channels ÷ bp.reduction
     layers = Chain(GlobalMeanPool(),
                    flatten,
                    Dense(channels=>mid_chs, bp.activation),

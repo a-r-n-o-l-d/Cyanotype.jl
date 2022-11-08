@@ -18,6 +18,10 @@ using Aqua
         end
     end
 
+    @testset "utilities" begin
+        include("utilities.jl")
+    end
+
     @testset "Cyanotype" begin
         include("cyanotype.jl")
     end
@@ -28,5 +32,9 @@ using Aqua
 
     @testset "Conv" begin
         include("conv.jl")
+    end
+
+    @testset "Squeeze excite" begin
+        include("squeeze_excite.jl")
     end
 end

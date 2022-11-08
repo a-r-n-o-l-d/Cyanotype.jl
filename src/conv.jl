@@ -106,7 +106,7 @@ struct HybridAtrouConvBp{N,C<:ConvBp} <: AbstractConvBp
 end
 )
 
-function make(bp::HybridAtrouConvBp, ksize, channels)
+function make(bp::HybridAtrouConvBp; ksize, channels)
     _check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")
     layers = []
     in_chs, out_chs = channels

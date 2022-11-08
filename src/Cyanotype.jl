@@ -19,7 +19,7 @@ abstract type AbstractBlueprint end
 """
 make
 
-export spread
+export spread, flatten_layers
 include("utilities.jl")
 
 export cyanotype
@@ -31,6 +31,7 @@ include("norm.jl")
 export ConvBp, DoubleConvBp, NConvBp, HybridAtrouConvBp
 include("conv.jl")
 
+export SqueezeExciteBp
 include("squeeze_excite.jl")
 
 end
