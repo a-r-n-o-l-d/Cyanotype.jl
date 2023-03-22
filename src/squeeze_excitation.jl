@@ -4,21 +4,32 @@ using Flux: unsqueeze, flatten
     """
 
     """
-    struct SqueezeExciteBp{A,GA}
+    struct BpSqueezeExcitation{A,GA}
         @volumetric
         @activation(Flux.relu)
         gate_activation::GA = Flux.sigmoid
         reduction::Int
+        #=
+        dconvolution::C = DoubleConvolution(; convolution1 = Convolution(; activation = relu),
+        convolution2 = Convolution(; activation = sigmoid))
+        =#
     end
 end
 
-function make(bp::SqueezeExciteBp; channels)
+function make(bp::BpSqueezeExcitation; channels)
     mid_chs = channels ÷ bp.reduction
+    #=
+    k = bp.volumetric ? (1, 1, 1) : (1, 1)
+    layers = [
+        AdaptiveMeanPool(k),
+        make(bp.dconv; ksize = k, channels = (channels, mid_chs, channels)),
+    ]
+    =#
     layers = Chain(GlobalMeanPool(),
                    flatten,
                    Dense(channels=>mid_chs, bp.activation),
                    Dense(mid_chs=>channels, bp.gate_activation),
-                   _unsqueeze(bp.volumetric))
+                   _unsqueeze(bp.vol))
     SkipConnection(layers, .*)
 end
 

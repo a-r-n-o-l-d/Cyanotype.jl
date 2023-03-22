@@ -1,3 +1,3 @@
-hac = HybridAtrouConvBp()
+hac = BpHAConv()
 hac2 = spread(hac; activation = leakyrelu)
-@test hac2.convolution.normalization.activation == leakyrelu
+@test hac2.conv.norm.activation == leakyrelu

@@ -17,7 +17,7 @@
 end
 
 # Check the correctness of kwargs constructor
-f = Foo(; a = 42, b = 84, c = 666, d = 1.618, volumetric = false)
+f = Foo(; a = 42, b = 84, c = 666, d = 1.618, vol = false)
 @test f.a == 42
 
 # Check the documentation generation
@@ -55,12 +55,12 @@ end
 @test Foo3() isa Cyanotype.AbstractBlueprint
 
 @cyanotype begin
-    KwargsMapping(;
-        flux_function = :BatchNorm,
-        field_names = (:init_bias, :init_scale, :affine, :track_stats, :epsilon, :momentum),
-        flux_kwargs = (:initβ,     :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-        field_types = (Any,        Any,         Bool,     Bool,        :N,       :N),
-        def_values  = (Flux.zeros32, Flux.ones32, true, true, 1f-5, 0.1f0)
+    KwargsMapping(
+        flfunc = :BatchNorm,
+        fnames = (:init_bias, :init_scale, :affine, :track_stats, :epsilon, :momentum),
+        flargs = (:initβ,     :initγ,      :affine, :track_stats, :ϵ,       :momentum),
+        ftypes = (Any,        Any,         Bool,     Bool,        :N,       :N),
+        defval = (Flux.zeros32, Flux.ones32, true, true, 1f-5, 0.1f0)
     )
 
     """

@@ -27,14 +27,18 @@ using Aqua
     end
 
     @testset "Norm" begin
-        include("norm.jl")
+        include("normalizations.jl")
     end
 
     @testset "Conv" begin
-        include("conv.jl")
+        include("convolutions.jl")
     end
 
     @testset "Squeeze excite" begin
-        include("squeeze_excite.jl")
+        include("squeeze_excitation.jl")
+    end
+
+    @testset "DropBlock" begin
+        include("dropblock.jl")
     end
 end

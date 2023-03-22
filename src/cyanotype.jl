@@ -8,28 +8,28 @@ blueprint.
 cyanotype
 
 """
-    KwargsMapping(; flux_function = :notflux, field_names = (), flux_kwargs = (),
-                    field_types = (), def_values = ())
+    KwargsMapping(; flux_function = :notflux, field_names = (), flargs = (),
+                    ftypes = (), defval = ())
 
 Define a mapping of keyword arguments to interface a blueprint with a `Flux` function or
 constructor.
 """
-struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},
+struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}}, #FluxKwargs
                      T3<:NTuple{N,Any}}
-    flux_function::Symbol
-    field_names::T1
-    flux_kwargs::T1
-    field_types::T2
-    def_values::T3
+    flfunc::Symbol
+    fnames::T1
+    flargs::T1
+    ftypes::T2
+    defval::T3
 end
 
-function KwargsMapping(; flux_function = :notflux, field_names = (), flux_kwargs = (),
-                         field_types = (), def_values = ())
-    KwargsMapping(flux_function, field_names, flux_kwargs, field_types, def_values)
+function KwargsMapping(; flfunc = :notflux, fnames = (), flargs = (),
+    ftypes = (), defval = ())
+    KwargsMapping(flfunc, fnames, flargs, ftypes, defval)
 end
 
-@inline eachkwargs(km::KwargsMapping) = zip(km.field_names, km.flux_kwargs, km.field_types,
-                                    km.def_values)
+@inline eachkwargs(km::KwargsMapping) = zip(km.fnames, km.flargs, km.ftypes,
+                                    km.defval)
 """
     @cyanotype(expr)
     @cyanotype begin
@@ -126,7 +126,7 @@ function _cyanotype(mod, doc, kmexp, head, body)
     kmap = eval(kmexp)
 
     # Flux name
-    flname = kmap.flux_function
+    flname = kmap.flfunc
 
     # Blueprint name
     name = _struct_name(head)
@@ -313,8 +313,8 @@ function _kwargs_func(mod, name)
             kmap = $mp(bp)
             kwargs = Dict()
             fields = $gf(bp)
-            for (i, arg) in enumerate(kmap.flux_kwargs)
-                push!(kwargs, arg=>fields[kmap.field_names[i]])
+            for (i, arg) in enumerate(kmap.flargs)
+                push!(kwargs, arg=>fields[kmap.fnames[i]])
             end
             kwargs
         end

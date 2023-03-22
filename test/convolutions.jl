@@ -1,24 +1,30 @@
-conv = ConvBp()
-norms = [NoNormBp(), BatchNormBp(), GroupNormBp(; groups = 2), InstanceNormBp()]
+conv = BpConv()
+norms = [
+            BpNoNorm(),
+            BpBatchNorm(),
+            BpGroupNorm(; groups = 2),
+            BpInstanceNorm()
+        ]
 revs = pres = [true, false]
 for n in norms, r in revs, p in pres
-    c = cyanotype(conv; normalization = n, pre_activation = p, reverse_norm = r)
+    c = cyanotype(conv; norm = n, preact = p, revnorm = r)
     m = Chain(make(c; ksize = 3, channels = 8=>16)...)
     @test Flux.outputsize(m, (32, 32, 8, 16)) == (32, 32, 16, 16)
 end
 
-dc = DoubleConvBp(; convolution1 = ConvBp(), convolution2 = ConvBp(; normalization = BatchNormBp()))
+dc = BpDConv(; conv1 = BpConv(),
+                         conv2 = BpConv(; norm = BpBatchNorm()))
 
 model = Chain(make(dc; ksize = 3, channels = (8, 16, 32))...)
 @test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 32, 16)
 
-model = Chain(make(NConvBp(; convolution = ConvBp(), nrepeat = 3), 3, 4=>16)...)
+model = Chain(make(BpNConv(; convolution = BpConv(), nrepeat = 3); ksize = 3, channels = 4=>16)...)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
-model = Chain(make(HybridAtrouConvBp(); ksize = 3, channels = 4=>16)...)
+model = Chain(make(BpHAConv(); ksize = 3, channels = 4=>16)...)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
 
-hac = HybridAtrouConvBp()
+hac = BpHAConv()
 model = Chain(make(hac; ksize = 3, channels = 4=>16)...)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)

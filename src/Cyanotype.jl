@@ -1,12 +1,19 @@
 #=
 wrappers: Flux to Cyanotype
 modules: high level modules
+To do :
+    - rename fields with shorter names
 =#
 module Cyanotype
 
 using Reexport
 @reexport using Flux
+#using CUDA
 using Flux: zeros32, ones32, glorot_uniform
+#using ChainRulesCore
+#using Functors
+#using MLUtils
+#using Random
 
 export make, CyFloat
 
@@ -25,13 +32,22 @@ include("utilities.jl")
 export cyanotype, KwargsMapping, @cyanotype
 include("cyanotype.jl")
 
-export NoNormBp, BatchNormBp, GroupNormBp, InstanceNormBp
-include("norm.jl")
+export BpNoNorm, BpBatchNorm, BpGroupNorm, BpInstanceNorm
+include("normalizations.jl")
 
-export ConvBp, DoubleConvBp, NConvBp, HybridAtrouConvBp
-include("conv.jl")
+export BpConv, BpDConv, BpNConv, BpHAConv
+include("convolutions.jl")
 
-export SqueezeExciteBp
-include("squeeze_excite.jl")
+export BpSqueezeExcitation
+include("squeeze_excitation.jl")
+
+include("samplers.jl")
+
+include("classifiers.jl")
+
+include("u_network.jl")
+
+#export DropBlock
+#include("dropblock.jl")
 
 end

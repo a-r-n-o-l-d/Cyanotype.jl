@@ -28,6 +28,56 @@ function spread(bp; kwargs...)
     _blueprint_gen(stack)
 end
 
+"""
+    chcat(x...)
+
+Concatenate the image data along the dimension corresponding to the channels.
+Image data should be stored in WHCN order (width, height, channels, batch) or
+WHDCN (width, height, depth, channels, batch) in 3D context. Channels are
+assumed to be the penultimate dimension.
+
+# Example
+```julia
+julia> x1 = rand(32, 32, 4, 6); # a batch of 6 images (32x32) with 4 channels
+
+julia> x2 = rand(32, 32, 4, 6); # a batch of 6 images (32x32) with 4 channels
+
+julia> chcat(x1, x2) |> size
+(32, 32, 8, 6)
+```
+"""
+chcat(x...) = cat(x...; dims = (x[1] |> size |> length) - 1)
+
+function flatten_layers(layers...)
+    result = []
+    _flatten_layers!(result, layers)
+    result
+end
+
+@inline genk(k, vol) = vol ? (k, k, k) : (k, k)
+
+macro volumetric()
+    esc(
+    quote
+        """
+        `vol`: indicates a building process for three-dimensionnal data (default `false`)
+        """
+        vol::Bool = false
+    end)
+end
+
+macro activation(func)
+    ref = "[`$func`](@ref $func)"
+    doc = "`activation`: activation function (default [`$func`](@ref Flux.$func))"
+    esc(
+    quote
+        """
+        $($(doc))
+        """
+        activation::A = $func #act
+    end)
+end
+
 # Shortcut that do nothing if not an AbstractBlueprint
 _parse_blueprint!(::Any, ::Any, ::Any; kwargs...) = nothing
 
@@ -70,17 +120,6 @@ function _blueprint_gen(stack)
     blueprints[:top]
 end
 
-#str2sym(d) = Dict(Symbol(k) => v for (k,v) in d)
-
-#sym2str(d) = Dict(String(k) => v for (k,v) in d)
-
-function flatten_layers(layers...) #clean_layers
-    result = []
-    #@code_warntype _flatten_layers!(result, layers)
-    _flatten_layers!(result, layers)
-    result
-end
-
 function _flatten_layers!(buffer, layers)
     if applicable(iterate, layers)
         for l in layers
@@ -115,25 +154,3 @@ end
 =#
 
 #const VOLUMETRIC_FIELD = :(volumetric::Bool = false) # pas encore test
-
-macro volumetric()
-    esc(
-    quote
-        """
-        `volumetric`: indicates a building process for three-dimensionnal data (default `false`)
-        """
-        volumetric::Bool = false
-    end)
-end
-
-macro activation(func)
-    ref = "[`$func`](@ref $func)"
-    doc = "`activation`: activation function (default [`$func`](@ref Flux.$func))"
-    esc(
-    quote
-        """
-        $($(doc))
-        """
-        activation::A = $func
-    end)
-end
