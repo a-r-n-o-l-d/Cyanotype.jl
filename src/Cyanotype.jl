@@ -3,6 +3,7 @@ wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
     - rename fields with shorter names
+    - replace NoNorm by nothing
 =#
 module Cyanotype
 

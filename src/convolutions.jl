@@ -22,7 +22,7 @@ const CyPad = Union{SamePad,Int}
         """
         `norm`:
         """
-        norm::N = BpNoNorm()
+        norm::N = BpNoNorm() #nothing
         """
         `revnorm`:
         """
