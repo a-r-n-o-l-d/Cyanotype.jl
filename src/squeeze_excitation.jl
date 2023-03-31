@@ -19,7 +19,7 @@ end
 function make(bp::BpSqueezeExcitation; channels)
     mid_chs = channels ÷ bp.reduction
     #=
-    k = bp.volumetric ? (1, 1, 1) : (1, 1)
+    k = genk(1, bp.vol) #bp.volumetric ? (1, 1, 1) : (1, 1)
     layers = [
         AdaptiveMeanPool(k),
         make(bp.dconv; ksize = k, channels = (channels, mid_chs, channels)),
