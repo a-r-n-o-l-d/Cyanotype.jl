@@ -105,13 +105,13 @@ end
     [example](@ref https://doi.org/10.1016/j.image.2019.115664)
     [example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
     """
-    struct BpHAConv{N,C<:BpConv} <: AbstractBpConv
+    struct BpHybridAtrouConv{N,C<:BpConv} <: AbstractBpConv #BpHybridAtrouConv
         dilation_rates::NTuple{N,Int} = (1, 2, 3)
         conv::C = BpConv(normalization=BpBatchNorm())
     end
 end
 
-function make(bp::BpHAConv; ksize = 3, channels)
+function make(bp::BpHybridAtrouConv; ksize = 3, channels)
     _check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")
     layers = []
     in_chs, out_chs = channels
@@ -122,11 +122,6 @@ function make(bp::BpHAConv; ksize = 3, channels)
     end
     layers
 end
-
-
-#_check_dilation_rates(3, [1, 2, 3])
-#_check_dilation_rates(3, [1, 2, 9]) || println("pouet")
-#_check_dilation_rates(3, [3, 2, 1]).
 
 ############################################################################################
 #                                   INTERNAL FUNCTIONS                                     #

@@ -21,10 +21,10 @@ model = Chain(make(dc; ksize = 3, channels = (8, 16, 32))...)
 model = Chain(make(BpNConv(; convolution=BpConv(), nrepeat=3); ksize=3, channels=4=>16)...)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
-model = Chain(make(BpHAConv(); ksize=3, channels=4=>16)...)
+model = Chain(make(BpHybridAtrouConv(); ksize=3, channels=4=>16)...)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
 
-hac = BpHAConv()
+hac = BpHybridAtrouConv()
 model = Chain(make(hac; ksize=3, channels=4=>16)...)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)

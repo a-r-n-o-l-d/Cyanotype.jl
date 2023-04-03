@@ -3,10 +3,9 @@ wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
     - cleaning
-    - rename fields with shorter names
-    - replace NoNorm by nothing
+    x replace NoNorm by nothing
     - ResidualConnection with dropout
-    - volmetric -> volume (more clear)
+    x volmetric -> volume (more clear)
 =#
 module Cyanotype
 
@@ -39,7 +38,7 @@ include("cyanotype.jl")
 export BpNoNorm, BpBatchNorm, BpGroupNorm, BpInstanceNorm
 include("normalizations.jl")
 
-export BpConv, BpDConv, BpNConv, BpHAConv
+export BpConv, BpDConv, BpNConv, BpHybridAtrouConv
 include("convolutions.jl")
 
 export BpSqueezeExcitation
