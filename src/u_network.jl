@@ -6,7 +6,7 @@ const DEFUCONV = BpDConv(; conv1 = BpConv(;norm = BpBatchNorm()))
     """
     struct UModelBp{C<:BpDConv,D<:AbstractDownSamplerBp,U<:AbstractUpSamplerBp,
                     P<:PixelClassifierBp}
-        @volumetric
+        @volume
         inchannels::Int
         nlevels::Int = 4
         basewidth::Int = 64

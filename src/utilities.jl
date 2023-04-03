@@ -56,13 +56,13 @@ end
 
 @inline genk(k, vol) = vol ? (k, k, k) : (k, k)
 
-macro volumetric()
+macro volume()
     esc(
     quote
         """
-        `vol`: indicates a building process for three-dimensionnal data (default `false`)
+        `volume`: indicates a building process for three-dimensionnal data (default `false`)
         """
-        vol::Bool = false
+        volume::Bool = false
     end)
 end
 

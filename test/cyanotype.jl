@@ -12,12 +12,12 @@
         b::Int
         c = 3
         d
-        Cyanotype.@volumetric
+        Cyanotype.@volume
     end
 end
 
 # Check the correctness of kwargs constructor
-f = Foo(; a = 42, b = 84, c = 666, d = 1.618, vol = false)
+f = Foo(; a=42, b=84, c=666, d=1.618, volume=false)
 @test f.a == 42
 
 # Check the documentation generation

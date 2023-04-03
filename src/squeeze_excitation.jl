@@ -5,7 +5,7 @@ using Flux: unsqueeze, flatten
     https://arxiv.org/pdf/1709.01507.pdf
     """
     struct BpSqueezeExcitation{A,GA}
-        @volumetric
+        @volume
         @activation(Flux.relu)
         gate_activation::GA = Flux.sigmoid
         reduction::Int #reduction_ratio
@@ -19,7 +19,7 @@ end
 function make(bp::BpSqueezeExcitation; channels)
     mid_chs = channels ÷ bp.reduction
     #=
-    k = genk(1, bp.vol) #bp.volumetric ? (1, 1, 1) : (1, 1)
+    k = genk(1, bp.volume) #bp.volumetric ? (1, 1, 1) : (1, 1)
     layers = [
         AdaptiveMeanPool(k),
         make(bp.dconv; ksize = k, channels = (channels, mid_chs, channels)),
@@ -34,7 +34,7 @@ function make(bp::BpSqueezeExcitation; channels)
                    flatten,
                    Dense(channels=>mid_chs, bp.activation),
                    Dense(mid_chs=>channels, bp.gate_activation),
-                   _unsqueeze(bp.vol))
+                   _unsqueeze(bp.volume))
     SkipConnection(layers, .*)
 end
 

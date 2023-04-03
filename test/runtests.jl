@@ -19,7 +19,7 @@ using Aqua
             =#
         end
     end
-#=
+
     @testset "utilities" begin
         include("utilities.jl")
     end
@@ -31,11 +31,11 @@ using Aqua
     @testset "Norm" begin
         include("normalizations.jl")
     end
-=#
+
     @testset "Convolutions" begin
         include("convolutions.jl")
     end
-#=
+
     @testset "Squeeze excite" begin
         include("squeeze_excitation.jl")
     end
@@ -43,5 +43,5 @@ using Aqua
     @testset "DropBlock" begin
         include("dropblock.jl")
     end
-=#
+
 end

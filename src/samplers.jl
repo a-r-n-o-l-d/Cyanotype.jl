@@ -8,13 +8,13 @@ abstract type AbstractUpSamplerBp end
     """
     """
     struct MaxDownSamplerBp <: AbstractDownSamplerBp
-        @volumetric
+        @volume
         wsize::Int = 2
     end
 end
 
 function make(bp::MaxDownSamplerBp)
-    ws = genk(bp.wsize, bp.vol)
+    ws = genk(bp.wsize, bp.volume)
     MaxPool(ws)
 end
 
@@ -22,13 +22,13 @@ end
     """
     """
     struct MeanDownSamplerBp <: AbstractDownSamplerBp
-        @volumetric
+        @volume
         wsize::Int = 2
     end
 end
 
 function make(bp::MeanDownSamplerBp)
-    ws = genk(bp.wsize, bp.vol)
+    ws = genk(bp.wsize, bp.volume)
     MeanPool(ws)
 end
 
@@ -36,13 +36,13 @@ end
     """
     """
     struct NearestUpSamplerBp <: AbstractUpSamplerBp
-        @volumetric
+        @volume
         scale::Int = 2
     end
 end
 
 function make(bp::NearestUpSamplerBp)
-    sc = genk(bp.scale, bp.vol)
+    sc = genk(bp.scale, bp.volume)
     Upsample(:nearest; scale = sc)
 end
 
@@ -50,13 +50,13 @@ end
     """
     """
     struct LinearUpSamplerBp <: AbstractUpSamplerBp
-        @volumetric
+        @volume
         scale::Int = 2
     end
 end
 
 function make(bp::LinearUpSamplerBp)
-    if bp.vol
+    if bp.volume
         Upsample(:trilinear; scale = (bp.scale, bp.scale, bp.scale))
     else
         Upsample(:bilinear; scale = (bp.scale, bp.scale))
@@ -67,12 +67,12 @@ end
     """
     """
     struct ConvUpSamplerBp <: AbstractUpSamplerBp
-        @volumetric
+        @volume
         scale::Int = 2
     end
 end
 
 function make(bp::ConvUpSamplerBp; channels)
-    k = genk(bp.scale, bp.vol)
+    k = genk(bp.scale, bp.volume)
     ConvTranspose(k, channels, stride = bp.scale)
 end

@@ -18,7 +18,7 @@ const CyPad = Union{SamePad,Int}
     of `norm` argument.
     """
     struct BpConv{N<:Union{Nothing,AbstractBpNorm},A,I<:Function,P<:CyPad} <: AbstractBpConv
-        @volumetric
+        @volume
         @activation(relu)
         """
         `norm`:
@@ -45,7 +45,7 @@ const CyPad = Union{SamePad,Int}
 end
 
 function make(bp::BpConv; ksize = 3, channels)
-    k = genk(ksize, bp.vol)
+    k = genk(ksize, bp.volume)
     #_build_conv(bp.norm, bp, k, channels) #|> flatten_layers
     _make_conv(bp, k, channels) #|> flatten_layers
 end
@@ -58,7 +58,7 @@ end
     """
     struct BpDConv{C1<:AbstractBpConv,
                              C2<:AbstractBpConv} <: AbstractBpConv
-        @volumetric #enlever
+        @volume #enlever
         conv1::C1 #conv1
         conv2::C2 = conv1 #conv2
     end
@@ -68,8 +68,8 @@ end
 # channels::NTuple{3} in_chs=>mid_chs mid_chs=>out_chs
 function make(bp::BpDConv; ksize = 3, channels)
     # convolution1.vol == convolution2.vol || error("")
-    c1 = spread(bp.conv1; vol = bp.vol) #cyanotype(bp.convolution1; vol = bp.vol)
-    c2 = spread(bp.conv2; vol = bp.vol) #cyanotype(bp.convolution2; vol = bp.vol)
+    c1 = spread(bp.conv1; vol = bp.volume) #cyanotype(bp.convolution1; vol = bp.volume)
+    c2 = spread(bp.conv2; vol = bp.volume) #cyanotype(bp.convolution2; vol = bp.volume)
     in_chs, mid_chs, out_chs = channels
     [
         make(c1; ksize = ksize, channels = in_chs=>mid_chs),

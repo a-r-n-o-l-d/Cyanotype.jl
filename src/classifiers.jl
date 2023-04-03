@@ -4,13 +4,13 @@ abstract type AbstractClassifier end
     """
     """
     struct PixelClassifierBp <: AbstractClassifier
-        @volumetric
+        @volume
         nclasses::Int
     end
 end
 
 function make(bp::PixelClassifierBp; channels)
-    k = genk(1, bp.vol)
+    k = genk(1, bp.volume)
     if bp.nclasses > 2
         [Conv(k, channels=>bp.nclasses), x -> softmax(x; dims = length(k))]
     else #if bp.nclasses == 2
