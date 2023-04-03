@@ -24,7 +24,10 @@ const CyPad = Union{SamePad,Int}
         `norm`:
         """
         norm::N = nothing # BpNoNorm()
-        # depthwise::Bool = false ?
+        """
+        `depthwise`:
+        """
+        depthwise::Bool = false
         # residual
         """
         `revnorm`:
@@ -131,7 +134,11 @@ end
 
 # Regular convolutionnal layer
 function _make_conv(bp::BpConv{N}, k, chs) where {N<:Nothing}
-    [Conv(k, chs, bp.activation; kwargs(bp)...)]
+    kw = kwargs(bp)
+    if bp.depthwise
+        kw[:groups] = chs
+    end
+    [Conv(k, chs, bp.activation; kw...)]
 end
 
 # Convolutionnal unit: convolutionnal layer & normalization layer
@@ -139,6 +146,10 @@ function _make_conv(bp::BpConv{N}, k, chs) where {N<:AbstractBpNorm}
     layers = []
     in_chs, out_chs = chs
     activation = bp.norm.activation
+    kw = kwargs(bp)
+    if bp.depthwise
+        kw[:groups] = chs
+    end
     # Normalization first
     if bp.revnorm
         # Activation before convolution ?
@@ -150,7 +161,7 @@ function _make_conv(bp::BpConv{N}, k, chs) where {N<:AbstractBpNorm}
             act_c = activation
         end
         norm = cyanotype(bp.norm; activation = act_n)
-        conv = Conv(k, chs, act_c; bias = bp.bias, kwargs(bp)...)
+        conv = Conv(k, chs, act_c; bias = bp.bias, kw...)
         push!(layers, make(norm; channels = in_chs), conv)
     # Convolution first
     else
@@ -162,7 +173,7 @@ function _make_conv(bp::BpConv{N}, k, chs) where {N<:AbstractBpNorm}
             act_n = activation
         end
         norm = cyanotype(bp.norm; activation = act_n)
-        conv = Conv(k, chs; bias = bp.bias, kwargs(bp)...)
+        conv = Conv(k, chs; bias = bp.bias, kw...)
         push!(layers, conv, make(norm; channels = out_chs))
     end
     flatten_layers(layers)
