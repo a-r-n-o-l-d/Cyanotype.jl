@@ -2,8 +2,10 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
+    - cleaning
     - rename fields with shorter names
     - replace NoNorm by nothing
+    - ResidualConnection with dropout
 =#
 module Cyanotype
 

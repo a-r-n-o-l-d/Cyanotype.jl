@@ -27,7 +27,7 @@ function make(bp::BpSqueezeExcitation; channels)
     layers = [
         GlobalMeanPool(),
         Conv(k, channels=>mid_chs, bp.activation),
-        Conv(k, channels=>mid_chs, bp.gate_activation)
+        Conv(k, mid_chs=>mid_chs, bp.gate_activation)
     ]
     =#
     layers = Chain(GlobalMeanPool(),

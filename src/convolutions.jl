@@ -12,17 +12,20 @@ const CyPad = Union{SamePad,Int}
         )
 
     """
-        Convolution(; kwargs...)
+    BpConv(; kwargs...)
 
     A cyanotype blueprint describing a convolutionnal module or layer depending om the value
     of `norm` argument.
     """
-    struct BpConv{N<:AbstractBpNorm,I<:Function,P<:CyPad} <: AbstractBpConv
+    struct BpConv{N<:Union{Nothing,AbstractBpNorm},A,I<:Function,P<:CyPad} <: AbstractBpConv
         @volumetric
+        @activation(relu)
         """
         `norm`:
         """
-        norm::N = BpNoNorm() #nothing
+        norm::N = nothing # BpNoNorm()
+        # depthwise::Bool = false ?
+        # residual
         """
         `revnorm`:
         """
@@ -34,13 +37,14 @@ const CyPad = Union{SamePad,Int}
         """
         `bias`:
         """
-        bias::Bool = norm isa BpNoNorm #bias
+        bias::Bool = norm isa Nothing #bias
     end
 end
 
 function make(bp::BpConv; ksize = 3, channels)
     k = genk(ksize, bp.vol)
-    _build_conv(bp.norm, bp, k, channels) #|> flatten_layers
+    #_build_conv(bp.norm, bp, k, channels) #|> flatten_layers
+    _make_conv(bp, k, channels) #|> flatten_layers
 end
 
 @cyanotype begin
@@ -125,6 +129,46 @@ end
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
+# Regular convolutionnal layer
+function _make_conv(bp::BpConv{N}, k, chs) where {N<:Nothing}
+    [Conv(k, chs, bp.activation; kwargs(bp)...)]
+end
+
+# Convolutionnal unit: convolutionnal layer & normalization layer
+function _make_conv(bp::BpConv{N}, k, chs) where {N<:AbstractBpNorm}
+    layers = []
+    in_chs, out_chs = chs
+    activation = bp.norm.activation
+    # Normalization first
+    if bp.revnorm
+        # Activation before convolution ?
+        if bp.preact
+            act_n = activation
+            act_c = identity
+        else
+            act_n = identity
+            act_c = activation
+        end
+        norm = cyanotype(bp.norm; activation = act_n)
+        conv = Conv(k, chs, act_c; bias = bp.bias, kwargs(bp)...)
+        push!(layers, make(norm; channels = in_chs), conv)
+    # Convolution first
+    else
+        # Activation before convolution ?
+        if bp.preact
+            act_n = identity
+            push!(layers, activation)
+        else
+            act_n = activation
+        end
+        norm = cyanotype(bp.norm; activation = act_n)
+        conv = Conv(k, chs; bias = bp.bias, kwargs(bp)...)
+        push!(layers, conv, make(norm; channels = out_chs))
+    end
+    flatten_layers(layers)
+end
+
+#=
 # A usual convolutionnal layer
 function _build_conv(::BpNoNorm, bp, k, chs)
     [Conv(k, chs, bp.norm.activation; kwargs(bp)...)]
@@ -159,11 +203,11 @@ function _build_conv(nm, bp, k, chs)
         end
         norm = cyanotype(nm; activation = act_n)
         conv = Conv(k, chs; bias = bp.bias, kwargs(bp)...)
-        push!(layers, conv, make(norm; channels =  out_chs))
+        push!(layers, conv, make(norm; channels = out_chs))
     end
     flatten_layers(layers)
 end
-
+=#
 #https://arxiv.org/pdf/1702.08502.pdf
 # DOI 10.1109/WACV.2018.00163
 function _check_dilation_rates(k, dr)

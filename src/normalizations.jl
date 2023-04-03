@@ -1,5 +1,5 @@
 abstract type AbstractBpNorm <: AbstractBlueprint end
-
+#=
 @cyanotype begin
     """
     NoNormalization()
@@ -8,7 +8,7 @@ abstract type AbstractBpNorm <: AbstractBlueprint end
         @activation(Flux.relu)
     end
 end
-
+=#
 @cyanotype begin
     KwargsMapping(
             flfunc = :BatchNorm,

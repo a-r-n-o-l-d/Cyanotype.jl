@@ -1,6 +1,6 @@
 conv = BpConv()
 norms = [
-            BpNoNorm(),
+            nothing, #BpNoNorm()
             BpBatchNorm(),
             BpGroupNorm(; groups = 2),
             BpInstanceNorm()
