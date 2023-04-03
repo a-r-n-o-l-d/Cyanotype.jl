@@ -6,6 +6,7 @@ To do :
     - rename fields with shorter names
     - replace NoNorm by nothing
     - ResidualConnection with dropout
+    - volmetric -> volume (more clear)
 =#
 module Cyanotype
 

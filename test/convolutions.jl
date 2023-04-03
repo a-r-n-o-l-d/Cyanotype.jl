@@ -5,10 +5,10 @@ norms = [
             BpGroupNorm(; groups = 2),
             BpInstanceNorm()
         ]
-revs = pres = [true, false]
-for n in norms, r in revs, p in pres
-    c = cyanotype(conv; norm = n, preact = p, revnorm = r)
-    m = Chain(make(c; ksize = 3, channels = 8=>16)...)
+dw, revs = pres = [true, false]
+for n in norms, r in revs, p in pres, d in dw
+    c = cyanotype(conv; norm=n, preact=p, revnorm=r, depthwise=d)
+    m = Chain(make(c; ksize=3, channels=8 => 16)...)
     @test Flux.outputsize(m, (32, 32, 8, 16)) == (32, 32, 16, 16)
 end
 

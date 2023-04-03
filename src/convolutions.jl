@@ -40,7 +40,7 @@ const CyPad = Union{SamePad,Int}
         """
         `bias`:
         """
-        bias::Bool = norm isa Nothing #bias
+        bias::Bool = norm isa Nothing
     end
 end
 
@@ -136,7 +136,7 @@ end
 function _make_conv(bp::BpConv{N}, k, chs) where {N<:Nothing}
     kw = kwargs(bp)
     if bp.depthwise
-        kw[:groups] = chs
+        kw[:groups] = first(chs)
     end
     [Conv(k, chs, bp.activation; kw...)]
 end
@@ -148,7 +148,7 @@ function _make_conv(bp::BpConv{N}, k, chs) where {N<:AbstractBpNorm}
     activation = bp.norm.activation
     kw = kwargs(bp)
     if bp.depthwise
-        kw[:groups] = chs
+        kw[:groups] = first(chs)
     end
     # Normalization first
     if bp.revnorm
