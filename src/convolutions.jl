@@ -34,9 +34,9 @@ const CyPad = Union{SamePad,Int}
         """
         revnorm::Bool = false
         """
-        `preact`:
+        `preactivation`:
         """
-        preact::Bool = false
+        preactivation::Bool = false
         """
         `bias`:
         """
@@ -153,7 +153,7 @@ function _make_conv(bp::BpConv{N}, k, chs) where {N<:AbstractBpNorm}
     # Normalization first
     if bp.revnorm
         # Activation before convolution ?
-        if bp.preact
+        if bp.preactivation
             act_n = activation
             act_c = identity
         else
@@ -166,7 +166,7 @@ function _make_conv(bp::BpConv{N}, k, chs) where {N<:AbstractBpNorm}
     # Convolution first
     else
         # Activation before convolution ?
-        if bp.preact
+        if bp.preactivation
             act_n = identity
             push!(layers, activation)
         else
@@ -193,7 +193,7 @@ function _build_conv(nm, bp, k, chs)
     # Normalization first
     if bp.revnorm
         # Activation before convolution ?
-        if bp.preact
+        if bp.preactivation
             act_n = activation
             act_c = identity
         else
@@ -206,7 +206,7 @@ function _build_conv(nm, bp, k, chs)
     # Convolution first
     else
         # Activation before convolution ?
-        if bp.preact
+        if bp.preactivation
             act_n = identity
             push!(layers, activation)
         else
