@@ -1,4 +1,4 @@
-const DEFUCONV = BpDConv(; conv1 = BpConv(;norm = BpBatchNorm()))
+const DEFUCONV = BpDConv(; conv1 = BpConv(normalization=BpBatchNorm()))
 
 @cyanotype begin
     """
@@ -12,7 +12,7 @@ const DEFUCONV = BpDConv(; conv1 = BpConv(;norm = BpBatchNorm()))
         basewidth::Int = 64
         expansion::Int = 2
         dconvolution::C = BpDConv(; vol = vol,
-                                       conv1 = BpConv(; norm = BpBatchNorm())) #DEFUCONV pad = 0
+                                       conv1 = BpConv(normalization=BpBatchNorm())) #DEFUCONV pad = 0
         downsampler::D = MaxDownSamplerBp(; vol = vol)
         upsampler::U = LinearUpSamplerBp(; vol = vol)
         classifier::P

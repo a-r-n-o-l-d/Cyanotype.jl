@@ -1,3 +1,3 @@
 hac = BpHAConv()
 hac2 = spread(hac; activation = leakyrelu)
-@test hac2.conv.norm.activation == leakyrelu
+@test hac2.conv.normalization.activation == leakyrelu
