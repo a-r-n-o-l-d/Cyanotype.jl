@@ -7,6 +7,7 @@ To do :
     - ResidualConnection with dropout
     x volmetric -> volume (more clear)
     - spread => broadcast
+    - activation identity by default
 =#
 module Cyanotype
 

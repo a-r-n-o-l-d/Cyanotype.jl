@@ -23,7 +23,7 @@ end
     """
     struct BpBatchNorm{F<:CyFloat,A<:Function,I1<:Function,
                               I2<:Function} <: AbstractBpNorm
-        @activation(relu)
+        @activation(identity)
     end
 end
 
@@ -48,7 +48,7 @@ end
     make(channels, bp::CyGroupNorm)
     """
     struct BpGroupNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractBpNorm
-        @activation(relu)
+        @activation(identity)
         """
         `groups`: the number of groups passed to [`GroupNorm`](@ref Flux.GroupNorm)
         constructor
@@ -78,7 +78,7 @@ end
     """
     struct BpInstanceNorm{F<:CyFloat,A<:Function,I1<:Function,
                                  I2<:Function} <: AbstractBpNorm
-        @activation(relu)
+        @activation(identity)
     end
 end
 

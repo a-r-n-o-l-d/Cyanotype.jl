@@ -19,7 +19,7 @@ const CyPad = Union{SamePad,Int}
     """
     struct BpConv{N<:Union{Nothing,AbstractBpNorm},A,I<:Function,P<:CyPad} <: AbstractBpConv
         @volume
-        @activation(relu)
+        @activation(identity)
         """
         `normalization`:
         """
