@@ -8,7 +8,8 @@ norms = [
 dw, revs = pres = [true, false]
 for n in norms, r in revs, p in pres, d in dw
     c = cyanotype(conv; normalization=n, preactivation=p, revnorm=r, depthwise=d)
-    m = Chain(make(c; ksize=3, channels=8 => 16)...)
+    layers = flatten_layers(make(c; ksize=3, channels=8 => 16))
+    m = Chain(layers...)
     @test Flux.outputsize(m, (32, 32, 8, 16)) == (32, 32, 16, 16)
 end
 

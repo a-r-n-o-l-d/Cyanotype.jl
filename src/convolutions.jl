@@ -44,11 +44,61 @@ const CyPad = Union{SamePad,Int}
     end
 end
 
-function make(bp::BpConv; ksize = 3, channels)
+#=function make(bp::BpConv; ksize=3, channels)
     k = genk(ksize, bp.volume)
     #_build_conv(bp.normalization, bp, k, channels) #|> flatten_layers
     _make_conv(bp, k, channels) #|> flatten_layers
+end=#
+
+# Regular convolutionnal layer
+function make(bp::BpConv{N}; ksize, channels) where {N<:Nothing}
+    k = genk(ksize, bp.volume)
+    kw = kwargs(bp)
+    if bp.depthwise
+        kw[:groups] = first(channels)
+    end
+    Conv(k, channels, bp.activation; kw...) #|> flatten_layers
 end
+
+# Convolutionnal unit: convolutionnal layer & normalization layer
+function make(bp::BpConv{N}; ksize, channels) where {N<:AbstractBpNorm}
+    k = genk(ksize, bp.volume)
+    layers = []
+    in_chs, out_chs = channels
+    activation = bp.normalization.activation
+    kw = kwargs(bp)
+    if bp.depthwise
+        kw[:groups] = in_chs
+    end
+    # Normalization first
+    if bp.revnorm
+        # Activation before convolution ?
+        if bp.preactivation
+            act_n = activation
+            act_c = identity
+        else
+            act_n = identity
+            act_c = activation
+        end
+        norm = cyanotype(bp.normalization; activation = act_n)
+        conv = Conv(k, channels, act_c; bias = bp.bias, kw...)
+        push!(layers, make(norm; channels = in_chs), conv)
+    # Convolution first
+    else
+        # Activation before convolution ?
+        if bp.preactivation
+            act_n = identity
+            push!(layers, activation)
+        else
+            act_n = activation
+        end
+        norm = cyanotype(bp.normalization; activation = act_n)
+        conv = Conv(k, channels; bias = bp.bias, kw...)
+        push!(layers, conv, make(norm; channels = out_chs))
+    end
+    flatten_layers(layers)
+end
+
 
 @cyanotype begin
     """
@@ -92,10 +142,10 @@ function make(bp::BpNConv; ksize = 3, channels)
     layers = []
     in_chs, out_chs = channels
     for _ in 1:bp.nrepeat
-        push!(layers, make(bp.convolution; ksize = ksize, channels = in_chs=>out_chs)...)
+        push!(layers, make(bp.convolution; ksize = ksize, channels = in_chs=>out_chs))
         in_chs = out_chs
     end
-    layers
+    flatten_layers(layers)
 end
 
 @cyanotype begin
@@ -120,13 +170,13 @@ function make(bp::BpHybridAtrouConv; ksize = 3, channels)
         push!(layers, make(c; ksize = ksize, channels = in_chs=>out_chs)...)
         in_chs = out_chs
     end
-    layers
+    flatten_layers(layers)
 end
 
 ############################################################################################
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
-
+#=
 # Regular convolutionnal layer
 function _make_conv(bp::BpConv{N}, k, chs) where {N<:Nothing}
     kw = kwargs(bp)
@@ -173,7 +223,7 @@ function _make_conv(bp::BpConv{N}, k, chs) where {N<:AbstractBpNorm}
     end
     flatten_layers(layers)
 end
-
+=#
 #=
 # A usual convolutionnal layer
 function _build_conv(::BpNoNorm, bp, k, chs)

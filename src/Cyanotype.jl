@@ -6,6 +6,7 @@ To do :
     x replace NoNorm by nothing
     - ResidualConnection with dropout
     x volmetric -> volume (more clear)
+    - spread => broadcast
 =#
 module Cyanotype
 
