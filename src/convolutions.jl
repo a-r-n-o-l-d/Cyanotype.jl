@@ -178,20 +178,17 @@ end
     """
 
     """
-    struct BpPointwiseConv <: AbstractBpConv #{N<:Union{Nothing,AbstractBpNorm},A}
-        #@volume
-        #norm::N = nothing
-        convolution::BpConv # = BpConv()
+    struct BpPointwiseConv <: AbstractBpConv
+        conv::BpConv
     end
 end
 
 BpPointwiseConv() = BpPointwiseConv(BpConv())
+
 BpPointwiseConv(; kwargs...) = BpPointwiseConv(BpConv(; kwargs...))
 
-function make(bp::BpPointwiseConv, channels)
-    k = genk(1, bp.volume)
-    make(bp.convolution, k, channels)
-end
+make(bp::BpPointwiseConv, channels) = make(bp.conv, 1, channels)
+
 
 #=
 function make(bp::BpPointwiseConv{<:Nothing}, channels)
@@ -299,6 +296,7 @@ function _build_conv(nm, bp, k, chs)
     flatten_layers(layers)
 end
 =#
+
 #https://arxiv.org/pdf/1702.08502.pdf
 # DOI 10.1109/WACV.2018.00163
 function _check_dilation_rates(k, dr)
