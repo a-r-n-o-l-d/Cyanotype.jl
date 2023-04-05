@@ -28,3 +28,7 @@ model = Chain(make(BpHybridAtrouConv(), 3, 4 => 16)...)
 hac = BpHybridAtrouConv()
 model = Chain(make(hac, 3, 4 => 16)...)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
+
+bp = BpPointwiseConv()
+#bp = BpPointwiseConv(normalization=BpBatchNorm())
+bp = BpPointwiseConv(normalization=BpBatchNorm())

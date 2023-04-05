@@ -101,7 +101,6 @@ function make(bp::BpConv{<:AbstractBpNorm}, ksize, channels::Pair) #where {N<:Ab
     flatten_layers(layers)
 end
 
-
 @cyanotype begin
     """
     BpDConv(; kwargs)
@@ -174,6 +173,40 @@ function make(bp::BpHybridAtrouConv, ksize, channels)
     end
     flatten_layers(layers)
 end
+
+@cyanotype constructor=false begin
+    """
+
+    """
+    struct BpPointwiseConv <: AbstractBpConv #{N<:Union{Nothing,AbstractBpNorm},A}
+        #@volume
+        #norm::N = nothing
+        convolution::BpConv # = BpConv()
+    end
+end
+
+BpPointwiseConv() = BpPointwiseConv(BpConv())
+BpPointwiseConv(; kwargs...) = BpPointwiseConv(BpConv(; kwargs...))
+
+function make(bp::BpPointwiseConv, channels)
+    k = genk(1, bp.volume)
+    make(bp.convolution, k, channels)
+end
+
+#=
+function make(bp::BpPointwiseConv{<:Nothing}, channels)
+    k = genk(1, bp.volume)
+    Conv(k, channels, bias=true)
+end
+
+function make(bp::BpPointwiseConv{<:AbstractBpNorm}, channels)
+    k = genk(1, bp.volume)
+    [
+        Conv(k, channels, bias=false),
+        make(bp.norm, last(channels))
+    ] |> flatten_layers
+end
+=#
 
 ############################################################################################
 #                                   INTERNAL FUNCTIONS                                     #

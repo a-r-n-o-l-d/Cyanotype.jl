@@ -5,15 +5,22 @@ using Flux: unsqueeze, flatten
     https://arxiv.org/pdf/1709.01507.pdf
     """
     struct BpSqueezeExcitation{A,GA}
-        @volume
-        @activation(Flux.relu)
-        gate_activation::GA = Flux.sigmoid
+        #@volume
+        #@activation(Flux.relu)
+        #gate_activation::GA = Flux.sigmoid
         reduction::Int #reduction_ratio
         #=
         dconvolution::C = DoubleConvolution(; convolution1 = Convolution(; activation = relu),
         convolution2 = Convolution(; activation = sigmoid))
         =#
     end
+end
+
+function BpSqueezeExcitation(; volume=false, activation=relu, gate_activation=sigmoid, reduction)
+    BpSqueezeExcitation(
+        BpConv(volume=volume, activation=activation),
+        BpConv(volume=volume, activation=gate_activation),
+        reduction)
 end
 
 function make(bp::BpSqueezeExcitation, channels)

@@ -71,6 +71,7 @@ For the keyword arguments mapping usage, see [`KwargsMapping`](@see KwargsMappin
 documentation.
 """
 macro cyanotype(expr)
+    #=
     doc = ""
     kmexp = :(KwargsMapping())
     head = :()
@@ -96,8 +97,49 @@ macro cyanotype(expr)
             end
         end
     end
+    =#
+    doc, kmexp, head, body = _parse_expr(__module__, expr)
     esc(_cyanotype(__module__, doc, kmexp, head, body))
 end
+
+macro cyanotype(opt, expr)
+    cons = true
+    if opt.head === :(=) && opt.args[1] === :constructor
+        cons = opt.args[2]
+    end #else error
+    doc, kmexp, head, body = _parse_expr(__module__, expr)
+    esc(_cyanotype(__module__, doc, kmexp, head, body, cons))
+end
+
+function _parse_expr(mod, expr)
+    doc = ""
+    kmexp = :(KwargsMapping())
+    head = :()
+    body = :()
+    for arg in expr.args
+        if arg isa Expr
+            if arg.head === :call && arg.args[1] === :KwargsMapping
+                kmexp = arg
+            elseif arg.head === :macrocall
+                for a in arg.args
+                    if a isa String
+                        doc = a
+                    elseif a isa Expr && a.head === :struct
+                        tmp = macroexpand(mod, a)
+                        head = tmp.args[2]
+                        body = tmp.args[3]
+                    end
+                end
+            elseif arg.head === :struct
+                tmp = macroexpand(mod, arg)
+                head = tmp.args[2]
+                body = tmp.args[3]
+            end
+        end
+    end
+    doc, kmexp, head, body
+end
+
 
 #=
 macro cyanotype(doc, expr)
@@ -115,7 +157,7 @@ end
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
-function _cyanotype(mod, doc, kmexp, head, body)
+function _cyanotype(mod, doc, kmexp, head, body, cons=true)
     # Forces the struct to inherit from AbstractCyano
     if head isa Symbol || head.head === :curly
         # It is not type stable to do that, since the head type is changed, but at this
@@ -168,13 +210,17 @@ function _cyanotype(mod, doc, kmexp, head, body)
         _push_field!(fields, kwargs, fnames, fdocs, fname, T, def, fdoc)
     end
 
+    #cons_expr = cons ? _kwargs_constructor(name, fnames, kwargs) : :()
+
+    #doc_expr = cons ? _kwargs_constructor(name, fnames, kwargs) : :()
+
     # Generates the struct and its associated functions
     quote
-        """$($(_generate_documentation(fdocs, doc)))"""
+        """$($(_generate_documentation(fdocs, doc, cons)))"""
         struct $head
             $(fields...)
         end
-        $(_kwargs_constructor(name, fnames, kwargs))
+        $(_kwargs_constructor(name, fnames, kwargs, cons)) #_kwargs_constructor(name, fnames, kwargs)
         $(_mapping_func1(mod, name, kmap))
         $(_getfields_func(mod, name, fnames))
         $(_cyanotype_func(mod, name))
@@ -251,21 +297,25 @@ function _push_field!(fields, kwargs, fnames, fdocs, name, T, def, doc)
     push!(fdocs, doc)
 end
 
-function _generate_documentation(fdocs, doc)
-    docs = """
+function _generate_documentation(fdocs, doc, cons)
+    #=docs = """
     $doc
 
     Keyword arguments:\n
-    """
-    for d in fdocs
-        docs = "$docs - $d\n"
+    """=#
+    docs = doc
+    if cons
+        docs *= "\nKeyword arguments:\n"
+        for d in fdocs
+            docs = "$docs - $d\n"
+        end
     end
     docs
 end
 
-function _kwargs_constructor(name, fnames, kwargs)
+function _kwargs_constructor(name, fnames, kwargs, cons)
     # If there is no field in the struct, no kwargs constructor
-    if isempty(fnames) && isempty(kwargs)
+    if isempty(fnames) && isempty(kwargs) || !cons
         :()
     else
         kw = Expr(:parameters, kwargs...)

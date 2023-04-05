@@ -37,7 +37,7 @@ using Aqua
     end
 
     @testset "Squeeze excite" begin
-        include("squeeze_excitation.jl")
+        #include("squeeze_excitation.jl")
     end
 
     @testset "DropBlock" begin
