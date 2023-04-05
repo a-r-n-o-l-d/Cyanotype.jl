@@ -16,7 +16,7 @@ using Flux: unsqueeze, flatten
     end
 end
 
-function make(bp::BpSqueezeExcitation; channels)
+function make(bp::BpSqueezeExcitation, channels)
     mid_chs = channels ÷ bp.reduction
     #=
     k = genk(1, bp.volume) #bp.volumetric ? (1, 1, 1) : (1, 1)

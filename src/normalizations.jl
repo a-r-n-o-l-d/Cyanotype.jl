@@ -9,6 +9,7 @@ abstract type AbstractBpNorm <: AbstractBlueprint end
     end
 end
 =#
+
 @cyanotype begin
     KwargsMapping(
             flfunc = :BatchNorm,
@@ -27,7 +28,7 @@ end
     end
 end
 
-function make(bp::BpBatchNorm; channels)
+function make(bp::BpBatchNorm, channels)
     [BatchNorm(channels, bp.activation; kwargs(bp)...)]
 end
 
@@ -57,7 +58,7 @@ end
     end
 end
 
-function make(bp::BpGroupNorm; channels)
+function make(bp::BpGroupNorm, channels)
     [GroupNorm(channels, bp.groups, bp.activation; kwargs(bp)...)]
 end
 
@@ -76,12 +77,11 @@ end
     Describes a building process for a [`InstanceNorm`](@ref) layer.
     make(channels, bp::CyInstanceNorm)
     """
-    struct BpInstanceNorm{F<:CyFloat,A<:Function,I1<:Function,
-                                 I2<:Function} <: AbstractBpNorm
+    struct BpInstanceNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractBpNorm
         @activation(identity)
     end
 end
 
-function make(bp::BpInstanceNorm; channels)
+function make(bp::BpInstanceNorm, channels)
     [InstanceNorm(channels, bp.activation; kwargs(bp)...)]
 end

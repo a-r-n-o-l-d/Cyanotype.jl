@@ -9,7 +9,7 @@ abstract type AbstractClassifier end
     end
 end
 
-function make(bp::PixelClassifierBp; channels)
+function make(bp::PixelClassifierBp, channels)
     k = genk(1, bp.volume)
     if bp.nclasses > 2
         [Conv(k, channels=>bp.nclasses), x -> softmax(x; dims = length(k))]

@@ -50,8 +50,10 @@ end
     _make_conv(bp, k, channels) #|> flatten_layers
 end=#
 
+make(bp::BpConv, ksize, channels::Int) = make(bp, ksize=ksize, channels=channels => channels)
+
 # Regular convolutionnal layer
-function make(bp::BpConv{N}; ksize, channels) where {N<:Nothing}
+function make(bp::BpConv{<:Nothing}, ksize, channels::Pair) #where {N<:Nothing}
     k = genk(ksize, bp.volume)
     kw = kwargs(bp)
     if bp.depthwise
@@ -61,7 +63,7 @@ function make(bp::BpConv{N}; ksize, channels) where {N<:Nothing}
 end
 
 # Convolutionnal unit: convolutionnal layer & normalization layer
-function make(bp::BpConv{N}; ksize, channels) where {N<:AbstractBpNorm}
+function make(bp::BpConv{<:AbstractBpNorm}, ksize, channels::Pair) #where {N<:AbstractBpNorm}
     k = genk(ksize, bp.volume)
     layers = []
     in_chs, out_chs = channels
@@ -82,7 +84,7 @@ function make(bp::BpConv{N}; ksize, channels) where {N<:AbstractBpNorm}
         end
         norm = cyanotype(bp.normalization; activation = act_n)
         conv = Conv(k, channels, act_c; bias = bp.bias, kw...)
-        push!(layers, make(norm; channels = in_chs), conv)
+        push!(layers, make(norm, in_chs), conv)
     # Convolution first
     else
         # Activation before convolution ?
@@ -94,7 +96,7 @@ function make(bp::BpConv{N}; ksize, channels) where {N<:AbstractBpNorm}
         end
         norm = cyanotype(bp.normalization; activation = act_n)
         conv = Conv(k, channels; bias = bp.bias, kw...)
-        push!(layers, conv, make(norm; channels = out_chs))
+        push!(layers, conv, make(norm, out_chs))
     end
     flatten_layers(layers)
 end
@@ -116,14 +118,14 @@ end
 
 # channels::Pair in_chs=>out_chs out_chs=>out_chs
 # channels::NTuple{3} in_chs=>mid_chs mid_chs=>out_chs
-function make(bp::BpDConv; ksize = 3, channels)
+function make(bp::BpDConv, ksize, channels)
     # convolution1.vol == convolution2.vol || error("")
     c1 = spread(bp.conv1; vol = bp.volume) #cyanotype(bp.convolution1; vol = bp.volume)
     c2 = spread(bp.conv2; vol = bp.volume) #cyanotype(bp.convolution2; vol = bp.volume)
     in_chs, mid_chs, out_chs = channels
     [
-        make(c1; ksize = ksize, channels = in_chs=>mid_chs),
-        make(c2; ksize = ksize, channels = mid_chs=>out_chs)
+        make(c1, ksize, in_chs=>mid_chs),
+        make(c2, ksize, mid_chs=>out_chs)
     ] |> flatten_layers
 end
 
@@ -138,11 +140,11 @@ end
     end
 end
 
-function make(bp::BpNConv; ksize = 3, channels)
+function make(bp::BpNConv, ksize, channels)
     layers = []
     in_chs, out_chs = channels
     for _ in 1:bp.nrepeat
-        push!(layers, make(bp.convolution; ksize = ksize, channels = in_chs=>out_chs))
+        push!(layers, make(bp.convolution, ksize, in_chs=>out_chs))
         in_chs = out_chs
     end
     flatten_layers(layers)
@@ -161,13 +163,13 @@ end
     end
 end
 
-function make(bp::BpHybridAtrouConv; ksize = 3, channels)
+function make(bp::BpHybridAtrouConv, ksize, channels)
     _check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")
     layers = []
     in_chs, out_chs = channels
     for dr in bp.dilation_rates
         c = cyanotype(bp.conv; dilation = dr)
-        push!(layers, make(c; ksize = ksize, channels = in_chs=>out_chs)...)
+        push!(layers, make(c, ksize, in_chs=>out_chs)...)
         in_chs = out_chs
     end
     flatten_layers(layers)

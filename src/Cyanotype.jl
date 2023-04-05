@@ -2,6 +2,7 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
+    - make without kwargs
     - cleaning
     x replace NoNorm by nothing
     - ResidualConnection with dropout

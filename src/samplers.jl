@@ -72,7 +72,7 @@ end
     end
 end
 
-function make(bp::ConvUpSamplerBp; channels)
+function make(bp::ConvUpSamplerBp, channels)
     k = genk(bp.scale, bp.volume)
     ConvTranspose(k, channels, stride = bp.scale)
 end
