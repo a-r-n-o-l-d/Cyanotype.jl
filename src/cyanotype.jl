@@ -71,33 +71,6 @@ For the keyword arguments mapping usage, see [`KwargsMapping`](@see KwargsMappin
 documentation.
 """
 macro cyanotype(expr)
-    #=
-    doc = ""
-    kmexp = :(KwargsMapping())
-    head = :()
-    body = :()
-    for arg in expr.args
-        if arg isa Expr
-            if arg.head === :call && arg.args[1] === :KwargsMapping
-                kmexp = arg
-            elseif arg.head === :macrocall
-                for a in arg.args
-                    if a isa String
-                        doc = a
-                    elseif a isa Expr && a.head === :struct
-                        tmp = macroexpand(__module__, a)
-                        head = tmp.args[2]
-                        body = tmp.args[3]
-                    end
-                end
-            elseif arg.head === :struct
-                tmp = macroexpand(__module__, arg)
-                head = tmp.args[2]
-                body = tmp.args[3]
-            end
-        end
-    end
-    =#
     doc, kmexp, head, body = _parse_expr(__module__, expr)
     esc(_cyanotype(__module__, doc, kmexp, head, body))
 end
@@ -110,6 +83,10 @@ macro cyanotype(opt, expr)
     doc, kmexp, head, body = _parse_expr(__module__, expr)
     esc(_cyanotype(__module__, doc, kmexp, head, body, cons))
 end
+
+############################################################################################
+#                                   INTERNAL FUNCTIONS                                     #
+############################################################################################
 
 function _parse_expr(mod, expr)
     doc = ""
@@ -139,23 +116,6 @@ function _parse_expr(mod, expr)
     end
     doc, kmexp, head, body
 end
-
-
-#=
-macro cyanotype(doc, expr)
-    expr = macroexpand(__module__, expr)
-    esc(_cyanotype(__module__, doc, :(KwargsMapping()), expr.args[2], expr.args[3]))
-end
-
-macro cyanotype(doc, kmap, expr)
-    expr = macroexpand(__module__, expr)
-    esc(_cyanotype(__module__, doc, kmap, expr.args[2], expr.args[3]))
-end
-=#
-
-############################################################################################
-#                                   INTERNAL FUNCTIONS                                     #
-############################################################################################
 
 function _cyanotype(mod, doc, kmexp, head, body, cons=true)
     # Forces the struct to inherit from AbstractCyano
@@ -210,17 +170,13 @@ function _cyanotype(mod, doc, kmexp, head, body, cons=true)
         _push_field!(fields, kwargs, fnames, fdocs, fname, T, def, fdoc)
     end
 
-    #cons_expr = cons ? _kwargs_constructor(name, fnames, kwargs) : :()
-
-    #doc_expr = cons ? _kwargs_constructor(name, fnames, kwargs) : :()
-
     # Generates the struct and its associated functions
     quote
         """$($(_generate_documentation(fdocs, doc, cons)))"""
         struct $head
             $(fields...)
         end
-        $(_kwargs_constructor(name, fnames, kwargs, cons)) #_kwargs_constructor(name, fnames, kwargs)
+        $(_kwargs_constructor(name, fnames, kwargs, cons))
         $(_mapping_func1(mod, name, kmap))
         $(_getfields_func(mod, name, fnames))
         $(_cyanotype_func(mod, name))
@@ -298,11 +254,6 @@ function _push_field!(fields, kwargs, fnames, fdocs, name, T, def, doc)
 end
 
 function _generate_documentation(fdocs, doc, cons)
-    #=docs = """
-    $doc
-
-    Keyword arguments:\n
-    """=#
     docs = doc
     if cons
         docs *= "\nKeyword arguments:\n"

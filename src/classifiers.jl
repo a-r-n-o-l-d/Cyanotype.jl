@@ -1,9 +1,9 @@
-abstract type AbstractClassifier end
+abstract type AbstractBpClassifier end
 
 @cyanotype begin
     """
     """
-    struct PixelClassifierBp <: AbstractClassifier
+    struct PixelClassifierBp <: AbstractBpClassifier
         @volume
         nclasses::Int
     end

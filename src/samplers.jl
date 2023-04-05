@@ -1,13 +1,13 @@
 # To Do : add PixelShuffle
 
-abstract type AbstractDownSamplerBp end
+abstract type AbstractBpDownSampler end
 
-abstract type AbstractUpSamplerBp end
+abstract type AbstractBpUpSampler end
 
 @cyanotype begin
     """
     """
-    struct MaxDownSamplerBp <: AbstractDownSamplerBp
+    struct MaxDownSamplerBp <: AbstractBpDownSampler
         @volume
         wsize::Int = 2
     end
@@ -21,7 +21,7 @@ end
 @cyanotype begin
     """
     """
-    struct MeanDownSamplerBp <: AbstractDownSamplerBp
+    struct MeanDownSamplerBp <: AbstractBpDownSampler
         @volume
         wsize::Int = 2
     end
@@ -35,7 +35,7 @@ end
 @cyanotype begin
     """
     """
-    struct NearestUpSamplerBp <: AbstractUpSamplerBp
+    struct NearestUpSamplerBp <: AbstractBpUpSampler
         @volume
         scale::Int = 2
     end
@@ -49,7 +49,7 @@ end
 @cyanotype begin
     """
     """
-    struct LinearUpSamplerBp <: AbstractUpSamplerBp
+    struct LinearUpSamplerBp <: AbstractBpUpSampler
         @volume
         scale::Int = 2
     end
@@ -66,7 +66,7 @@ end
 @cyanotype begin
     """
     """
-    struct ConvUpSamplerBp <: AbstractUpSamplerBp
+    struct ConvUpSamplerBp <: AbstractBpUpSampler
         @volume
         scale::Int = 2
     end

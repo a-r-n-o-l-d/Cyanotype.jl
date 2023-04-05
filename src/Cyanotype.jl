@@ -2,7 +2,7 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
-    - make without kwargs
+    x make without kwargs
     - cleaning
     x replace NoNorm by nothing
     - ResidualConnection with dropout
@@ -14,12 +14,7 @@ module Cyanotype
 
 using Reexport
 @reexport using Flux
-#using CUDA
 using Flux: zeros32, ones32, glorot_uniform
-#using ChainRulesCore
-#using Functors
-#using MLUtils
-#using Random
 
 export make, CyFloat
 

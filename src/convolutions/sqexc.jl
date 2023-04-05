@@ -1,5 +1,3 @@
-#using Flux: unsqueeze, flatten
-
 @cyanotype constructor=false begin
     """
     https://arxiv.org/pdf/1709.01507.pdf

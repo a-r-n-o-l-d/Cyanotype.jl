@@ -23,7 +23,7 @@ const CyPad = Union{SamePad,Int}
         """
         `normalization`:
         """
-        normalization::N = nothing # BpNoNorm()
+        normalization::N = nothing
         """
         `depthwise`:
         """

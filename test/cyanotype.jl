@@ -1,7 +1,4 @@
-#module CynotypeTest
-
-#using Cyanotype: KwargsMapping, @cyanotype
-#import Cyanotype: mapping
+# ToDo: check correcness without constructor
 
 @cyanotype begin
     """
