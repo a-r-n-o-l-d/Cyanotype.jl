@@ -1,14 +1,16 @@
 using Flux: unsqueeze, flatten
 
-@cyanotype begin
+@cyanotype constructor=false begin
     """
     https://arxiv.org/pdf/1709.01507.pdf
     """
-    struct BpSqueezeExcitation{A,GA}
+    struct BpSqueezeExcitation #{A,GA}
         #@volume
         #@activation(Flux.relu)
         #gate_activation::GA = Flux.sigmoid
         reduction::Int #reduction_ratio
+        conv1::BpPointwiseConv
+        conv2::BpPointwiseConv
         #=
         dconvolution::C = DoubleConvolution(; convolution1 = Convolution(; activation = relu),
         convolution2 = Convolution(; activation = sigmoid))
@@ -16,11 +18,13 @@ using Flux: unsqueeze, flatten
     end
 end
 
-function BpSqueezeExcitation(; volume=false, activation=relu, gate_activation=sigmoid, reduction)
+function BpSqueezeExcitation(; activation=relu, gate_activation=sigmoid, reduction, kwargs...)
+    # Verifier que kwargs ne contient pas volume ou activation
     BpSqueezeExcitation(
-        BpConv(volume=volume, activation=activation),
-        BpConv(volume=volume, activation=gate_activation),
-        reduction)
+        reduction,
+        BpPointwiseConv(activation=activation, kwargs...),
+        BpPointwiseConv(activation=gate_activation, kwargs...)
+    )
 end
 
 function make(bp::BpSqueezeExcitation, channels)
@@ -37,14 +41,20 @@ function make(bp::BpSqueezeExcitation, channels)
         Conv(k, mid_chs=>channels, bp.gate_activation)
     ]
     =#
-    layers = Chain(GlobalMeanPool(),
+    #=layers = Chain(GlobalMeanPool(),
                    flatten,
                    Dense(channels=>mid_chs, bp.activation),
                    Dense(mid_chs=>channels, bp.gate_activation),
-                   _unsqueeze(bp.volume))
-    SkipConnection(layers, .*)
+                   _unsqueeze(bp.volume))=#
+    layers = [
+        GlobalMeanPool(),
+        make(bp.conv1, channels => mid_chs),
+        make(bp.conv2, mid_chs => channels),
+    ] |> flatten_layers
+    SkipConnection(Chain(layers...), .*)
 end
 
+#=
 function _unsqueeze(volumetric)
     unsq2(x) = unsqueeze(unsqueeze(x; dims = 1); dims = 1)
     if volumetric
@@ -53,3 +63,4 @@ function _unsqueeze(volumetric)
         unsq2
     end
 end
+=#
