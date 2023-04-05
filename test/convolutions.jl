@@ -48,3 +48,5 @@ model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 bp = BpDepthwiseConv(normalization=BpBatchNorm())
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
+
+bp = BpMBConv(stride=1, ch_expansion=6, se_reduction=4)

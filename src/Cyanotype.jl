@@ -47,6 +47,9 @@ include("convolutions.jl")
 export BpSqueezeExcitation
 include("squeeze_excitation.jl")
 
+export BpMBConv
+include("mbconv.jl")
+
 include("samplers.jl")
 
 include("classifiers.jl")
