@@ -41,7 +41,7 @@ include("cyanotype.jl")
 export BpNoNorm, BpBatchNorm, BpGroupNorm, BpInstanceNorm
 include("normalizations.jl")
 
-export BpConv, BpDConv, BpNConv, BpHybridAtrouConv, BpPointwiseConv
+export BpConv, BpDConv, BpNConv, BpHybridAtrouConv, BpPointwiseConv, BpChannelExpansion
 include("convolutions.jl")
 
 export BpSqueezeExcitation

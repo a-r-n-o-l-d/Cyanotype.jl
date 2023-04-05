@@ -50,7 +50,7 @@ end
     _make_conv(bp, k, channels) #|> flatten_layers
 end=#
 
-make(bp::BpConv, ksize, channels::Int) = make(bp, ksize=ksize, channels=channels => channels)
+make(bp::BpConv, ksize, channels::Int) = make(bp, ksize, channels => channels)
 
 # Regular convolutionnal layer
 function make(bp::BpConv{<:Nothing}, ksize, channels::Pair) #where {N<:Nothing}
@@ -183,11 +183,37 @@ end
     end
 end
 
-BpPointwiseConv() = BpPointwiseConv(BpConv())
+#BpPointwiseConv() = BpPointwiseConv(BpConv())
 
 BpPointwiseConv(; kwargs...) = BpPointwiseConv(BpConv(; kwargs...))
 
 make(bp::BpPointwiseConv, channels) = make(bp.conv, 1, channels)
+
+@cyanotype constructor=false begin
+    """
+
+    """
+    struct BpChannelExpansion <: AbstractBpConv
+        expansion::Int
+        conv::BpPointwiseConv
+    end
+end
+
+function BpChannelExpansion(; kwargs...)
+    kw = Dict(kwargs)
+    expansion = kw[:expansion]
+    delete!(kw, :expansion)
+    conv =  BpPointwiseConv(; kw...)
+    BpChannelExpansion(expansion, conv)
+end
+
+function make(bp::BpChannelExpansion, channels)
+    if bp.expansion <= 1
+        identity
+    else
+        make(bp.conv, channels => channels * bp.expansion)
+    end
+end
 
 
 #=

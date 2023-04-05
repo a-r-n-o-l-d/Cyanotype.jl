@@ -13,8 +13,7 @@ for n in norms, r in revs, p in pres, d in dw
     @test Flux.outputsize(m, (32, 32, 8, 16)) == (32, 32, 16, 16)
 end
 
-dc = BpDConv(; conv1 = BpConv(),
-                         conv2 = BpConv(; normalization=BpBatchNorm()))
+dc = BpDConv(; conv1=BpConv(), conv2=BpConv(; normalization=BpBatchNorm()))
 
 model = Chain(make(dc, 3, (8, 16, 32))...)
 @test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 32, 16)
@@ -35,3 +34,10 @@ model = Chain(make(bp, 4 => 16) |> flatten_layers)
 bp = BpPointwiseConv(normalization=BpBatchNorm())
 model = Chain(make(bp, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
+
+bp = BpChannelExpansion(expansion=2)
+model = Chain(make(bp, 4) |> flatten_layers)
+@test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 8, 16)
+bp = BpChannelExpansion(expansion=2, normalization=BpBatchNorm())
+model = Chain(make(bp, 4) |> flatten_layers)
+@test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 8, 16)

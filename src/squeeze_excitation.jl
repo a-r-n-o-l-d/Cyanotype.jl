@@ -19,7 +19,10 @@ using Flux: unsqueeze, flatten
 end
 
 function BpSqueezeExcitation(; activation=relu, gate_activation=sigmoid, reduction, kwargs...)
-    # Verifier que kwargs ne contient pas volume ou activation
+    # Verifier que kwargs ne contient pas activation
+    haskey(kwargs, :activation) && error(
+        """
+        """)
     BpSqueezeExcitation(
         reduction,
         BpPointwiseConv(activation=activation, kwargs...),
