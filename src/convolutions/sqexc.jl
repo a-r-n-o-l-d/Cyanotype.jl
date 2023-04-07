@@ -13,11 +13,12 @@ function BpSqueezeExcitation(; activation=relu, gate_activation=sigmoid, reducti
     # Verifier que kwargs ne contient pas activation
     haskey(kwargs, :activation) && error(
         """
+        pouet pouet
         """)
     BpSqueezeExcitation(
         reduction,
-        BpPointwiseConv(activation=activation, kwargs...),
-        BpPointwiseConv(activation=gate_activation, kwargs...)
+        BpPointwiseConv(; activation=activation, kwargs...),
+        BpPointwiseConv(; activation=gate_activation, kwargs...)
     )
 end
 

@@ -15,19 +15,22 @@ end
 function BpMBConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activation=swish,
                   normalization=BpBatchNorm(activation=activation), kwargs...)
 
-    expansion = BpChannelExpansionConv(activation=activation,
-                                       expansion=ch_expansion,
-                                       normalization=normalization, kwargs...)
+    expansion = BpChannelExpansionConv(; activation=activation,
+                                         expansion=ch_expansion,
+                                         normalization=normalization,
+                                         kwargs...)
 
-    depthwise = BpDepthwiseConv(activation=activation,
-                                stride=stride,
-                                normalization=normalization, kwargs...)
+    depthwise = BpDepthwiseConv(; activation=activation,
+                                  stride=stride,
+                                  normalization=normalization,
+                                  kwargs...)
 
-    excitation = BpSqueezeExcitation(activation=activation,
-                                     gate_activation=hardσ,
-                                     reduction=se_reduction, kwargs...)
+    excitation = BpSqueezeExcitation(; activation=activation,
+                                       gate_activation=hardσ,
+                                       reduction=se_reduction,
+                                       kwargs...)
 
-    projection = BpPointwiseConv(normalization=normalization, kwargs...)
+    projection = BpPointwiseConv(; normalization=normalization, kwargs...)
 
     BpMBConv(skip, expansion, depthwise, excitation, projection)
 end
