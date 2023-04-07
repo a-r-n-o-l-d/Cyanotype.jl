@@ -72,10 +72,12 @@ end
     end
 end
 
-function make(bp::BpConvTransposeUp, channels)
+function make(bp::BpConvTransposeUp, channels::Pair)
     k = genk(bp.scale, bp.volume)
-    ConvTranspose(k, channels, stride = bp.scale)
+    ConvTranspose(k, channels, stride=bp.scale)
 end
+
+make(bp::BpConvTransposeUp, channels::Int) = make(bp, channels => channels)
 
 @cyanotype constructor=false begin
     """

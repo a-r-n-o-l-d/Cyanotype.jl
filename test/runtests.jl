@@ -28,7 +28,7 @@ using Aqua
         include("cyanotype.jl")
     end
 
-    @testset "Norm" begin
+    @testset "Normalizations" begin
         include("normalizations.jl")
     end
 
@@ -36,4 +36,7 @@ using Aqua
         include("convolutions.jl")
     end
 
+    @testset "Samplers" begin
+        include("samplers.jl")
+    end
 end

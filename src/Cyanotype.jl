@@ -34,19 +34,17 @@ export cyanotype, KwargsMapping, @cyanotype
 include("cyanotype.jl")
 
 export BpNoNorm, BpBatchNorm, BpGroupNorm, BpInstanceNorm
-include("normalizations.jl")
+include("units/normalizations.jl")
 
 export BpConv, BpDConv, BpNConv, BpPointwiseConv, BpChannelExpansionConv, BpDepthwiseConv,
        BpHybridAtrouConv, BpSqueezeExcitation, BpMBConv
-include("convolutions/convolutions.jl")
+include("units/convolutions.jl")
 
-include("samplers.jl")
+export BpMaxDown, BpMeanDown, BpNearestUp, BpLinearUp, BpConvTransposeUp, BpPixelShuffleUp
+include("units/samplers.jl")
 
-include("classifiers.jl")
+include("units/classifiers.jl")
 
 #include("u_network.jl")
-
-#export DropBlock
-#include("dropblock.jl")
 
 end

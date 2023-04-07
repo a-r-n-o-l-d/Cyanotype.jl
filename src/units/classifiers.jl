@@ -3,13 +3,13 @@ abstract type AbstractBpClassifier end
 @cyanotype begin
     """
     """
-    struct PixelClassifierBp <: AbstractBpClassifier
+    struct BpPixelClassifier <: AbstractBpClassifier
         @volume
         nclasses::Int
     end
 end
 
-function make(bp::PixelClassifierBp, channels)
+function make(bp::BpPixelClassifier, channels)
     k = genk(1, bp.volume)
     if bp.nclasses > 2
         [Conv(k, channels=>bp.nclasses), x -> softmax(x; dims = length(k))]
