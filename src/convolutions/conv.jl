@@ -1,4 +1,4 @@
-abstract type AbstractBpConv <: AbstractBlueprint end
+
 
 const CyPad = Union{SamePad,Int}
 
@@ -17,7 +17,7 @@ const CyPad = Union{SamePad,Int}
     A cyanotype blueprint describing a convolutionnal module or layer depending om the value
     of `normalization` argument.
     """
-    struct BpConv{N<:Union{Nothing,AbstractBpNorm},A,I<:Function,P<:CyPad} <: AbstractBpConv
+    struct BpConv{N<:Union{Nothing,AbstractBpNorm},A,I<:Function,P<:Union{SamePad,Int}} <: AbstractBpConv
         @volume
         @activation(identity)
         """

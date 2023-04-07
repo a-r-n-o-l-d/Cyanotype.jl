@@ -8,10 +8,11 @@
 end
 
 function BpDepthwiseConv(; kwargs...)
-    if haskey(kwargs, :depthwise)
-        kwargs[:depthwise] = true
+    kw = Dict(kwargs)
+    if haskey(kw, :depthwise)
+        kw[:depthwise] = true
     end
-    BpDepthwiseConv(BpConv(; kwargs...))
+    BpDepthwiseConv(BpConv(; kw...))
 end
 
 make(bp::BpDepthwiseConv, ksize, channels) = make(bp.conv, ksize, channels)

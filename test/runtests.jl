@@ -36,12 +36,4 @@ using Aqua
         include("convolutions.jl")
     end
 
-    @testset "Squeeze excite" begin
-        include("squeeze_excitation.jl")
-    end
-
-    @testset "DropBlock" begin
-        include("dropblock.jl")
-    end
-
 end

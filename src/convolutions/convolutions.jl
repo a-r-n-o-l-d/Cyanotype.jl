@@ -1,3 +1,5 @@
+abstract type AbstractBpConv <: AbstractBlueprint end
+
 include("conv.jl")
 include("compconv.jl")
 include("pwconv.jl")
