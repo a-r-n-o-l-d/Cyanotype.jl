@@ -28,7 +28,6 @@ const CyPad = Union{SamePad,Int}
         `depthwise`:
         """
         depthwise::Bool = false
-        # residual
         """
         `revnorm`:
         """

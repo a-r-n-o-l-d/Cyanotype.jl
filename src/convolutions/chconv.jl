@@ -2,21 +2,21 @@
     """
 
     """
-    struct BpChannelExpansion <: AbstractBpConv
+    struct BpChannelExpansionConv <: AbstractBpConv
         expansion::Int
         conv::BpPointwiseConv
     end
 end
 
-function BpChannelExpansion(; kwargs...)
+function BpChannelExpansionConv(; kwargs...)
     kw = Dict(kwargs)
     expansion = kw[:expansion]
     delete!(kw, :expansion)
     conv =  BpPointwiseConv(; kw...)
-    BpChannelExpansion(expansion, conv)
+    BpChannelExpansionConv(expansion, conv)
 end
 
-function make(bp::BpChannelExpansion, channels)
+function make(bp::BpChannelExpansionConv, channels)
     if bp.expansion <= 1
         identity
     else
