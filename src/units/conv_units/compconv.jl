@@ -1,7 +1,7 @@
 # to refactor
 @cyanotype begin
     """
-    BpDConv(; kwargs)
+    BpDoubleConv(; kwargs)
 
     Describes a convolutionnal module formed by two successive convolutionnal modules.
     """
