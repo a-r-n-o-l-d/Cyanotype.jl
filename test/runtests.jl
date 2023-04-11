@@ -39,4 +39,8 @@ using Aqua
     @testset "Samplers" begin
         include("samplers.jl")
     end
+
+    @testset "Classifiers" begin
+        include("classifiers.jl")
+    end
 end

@@ -46,6 +46,7 @@ include("units/convolutions.jl")
 export BpMaxDown, BpMeanDown, BpNearestUp, BpLinearUp, BpConvTransposeUp, BpPixelShuffleUp
 include("units/samplers.jl")
 
+export BpPixelClassifier
 include("units/classifiers.jl")
 
 #include("u_network.jl")
