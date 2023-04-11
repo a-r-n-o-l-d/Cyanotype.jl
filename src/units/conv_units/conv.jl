@@ -60,7 +60,7 @@ function make(bp::BpConv{<:AbstractBpNorm}, ksize, channels::Pair)
     k = genk(ksize, bp.volume)
     layers = []
     in_chs, out_chs = channels
-    activation = bp.normalization.activation
+    activation = bp.activation
     kw = kwargs(bp)
     if bp.depthwise
         kw[:groups] = in_chs
