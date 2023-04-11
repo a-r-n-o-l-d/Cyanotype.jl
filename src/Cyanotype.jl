@@ -7,8 +7,9 @@ To do :
     x replace NoNorm by nothing
     - ResidualConnection with dropout
     x volmetric -> volume (more clear)
-    - spread => broadcast
-    - activation identity by default
+    - spread => broadcast(?)
+    x activation identity by default
+    - BpDConv => BpDoubleConv
 =#
 module Cyanotype
 
@@ -27,6 +28,8 @@ abstract type AbstractBlueprint end
 """
 make
 
+make(::Nothing) = identity
+
 export spread, flatten_layers
 include("utilities.jl")
 
@@ -36,7 +39,7 @@ include("cyanotype.jl")
 export BpNoNorm, BpBatchNorm, BpGroupNorm, BpInstanceNorm
 include("units/normalizations.jl")
 
-export BpConv, BpDConv, BpNConv, BpPointwiseConv, BpChannelExpansionConv, BpDepthwiseConv,
+export BpConv, BpDoubleConv, BpNConv, BpPointwiseConv, BpChannelExpansionConv, BpDepthwiseConv,
        BpHybridAtrouConv, BpSqueezeExcitation, BpMBConv
 include("units/convolutions.jl")
 

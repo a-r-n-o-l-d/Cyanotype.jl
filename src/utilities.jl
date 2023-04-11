@@ -46,7 +46,7 @@ julia> chcat(x1, x2) |> size
 (32, 32, 8, 6)
 ```
 """
-chcat(x...) = cat(x...; dims = (x[1] |> size |> length) - 1)
+chcat(x...) = cat(x...; dims=(x[1] |> size |> length) - 1)
 
 function flatten_layers(layers...)
     result = []
@@ -74,7 +74,7 @@ macro activation(func)
         """
         $($(doc))
         """
-        activation::A = $func #act
+        activation::A = $func
     end)
 end
 
