@@ -43,7 +43,8 @@ function uchain(; encoders, decoders, bridge, paths=fill(nothing, length(encoder
     """)
     # build from bottom to top
     lvl = _ubridge(bridge, paths[end])
-    for (enc, dec, pth) in zip(reverse(encoders[2:end]), reverse(decoders[2:end]), reverse(paths[1:end - 1]))
+    ite = zip(reverse(encoders[2:end]), reverse(decoders[2:end]), reverse(paths[1:end - 1]))
+    for (enc, dec, pth) in ite
         lvl = _uconnect(enc, lvl, dec)
         lvl = _path(lvl, pth)
     end

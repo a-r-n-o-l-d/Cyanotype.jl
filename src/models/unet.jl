@@ -56,7 +56,9 @@ make(bp::BpUBridge, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUNet{H<:AbstractBpConv}
+    struct BpUNet{S<:Union{Nothing,AbstractBpConv},
+                  P<:Union{Nothing,AbstractBpConv},
+                  H<:Union{Nothing,AbstractBpConv}}
         inchannels::Int = 3
         nlevels::Int = 4
         basewidth::Int = 64
@@ -65,20 +67,26 @@ make(bp::BpUBridge, ksize, channels) = flatten_layers(
         encoder::BpUEncoder
         decoder::BpUDecoder
         bridge::BpUBridge
-        #stem::S # nothing, si nothing => encoder
-        head::H
-        # connection = nothing => connection path CBAM, convpath
+        stem::S = nothing # si nothing => encoder
+        path::P = nothing #  => connection path CBAM, convpath
+        head::H = nothing
     end
 end
 
 function make(bp::BpUNet)
     # Build encoders and decoders for each level
-    enc, dec = [], []
+    enc, dec, pth = [], [], []
     for l ∈ 1:bp.nlevels
-        push!.((enc, dec), _level_encodec(bp, 3, l))
+        enc_chs, dec_chs = _level_encodec(bp, 3, l)
+        push!.((enc, dec), (enc_chs, dec_chs))
+        if !isnothing(bp.path)
+            push!(pth, make(bp.path, last(enc_chs)))
+        else
+            push!(pth, bp.path)
+        end
     end
     bdg = make(bp.bridge, 3, _bridge_channels(bp))
-    uchain(encoders=enc, decoders=dec, bridge=bdg)
+    uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
 end
 
 ############################################################################################
@@ -121,8 +129,10 @@ function _level_encodec(bp, ksize, level) #
     # number of channels (input, middle, output)
     enc_chs, dec_chs = _level_channels(bp, level)
     if level == 1
-        # if downsampling is done with a strided convolution
-        if isnothing(bp.encoder.downsampler)
+        if !isnothing(bp.stem)
+            enc = make(bp.stem, ksize, enc_chs)
+        elseif isnothing(bp.encoder.downsampler) && isnothing(bp.stem)
+            # if downsampling is done with a strided convolution
             encoder = spread(bp.encoder; stride=1)
             enc = make(encoder, ksize, enc_chs)
         else
