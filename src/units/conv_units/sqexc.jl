@@ -25,11 +25,13 @@ end
 
 function make(bp::BpSqueezeExcitation, channels)
     mid_chs = channels ÷ bp.reduction
-    layers = [
-        GlobalMeanPool(),
-        make(bp.conv1, channels => mid_chs),
-        make(bp.conv2, mid_chs => channels),
-    ] |> flatten_layers
+    layers = flatten_layers(
+        [
+            GlobalMeanPool(),
+            make(bp.conv1, channels => mid_chs),
+            make(bp.conv2, mid_chs => channels),
+        ]
+    )
     SkipConnection(Chain(layers...), .*)
 end
 

@@ -7,8 +7,8 @@
     """
     struct BpDoubleConv{C1<:AbstractBpConv,C2<:AbstractBpConv} <: AbstractBpConv
         #@volume #enlever
-        conv1::C1 #conv1
-        conv2::C2 = conv1 #conv2
+        conv1::C1 #firstconv
+        conv2::C2 = conv1 #secondconv
     end
 end
 

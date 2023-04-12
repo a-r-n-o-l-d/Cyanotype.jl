@@ -11,10 +11,14 @@
     end
 end
 
-function BpChannelAttention(; activation=relu, gate_activation=sigmoid, kwargs...)
-    shared_mlp = BpDoubleConv(;
-        conv1=BpPointwiseConv(; activation=activation, kwargs...),
-        conv2=BpPointwiseConv(; activation=identity, kwargs...)
+function BpChannelAttention(; reduction, activation=relu, gate_activation=sigmoid, kwargs...)
+    BpChannelAttention(
+        reduction,
+        BpDoubleConv(
+            conv1=BpPointwiseConv(; activation=activation, kwargs...),
+            conv2=BpPointwiseConv(; activation=identity, kwargs...)
+        ),
+        gate_activation
     )
 end
 
@@ -23,7 +27,8 @@ function make(bp::BpChannelAttention, channels)
     shared_mlp = Chain(make(bp.shared_mlp, (channels, mid_chs, channels))...)
     SkipConnection(
         Chain(
-            Parallel(+,
+            Parallel(
+                +,
                 Chain(GlobalMeanPool(), shared_mlp),
                 Chain(GlobalMaxPool(), shared_mlp)
             ),
