@@ -56,11 +56,12 @@ make(bp::BpUBridge, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUNet{H<:AbstractBpConv} #,P<:BpPixelClassifierBp
+    struct BpUNet{H<:AbstractBpConv}
         inchannels::Int = 3
         nlevels::Int = 4
         basewidth::Int = 64
         expansion::Int = 2
+        ksize::Int = 3
         encoder::BpUEncoder
         decoder::BpUDecoder
         bridge::BpUBridge
@@ -70,15 +71,14 @@ make(bp::BpUBridge, ksize, channels) = flatten_layers(
     end
 end
 
-function Cyanotype.make(bp::BpUNet)
+function make(bp::BpUNet)
     # Build encoders and decoders for each level
-    enc, dec, con = [], [], []
+    enc, dec = [], []
     for l ∈ 1:bp.nlevels
         push!.((enc, dec), _level_encodec(bp, 3, l))
-        push!(con, chcat)
     end
     bdg = make(bp.bridge, 3, _bridge_channels(bp))
-    uchain(encoders=enc, decoders=dec, bridge=bdg, connection=con)
+    uchain(encoders=enc, decoders=dec, bridge=bdg)
 end
 
 ############################################################################################
@@ -87,7 +87,7 @@ end
 
 _make(bp::BpPixelShuffleUp, channels) = make(bp, last(channels))
 
-_make(bp::BpConvTransposeUp, channels) = make(bp, last(channels) => last(channels) ÷ 2) # last(channels) ÷ expansion
+_make(bp::BpConvTransposeUp, channels) = make(bp, last(channels) => last(channels) ÷ 2)
 
 _make(bp, channels) = make(bp)
 
@@ -121,11 +121,12 @@ function _level_encodec(bp, ksize, level) #
     # number of channels (input, middle, output)
     enc_chs, dec_chs = _level_channels(bp, level)
     if level == 1
-        enc = if isnothing(bp.encoder.downsampler) # downsampling is done with a strided convolution
+        # if downsampling is done with a strided convolution
+        if isnothing(bp.encoder.downsampler)
             encoder = spread(bp.encoder; stride=1)
-            make(encoder, ksize, enc_chs)
+            enc = make(encoder, ksize, enc_chs)
         else
-            make(bp.encoder.convolution, ksize, enc_chs)
+            enc = make(bp.encoder.convolution, ksize, enc_chs)
         end
         dec = [
                 make(bp.decoder.convolution, ksize, dec_chs),

@@ -8,7 +8,6 @@ using Aqua
     @testset verbose = true "Code quality" begin
         @testset verbose = true "Aqua" begin
             #Aqua.test_all(Cyanotype) #  => ambiguities from Flux, Zygote, StatsBase
-            #=
             Aqua.test_ambiguities(Cyanotype)
             Aqua.test_unbound_args(Cyanotype)
             Aqua.test_undefined_exports(Cyanotype)
@@ -16,31 +15,35 @@ using Aqua
             Aqua.test_stale_deps(Cyanotype)
             Aqua.test_deps_compat(Cyanotype)
             Aqua.test_project_toml_formatting(Cyanotype)
-            =#
         end
     end
 
-    @testset "utilities" begin
+    @testset verbose = true "utilities" begin
         include("utilities.jl")
     end
 
-    @testset "Cyanotype" begin
+    @testset verbose = true "Cyanotype" begin
         include("cyanotype.jl")
     end
 
-    @testset "Normalizations" begin
+    @testset verbose = true "Normalizations" begin
         include("normalizations.jl")
     end
 
-    @testset "Convolutions" begin
+    @testset verbose = true "Convolutions" begin
         include("convolutions.jl")
     end
 
-    @testset "Samplers" begin
+    @testset verbose = true "Samplers" begin
         include("samplers.jl")
     end
 
-    @testset "Classifiers" begin
+    @testset verbose = true "Classifiers" begin
         include("classifiers.jl")
+    end
+
+    @testset verbose = true "UNet" begin
+        include("uchain.jl")
+        include("unet.jl")
     end
 end

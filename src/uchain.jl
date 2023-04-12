@@ -41,44 +41,34 @@ except the first level decoder.
 ```
 See also [`chcat`](@ref).
 """
-function uchain(;encoders, decoders, bridge, connection)
-    length(encoders) == length(decoders) || throw(ArgumentError(
-        "The number of encoders should be equal to the number of decoders."))
-
-    if isa(connection, AbstractArray)
-        length(encoders) == length(connection) || throw(ArgumentError(
-            "The number of connections should be equal to the number of encoders/decoders."))
-    else
-        connection = repeat([connection], length(encoders))
-    end
-
+function uchain(; encoders, decoders, bridge)
+    length(encoders) == length(decoders) || error("""
+    The number of encoders should be equal to the number of decoders.
+    """)
     # build from bottom to top
-    ite = zip(reverse(encoders[2:end]),
-              reverse(decoders[2:end]),
-              reverse(connection[1:(end - 1)]))
-    l = ubridge(bridge, connection[end])
-    for (e, d, c) ∈ ite
+    l = ubridge(bridge)
+    for (e, d) in zip(reverse(encoders[2:end]), reverse(decoders[2:end]))
         l = uconnect(e, l, d)
-        l = SkipConnection(l, c) # Parallel(c, l, cross_connector_block)
+        l = SkipConnection(l, chcat) # Parallel(c, l, cross_connector_block)
     end
-    uconnect(encoders[1], l, decoders[1]) # Chain(input = input, backbone = uconnect(encoders[1], l, decoders[1]), classifier = classifier)
+    uconnect(encoders[1], l, decoders[1])
 end
 
 @inline uconnect(enc, prl, dec) = Chain(enc, prl, dec)
 
-for T1 ∈ [:Chain :AbstractArray], T2 ∈ [:Chain :AbstractArray] # AbstractVector
+for T1 in [:Chain :AbstractArray], T2 in [:Chain :AbstractArray]
     @eval begin
         @inline uconnect(enc::($T1), prl, dec::($T2)) = Chain(enc..., prl, dec...)
     end
 end
 
-for T ∈ [:Chain :AbstractArray]
+for T in [:Chain :AbstractArray]
     @eval begin
         @inline uconnect(enc::($T), prl, dec) = Chain(enc..., prl, dec)
         @inline uconnect(enc, prl, dec::($T)) = Chain(enc, prl, dec...)
     end
 end
 
-@inline ubridge(b, c) = SkipConnection(b, c) #_ubridge
+@inline ubridge(b) = SkipConnection(b, chcat)
 
-@inline ubridge(b::AbstractArray, c) = SkipConnection(Chain(b...), c)
+@inline ubridge(b::AbstractArray) = SkipConnection(Chain(b...), chcat)

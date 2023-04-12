@@ -36,7 +36,7 @@ include("utilities.jl")
 export cyanotype, KwargsMapping, @cyanotype
 include("cyanotype.jl")
 
-export BpNoNorm, BpBatchNorm, BpGroupNorm, BpInstanceNorm
+export BpBatchNorm, BpGroupNorm, BpInstanceNorm
 include("units/normalizations.jl")
 
 export BpConv, BpDoubleConv, BpNConv, BpPointwiseConv, BpChannelExpansionConv, BpDepthwiseConv,
@@ -49,6 +49,8 @@ include("units/samplers.jl")
 export BpPixelClassifier
 include("units/classifiers.jl")
 
-#include("u_network.jl")
+export uchain, BpUEncoder, BpUDecoder, BpUBridge, BpUNet
+include("uchain.jl")
+include("unet.jl")
 
 end
