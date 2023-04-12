@@ -9,7 +9,7 @@ To do :
     x volmetric -> volume (more clear)
     - spread => broadcast(?)
     x activation identity by default
-    - BpDConv => BpDoubleConv
+    x BpDConv => BpDoubleConv
 =#
 module Cyanotype
 
