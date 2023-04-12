@@ -38,8 +38,8 @@ end
 function make(bp::BpMBConv, ksize, channels)
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expansion.expansion
-    if bp.skip
-        in_chs == out_chs || error("""
+    if bp.skip && in_chs !== out_chs
+        error("""
         If a 'BpMBConv' have a skip connection defined, the number fo input channels and
         output channels must be the same.
         """)

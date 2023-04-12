@@ -9,7 +9,7 @@
 end
 
 function BpChannelExpansionConv(; kwargs...)
-    kw = Dict(kwargs)
+    kw = Dict(kwargs...)
     expansion = kw[:expansion]
     delete!(kw, :expansion)
     conv =  BpPointwiseConv(; kw...)
