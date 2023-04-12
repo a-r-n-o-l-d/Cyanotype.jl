@@ -4,6 +4,7 @@
     """
     struct BpSqueezeExcitation
         reduction::Int
+        #convolution::BpDoubleConv{BpPointwiseConv,BpPointwiseConv}
         conv1::BpPointwiseConv
         conv2::BpPointwiseConv
     end

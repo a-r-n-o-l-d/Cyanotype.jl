@@ -2,6 +2,7 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
+    - BpDoubleConv with kwargs
     x make without kwargs
     - cleaning
     x replace NoNorm by nothing
