@@ -80,7 +80,7 @@ function make(bp::BpUNet)
         enc_chs, dec_chs = _level_encodec(bp, 3, l)
         push!.((enc, dec), (enc_chs, dec_chs))
         if !isnothing(bp.path)
-            push!(pth, make(bp.path, last(enc_chs)))
+            push!(pth, make(bp.path, bp.ksize, last(enc_chs)))
         else
             push!(pth, bp.path)
         end
