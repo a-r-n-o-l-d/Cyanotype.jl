@@ -1,4 +1,4 @@
-abstract type AbstractBpClassifier end
+abstract type AbstractBpClassifier <: AbstractBpConv end
 
 @cyanotype constructor=false begin
     """
@@ -21,7 +21,10 @@ function make(bp::BpPixelClassifier, channels)
     layers = []
     if bp.nclasses > 2
         push!(layers, make(bp.convolution, channels => bp.nclasses))
-        push!(layers, x -> softmax(x; dims = length(k)))
+        push!(layers, chsoftmax)
+        # x -> softmax(x; dims=length(k))
+        # chcat(x...) = cat(x...; dims=(x[1] |> size |> length) - 1)
+        # chsoftmax(x) = softmax(x; dims=ndims(x) - 1)
         #[Conv(k, channels => bp.nclasses), x -> softmax(x; dims = length(k))]
     else #if bp.nclasses == 2
         push!(layers, make(bp.convolution, channels => 1))

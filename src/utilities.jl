@@ -46,7 +46,9 @@ julia> chcat(x1, x2) |> size
 (32, 32, 8, 6)
 ```
 """
-chcat(x...) = cat(x...; dims=(x[1] |> size |> length) - 1)
+chcat(x...) = cat(x...; dims=ndims(x[1]) - 1) #  (x[1] |> size |> length) - 1
+
+chsoftmax(x) = softmax(x; dims=ndims(x) - 1)
 
 function flatten_layers(layers...)
     result = []
