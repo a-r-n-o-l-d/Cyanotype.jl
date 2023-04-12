@@ -40,17 +40,14 @@ export BpBatchNorm, BpGroupNorm, BpInstanceNorm
 include("units/normalizations.jl")
 
 export BpConv, BpDoubleConv, BpNConv, BpPointwiseConv, BpChannelExpansionConv, BpDepthwiseConv,
-       BpHybridAtrouConv, BpSqueezeExcitation, BpMBConv
+       BpHybridAtrouConv, BpSqueezeExcitation, BpMBConv, BpPixelClassifier
 include("units/convolutions.jl")
 
 export BpMaxDown, BpMeanDown, BpNearestUp, BpLinearUp, BpConvTransposeUp, BpPixelShuffleUp
 include("units/samplers.jl")
 
-export BpPixelClassifier
-include("units/classifiers.jl")
-
 export uchain, BpUEncoder, BpUDecoder, BpUBridge, BpUNet
-include("uchain.jl")
-include("unet.jl")
+include("models/uchain.jl")
+include("models/unet.jl")
 
 end
