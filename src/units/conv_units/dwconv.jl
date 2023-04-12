@@ -9,9 +9,9 @@ end
 
 function BpDepthwiseConv(; kwargs...)
     kw = Dict(kwargs)
-    if haskey(kw, :depthwise)
+    #if haskey(kw, :depthwise)
         kw[:depthwise] = true
-    end
+    #end
     BpDepthwiseConv(BpConv(; kw...))
 end
 
