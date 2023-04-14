@@ -6,8 +6,8 @@
     """
     struct BpChannelAttention{GA<:Function}
         reduction::Int
-        shared_mlp::BpDoubleConv #{BpPointwiseConv,BpPointwiseConv}
-        gate_activation::GA = sigmoid
+        shared_mlp::BpDoubleConv{BpPointwiseConv,BpPointwiseConv}
+        gate_activation::GA
     end
 end
 
@@ -33,6 +33,34 @@ function make(bp::BpChannelAttention, channels)
                 Chain(GlobalMaxPool(), shared_mlp)
             ),
             bp.gate_activation
+        ),
+        .*
+    )
+end
+
+@cyanotype constructor=false begin
+    """
+
+    """
+    struct BpSpatialAttention #{GA<:Function}
+        convolution::BpPointwiseConv
+        #gate_activation::GA
+    end
+end
+
+BpSpatialAttention(; gate_activation=sigmoid, kwargs...) = BpSpatialAttention(
+    BpPointwiseConv(; activation=gate_activation, kwargs...)
+)
+
+chmeanpool(x) = mean(x; dims=ndims(x) - 1)
+
+chmaxpool(x) = maximum(x; dims=ndims(x) - 1)
+
+function make(bp::BpSpatialAttention)
+    SkipConnection(
+        Chain(
+            Parallel(chcat, chmeanpool, chmaxpool),
+            flatten_layers(make(bp.convolution, 2 => 1))...
         ),
         .*
     )
