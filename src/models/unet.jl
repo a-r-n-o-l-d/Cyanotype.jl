@@ -2,7 +2,7 @@
     """
 
     """
-    struct BpUEncoder{C<:AbstractBpConv,D<:Union{Nothing,AbstractBpDownSampler}}
+    struct BpUEncoder{C<:AbstractBpConv,D<:Union{Nothing,AbstractBpDownsampler}}
         convolution::C #BpDoubleConv
         downsampler::D #nothing si stride=2
     end
@@ -20,7 +20,7 @@ make(bp::BpUEncoder, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUDecoder{C<:AbstractBpConv,U<:AbstractBpUpSampler}
+    struct BpUDecoder{C<:AbstractBpConv,U<:AbstractBpUpsampler}
         convolution::C
         upsampler::U
     end
@@ -37,7 +37,7 @@ make(bp::BpUDecoder, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUBridge{D<:Union{Nothing,AbstractBpDownSampler},U<:AbstractBpUpSampler} #,P<:BpPixelClassifierBp
+    struct BpUBridge{D<:Union{Nothing,AbstractBpDownsampler},U<:AbstractBpUpsampler} #,P<:BpPixelClassifierBp
         convolution::BpDoubleConv
         downsampler::D #nothing si stride=2
         upsampler::U
@@ -93,9 +93,9 @@ end
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
-_make(bp::BpPixelShuffleUp, channels) = make(bp, last(channels))
+_make(bp::BpPixelShuffleUpsampler, channels) = make(bp, last(channels))
 
-_make(bp::BpConvTransposeUp, channels) = make(bp, last(channels) => last(channels) ÷ 2)
+_make(bp::BpConvTransposeUpsampler, channels) = make(bp, last(channels) => last(channels) ÷ 2)
 
 _make(bp, channels) = make(bp)
 
@@ -110,7 +110,7 @@ function _level_channels(bp, level)
     mid_enc = out_enc = bp.expansion^(level - 1) * bp.basewidth
     # decoder channels: input, middle, ouptput = (icd, mcd, ocd)
     in_dec, mid_dec = 2 * out_enc, out_enc
-    if bp.decoder.upsampler isa BpConvTransposeUp
+    if bp.decoder.upsampler isa BpConvTransposeUpsampler
         out_dec = mid_dec
     else
         out_dec = (level == 1) ? mid_dec : mid_dec ÷ 2

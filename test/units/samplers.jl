@@ -1,31 +1,31 @@
-sp = BpMaxDown()
+sp = BpMaxDownsampler()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (2, 2, 4, 2)
 
-sp = BpMeanDown()
+sp = BpMeanDownsampler()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (2, 2, 4, 2)
 
-sp = BpNearestUp()
+sp = BpNearestUpsamplers()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (8, 8, 4, 2)
 
-sp = BpLinearUp()
+sp = BpLinearUpsampler()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (8, 8, 4, 2)
 
-sp = BpLinearUp(volume=true)
+sp = BpLinearUpsampler(volume=true)
 m = make(sp)
 @test m(ones(4, 4, 4, 4, 2)) |> size == (8, 8, 8, 4, 2)
 
-sp = BpConvTransposeUp()
+sp = BpConvTransposeUpsampler()
 m = Chain(make(sp, 4))
 @test Flux.outputsize(m, (4, 4, 4, 2)) == (8, 8, 4, 2)
 
-sp = BpPixelShuffleUp()
+sp = BpPixelShuffleUpsampler()
 m = Chain(make(sp, 4)...)
 @test Flux.outputsize(m, (4, 4, 4, 2)) == (8, 8, 4, 2)
 
-sp = BpPixelShuffleUp(volume=true)
+sp = BpPixelShuffleUpsampler(volume=true)
 m = Chain(make(sp, 4)...)
 @test Flux.outputsize(m, (4, 4, 4, 4, 2)) == (8, 8, 8, 4, 2)

@@ -2,6 +2,8 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
+    - docs, docs, docs, docs
+    - BpUDecoder => dispatch on make not on _make
     - BpDoubleConv with kwargs
     x make without kwargs
     - cleaning
@@ -45,7 +47,7 @@ include("units/normalizations.jl")
 
 include("units/convolutions.jl")
 
-export BpMaxDown, BpMeanDown, BpNearestUp, BpLinearUp, BpConvTransposeUp, BpPixelShuffleUp
+export BpMaxDownsampler, BpMeanDownsampler, BpNearestUpsamplers, BpLinearUpsampler, BpConvTransposeUpsampler, BpPixelShuffleUpsampler
 include("units/samplers.jl")
 
 export uchain, BpUEncoder, BpUDecoder, BpUBridge, BpUNet
