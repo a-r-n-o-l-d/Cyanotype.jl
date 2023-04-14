@@ -7,7 +7,7 @@
     """
     struct BpDoubleConv{C1<:AbstractBpConv,C2<:AbstractBpConv} <: AbstractBpConv
         #@volume #enlever
-        conv1::C1 #firstconv
+        conv1::C1         #firstconv
         conv2::C2 = conv1 #secondconv
     end
 end
@@ -23,6 +23,17 @@ function make(bp::BpDoubleConv, ksize, channels::NTuple{3})
         make(bp.conv1, ksize, in_chs=>mid_chs),
         make(bp.conv2, ksize, mid_chs=>out_chs)
     ] |> flatten_layers
+end
+
+function make(bp::BpDoubleConv, channels::NTuple{3})
+    # convolution1.vol == convolution2.vol || error("")
+    in_chs, mid_chs, out_chs = channels
+    flatten_layers(
+        [
+            make(bp.conv1, in_chs=>mid_chs),
+            make(bp.conv2, mid_chs=>out_chs)
+        ]
+    )
 end
 
 # Peut-etre inutile

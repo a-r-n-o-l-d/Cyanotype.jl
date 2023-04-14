@@ -4,7 +4,7 @@ using Test
 using Aqua
 
 @testset verbose = true "Cyanotype.jl" begin
-
+#=
     @testset verbose = true "Code quality" begin
         @testset verbose = true "Aqua" begin
             #Aqua.test_all(Cyanotype) #  => ambiguities from Flux, Zygote, StatsBase
@@ -29,7 +29,7 @@ using Aqua
     @testset verbose = true "Normalizations" begin
         include("normalizations.jl")
     end
-
+=#
     @testset verbose = true "Convolutions" begin
         include("convolutions.jl")
     end

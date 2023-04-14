@@ -41,7 +41,7 @@ export BpBatchNorm, BpGroupNorm, BpInstanceNorm
 include("units/normalizations.jl")
 
 export BpConv, BpDoubleConv, BpNConv, BpPointwiseConv, BpChannelExpansionConv, BpDepthwiseConv,
-       BpHybridAtrouConv, BpSqueezeExcitation, BpMBConv, BpPixelClassifier
+       BpHybridAtrouConv, BpSqueezeExcitation, BpMBConv, BpPixelClassifier, BpChannelAttention
 include("units/convolutions.jl")
 
 export BpMaxDown, BpMeanDown, BpNearestUp, BpLinearUp, BpConvTransposeUp, BpPixelShuffleUp
