@@ -34,14 +34,3 @@ function make(bp::BpSqueezeExcitation, channels)
     )
     SkipConnection(Chain(layers...), .*)
 end
-
-#=
-function _unsqueeze(volumetric)
-    unsq2(x) = unsqueeze(unsqueeze(x; dims = 1); dims = 1)
-    if volumetric
-        unsq3(x) = unsqueeze(unsq2(x); dims = 1)
-    else
-        unsq2
-    end
-end
-=#
