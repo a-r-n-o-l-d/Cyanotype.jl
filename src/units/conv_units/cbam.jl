@@ -4,7 +4,7 @@
     """
 
     """
-    struct BpChannelAttention{GA<:Function}
+    struct BpChannelAttention{GA<:Function} <: AbstractBpConv
         reduction::Int
         shared_mlp::BpDoubleConv{BpPointwiseConv,BpPointwiseConv}
         gate_activation::GA
@@ -42,22 +42,22 @@ end
     """
 
     """
-    struct BpSpatialAttention
-        convolution::BpPointwiseConv
+    struct BpSpatialAttention <: AbstractBpConv
+        convolution::BpConv
     end
 end
 
 function BpSpatialAttention(; gate_activation=sigmoid, kwargs...)
     BpSpatialAttention(
-        BpPointwiseConv(; activation=gate_activation, kwargs...)
+        BpConv(; activation=gate_activation, kwargs...)
     )
 end
 
-function make(bp::BpSpatialAttention)
+function make(bp::BpSpatialAttention, ksize)
     SkipConnection(
         Chain(
             Parallel(chcat, chmeanpool, chmaxpool),
-            flatten_layers(make(bp.convolution, 2 => 1))...
+            flatten_layers(make(bp.convolution, ksize, 2 => 1))...
         ),
         .*
     )
@@ -67,14 +67,13 @@ end
     """
 
     """
-    struct BpCBAM
+    struct BpCBAM <: AbstractBpConv
         channel_gate::BpChannelAttention
         spatial_gate::BpSpatialAttention
     end
 end
 
-function BpCBAM(; reduction, activation=relu, gate_activation=sigmoid, kwargs...)
-    BpCBAM(
+BpCBAM(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = BpCBAM(
         BpChannelAttention(;
             reduction=reduction,
             activation=activation,
@@ -85,7 +84,11 @@ function BpCBAM(; reduction, activation=relu, gate_activation=sigmoid, kwargs...
             gate_activation=gate_activation,
             kwargs...
         )
-    )
-end
+)
 
-make(bp::BpCBAM, channels) = [make(bp.channel_gate, channels), make(bp.spatial_gate)]
+make(bp::BpCBAM, ksize, channels) = flatten_layers(
+    [
+        make(bp.channel_gate, channels),
+        make(bp.spatial_gate, ksize)
+    ]
+)

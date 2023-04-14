@@ -74,11 +74,11 @@ layers = Chain(flatten_layers(make(ca, 16))...)
 @test Flux.outputsize(layers, (32, 32, 16, 16)) == (32, 32, 16, 16)
 
 sa = BpSpatialAttention()
-layers = Chain(flatten_layers(make(sa))...)
+layers = Chain(flatten_layers(make(sa, 3))...)
 @test Flux.outputsize(layers, (32, 32, 16, 16)) == (32, 32, 16, 16)
 
 cbam = BpCBAM(reduction=2)
-layers = Chain(flatten_layers(make(cbam, 16))...)
+layers = Chain(flatten_layers(make(cbam, 3, 16))...)
 @test Flux.outputsize(layers, (32, 32, 16, 16)) == (32, 32, 16, 16)
 
 pc = BpPixelClassifier(; nclasses=1)
