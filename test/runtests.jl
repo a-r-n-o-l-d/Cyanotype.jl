@@ -27,23 +27,23 @@ using Aqua
     end
 
     @testset verbose = true "Normalizations" begin
-        include("normalizations.jl")
+        include("units/normalizations.jl")
     end
 
     @testset verbose = true "Convolutions" begin
-        include("convolutions.jl")
+        include("units/convolutions.jl")
     end
 
     @testset verbose = true "Samplers" begin
-        include("samplers.jl")
+        include("units/samplers.jl")
     end
 
     @testset verbose = true "Classifiers" begin
-        include("classifiers.jl")
+        include("units/classifiers.jl")
     end
 
     @testset verbose = true "UNet" begin
-        include("uchain.jl")
-        include("unet.jl")
+        include("models/uchain.jl")
+        include("models/unet.jl")
     end
 end
