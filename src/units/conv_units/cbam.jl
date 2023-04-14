@@ -11,7 +11,8 @@
     end
 end
 
-function BpChannelAttention(; reduction, activation=relu, gate_activation=sigmoid, kwargs...)
+function BpChannelAttention(; reduction, activation=relu, gate_activation=sigmoid,
+                              kwargs...)
     BpChannelAttention(
         reduction,
         BpDoubleConv(
@@ -47,21 +48,17 @@ end
     end
 end
 
-function BpSpatialAttention(; gate_activation=sigmoid, kwargs...)
-    BpSpatialAttention(
-        BpConv(; activation=gate_activation, kwargs...)
-    )
-end
+BpSpatialAttention(; gate_activation=sigmoid, kwargs...) = BpSpatialAttention(
+    BpConv(; activation=gate_activation, kwargs...)
+)
 
-function make(bp::BpSpatialAttention, ksize)
-    SkipConnection(
-        Chain(
-            Parallel(chcat, chmeanpool, chmaxpool),
-            flatten_layers(make(bp.convolution, ksize, 2 => 1))...
-        ),
-        .*
-    )
-end
+make(bp::BpSpatialAttention, ksize) = SkipConnection(
+    Chain(
+        Parallel(chcat, chmeanpool, chmaxpool),
+        flatten_layers(make(bp.convolution, ksize, 2 => 1))...
+    ),
+    .*
+)
 
 @cyanotype constructor=false begin
     """
@@ -74,16 +71,16 @@ end
 end
 
 BpCBAM(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = BpCBAM(
-        BpChannelAttention(;
-            reduction=reduction,
-            activation=activation,
-            gate_activation=gate_activation,
-            kwargs...
-        ),
-        BpSpatialAttention(;
-            gate_activation=gate_activation,
-            kwargs...
-        )
+    BpChannelAttention(;
+        reduction=reduction,
+        activation=activation,
+        gate_activation=gate_activation,
+        kwargs...
+    ),
+    BpSpatialAttention(;
+        gate_activation=gate_activation,
+        kwargs...
+    )
 )
 
 make(bp::BpCBAM, ksize, channels) = flatten_layers(
