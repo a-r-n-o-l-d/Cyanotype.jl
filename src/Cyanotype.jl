@@ -35,7 +35,7 @@ make(::Nothing) = identity
 export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BpBatchNorm,
        BpGroupNorm, BpInstanceNorm, BpConv, BpDoubleConv, BpNConv, BpPointwiseConv,
        BpChannelExpansionConv, BpDepthwiseConv, BpHybridAtrouConv, BpSqueezeExcitation,
-       BpMBConv, BpPixelClassifier, BpChannelAttention, BpSpatialAttention,
+       BpMBConv, BpPixelClassifier, BpChannelAttention, BpSpatialAttention, BpCBAM
 
 include("utilities.jl")
 

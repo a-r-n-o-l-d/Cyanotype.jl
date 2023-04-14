@@ -42,19 +42,16 @@ end
     """
 
     """
-    struct BpSpatialAttention #{GA<:Function}
+    struct BpSpatialAttention
         convolution::BpPointwiseConv
-        #gate_activation::GA
     end
 end
 
-BpSpatialAttention(; gate_activation=sigmoid, kwargs...) = BpSpatialAttention(
-    BpPointwiseConv(; activation=gate_activation, kwargs...)
-)
-
-chmeanpool(x) = mean(x; dims=ndims(x) - 1)
-
-chmaxpool(x) = maximum(x; dims=ndims(x) - 1)
+function BpSpatialAttention(; gate_activation=sigmoid, kwargs...)
+    BpSpatialAttention(
+        BpPointwiseConv(; activation=gate_activation, kwargs...)
+    )
+end
 
 function make(bp::BpSpatialAttention)
     SkipConnection(
@@ -65,3 +62,30 @@ function make(bp::BpSpatialAttention)
         .*
     )
 end
+
+@cyanotype constructor=false begin
+    """
+
+    """
+    struct BpCBAM
+        channel_gate::BpChannelAttention
+        spatial_gate::BpSpatialAttention
+    end
+end
+
+function BpCBAM(; reduction, activation=relu, gate_activation=sigmoid, kwargs...)
+    BpCBAM(
+        BpChannelAttention(;
+            reduction=reduction,
+            activation=activation,
+            gate_activation=gate_activation,
+            kwargs...
+        ),
+        BpSpatialAttention(;
+            gate_activation=gate_activation,
+            kwargs...
+        )
+    )
+end
+
+make(bp::BpCBAM, channels) = [make(bp.channel_gate, channels), make(bp.spatial_gate)]

@@ -50,6 +50,10 @@ chcat(x...) = cat(x...; dims=ndims(x[1]) - 1) #  (x[1] |> size |> length) - 1
 
 chsoftmax(x) = softmax(x; dims=ndims(x) - 1)
 
+chmeanpool(x) = mean(x; dims=ndims(x) - 1)
+
+chmaxpool(x) = maximum(x; dims=ndims(x) - 1)
+
 function flatten_layers(layers...)
     result = []
     _flatten_layers!(result, layers)
