@@ -12,6 +12,8 @@
     end
 end
 
+# BpMBConv(expkwargs, depkwargs, exckwargs, projkwargs; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
+# normalization=BpBatchNorm(activation=activation))
 function BpMBConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
                   normalization=BpBatchNorm(activation=activation), kwargs...)
 
