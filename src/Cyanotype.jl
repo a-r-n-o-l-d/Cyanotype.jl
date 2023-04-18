@@ -3,6 +3,8 @@ wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
     - docs, docs, docs, docs
+    - showing blueprints is ugly => GarishPrint or custom ?
+    - BpMBConv => BpMbConv
     - BpUDecoder => dispatch on make not on _make
     - BpDoubleConv with kwargs
     x make without kwargs
