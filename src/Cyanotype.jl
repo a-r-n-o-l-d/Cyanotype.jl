@@ -36,6 +36,8 @@ make
 
 make(::Nothing) = identity
 
+make(::Nothing, ::Any) = identity
+
 export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BpBatchNorm,
        BpGroupNorm, BpInstanceNorm, BpConv, BpDoubleConv, BpNConv, BpPointwiseConv,
        BpChannelExpansionConv, BpDepthwiseConv, BpHybridAtrouConv, BpSqueezeExcitation,
