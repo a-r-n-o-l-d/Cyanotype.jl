@@ -9,8 +9,9 @@ include("effnetstage.jl")
                           B<:NTuple{N,EfficientNetStageBp},
                           H<:Union{Nothing,AbstractConvBp},
                           T<:Union{Nothing,LabelClassifierBp}}
-        inchannels::Int = 3
-        headchannels::Int = 1280
+        inchannels::Int
+        stemchannels::Int
+        headchannels::Int
         stem::S
         backbone::B
         head::H
@@ -18,7 +19,7 @@ include("effnetstage.jl")
     end
 end
 
-function EfficientNetBp(config; inchannels=3, headchannels=1280, nclasses,
+function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280, nclasses,
                         include_stem=true, include_head=true, include_top=true) #activation
     stem = if include_stem
         ConvBp(; activation=swish, normalization=BatchNormBp(), stride=2)
@@ -26,7 +27,7 @@ function EfficientNetBp(config; inchannels=3, headchannels=1280, nclasses,
         nothing
     end
     head = if include_head
-        ConvBp(; activation=swish, normalization=BatchNormBp(), stride=2)
+        ConvBp(; activation=swish, normalization=BatchNormBp())
     else
         nothing
     end
@@ -35,19 +36,23 @@ function EfficientNetBp(config; inchannels=3, headchannels=1280, nclasses,
     else
         nothing
     end
-    EfficientNetBp(inchannels, headchannels, stem, _effnet_backbone(config), head, top)
+    bb = _effnet_backbone(config)
+    EfficientNetBp(inchannels, stemchannels, headchannels, stem, bb, head, top)
 end
 
 function make(bp::EfficientNetBp)
     layers = []
-    out_chs = first(bp.backbone).outchannels
+    out_chs = bp.stemchannels
     push!(layers, make(bp.stem, 3, bp.inchannels => out_chs))
+    #println(Chain(layers...))
     for s in bp.backbone
+        #println(out_chs)
         push!(layers, make(s, out_chs))
         out_chs = s.outchannels
     end
     push!(layers, make(bp.head, 3, out_chs => bp.headchannels))
-    flatten_layers(layers)
+    push!(layers, make(bp.top, bp.headchannels))
+    Chain(flatten_layers(layers)...)
 end
 
 ############################################################################################

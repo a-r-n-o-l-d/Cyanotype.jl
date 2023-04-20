@@ -42,12 +42,12 @@ end
 function make(bp::MbConvBp, ksize, channels) # add dropout for stochastic depth
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expansion.expansion
-    if bp.skip && in_chs !== out_chs
+    #=if bp.skip && in_chs !== out_chs
         error("""
         If a 'MbConvBp' have a skip connection defined, the number fo input channels and
         output channels must be the same.
         """)
-    end
+    end=#
     layers = flatten_layers(
         [
             make(bp.expansion, in_chs),
@@ -56,7 +56,7 @@ function make(bp::MbConvBp, ksize, channels) # add dropout for stochastic depth
             make(bp.projection, mid_chs => out_chs)
         ]
     )
-    bp.skip ? SkipConnection(Chain(layers...), +) : layers
+    bp.skip && in_chs == out_chs ? SkipConnection(Chain(layers...), +) : layers
 end
 
 function _mblayers(bp::MbConvBp, ksize, channels)
