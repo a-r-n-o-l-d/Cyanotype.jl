@@ -7,7 +7,7 @@
         #dropout
         expansion::ChannelExpansionConvBp
         depthwise::DepthwiseConvBp
-        excitation::BpSqueezeExcitation
+        excitation::SqueezeExcitationBp
         projection::PointwiseConvBp
     end
 end
@@ -29,7 +29,7 @@ function BpMbConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activa
                                   normalization=normalization,
                                   kwargs...)
 
-    excitation = BpSqueezeExcitation(; activation=activation,
+    excitation = SqueezeExcitationBp(; activation=activation,
                                        gate_activation=hardσ,
                                        reduction=se_reduction,
                                        kwargs...)
