@@ -1,5 +1,48 @@
 include("effnetstage.jl")
 
+@cyanotype begin #constructor=false
+    """
+
+    """
+    struct EfficientNetBp{N,
+                          S<:Union{Nothing,AbstractBpConv},
+                          B<:NTuple{N,EfficientNetStageBp},
+                          H<:Union{Nothing,AbstractBpConv},
+                          T<:Union{Nothing,BpLabelClassifier}}
+        inchannels::Int = 3
+        stem::S
+        backbone::B
+        head::H
+        top::T
+    end
+end
+
+function EfficientNetBp(config; inchannels, nclasses, include_stem=true, include_head=true,
+                        include_top=true)
+    stem = if include_stem
+        ConvBp(; activation=swish, normalization=BatchNormBp(), stride=2)
+    else
+        nothing
+    end
+    head = if include_head
+        ConvBp(; activation=swish, normalization=BatchNormBp(), stride=2)
+    else
+        nothing
+    end
+    top = if include_top
+        BpLabelClassifier(nclasses=nclasses)
+    else
+        nothing
+    end
+    BpEfficientNet(;
+        inchannels=inchannels,
+        stem=stem,
+        backbone=_effnet_backbone(config),
+        head=head,
+        top=top
+    )
+end
+
 function _effnet_backbone(config)
     if config ∈ [:b0, :b1, :b2, :b3, :b4, :b5, :b6, :b7, :b8]
         _effnetv1_backbone(config)
