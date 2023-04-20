@@ -57,11 +57,11 @@ bp = DepthwiseConvBp(normalization=BatchNormBp(), depthwise=false, init=Flux.glo
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
-bp = BpMbConv(stride=2, ch_expansion=6, se_reduction=4)
+bp = MbConvBp(stride=2, ch_expansion=6, se_reduction=4)
 model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (16, 16, 4, 16)
 
-bp = BpMbConv(stride=1, ch_expansion=6, se_reduction=4, init=Flux.glorot_normal)
+bp = MbConvBp(stride=1, ch_expansion=6, se_reduction=4, init=Flux.glorot_normal)
 model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 4, 16)
 

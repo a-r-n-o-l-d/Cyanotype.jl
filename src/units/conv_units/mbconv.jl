@@ -2,7 +2,7 @@
     """
 
     """
-    struct BpMbConv <: AbstractConvBp
+    struct MbConvBp <: AbstractConvBp
         skip::Bool
         #dropout
         expansion::ChannelExpansionConvBp
@@ -12,12 +12,12 @@
     end
 end
 
-# BpMbConv(expkwargs, depkwargs, exckwargs, projkwargs; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
+# MbConvBp(expkwargs, depkwargs, exckwargs, projkwargs; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
 # normalization=BatchNormBp(activation=activation))
-function BpMbConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
+function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
                   normalization=BatchNormBp(activation=activation), kwargs...)
 
-    stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `BpMbConv`")
+    stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `MbConvBp`")
 
     expansion = ChannelExpansionConvBp(; activation=activation,
                                          expansion=ch_expansion,
@@ -36,15 +36,15 @@ function BpMbConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activa
 
     projection = PointwiseConvBp(; normalization=normalization, kwargs...)
 
-    BpMbConv(skip, expansion, depthwise, excitation, projection)
+    MbConvBp(skip, expansion, depthwise, excitation, projection)
 end
 
-function make(bp::BpMbConv, ksize, channels) # add dropout for stochastic depth
+function make(bp::MbConvBp, ksize, channels) # add dropout for stochastic depth
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expansion.expansion
     if bp.skip && in_chs !== out_chs
         error("""
-        If a 'BpMbConv' have a skip connection defined, the number fo input channels and
+        If a 'MbConvBp' have a skip connection defined, the number fo input channels and
         output channels must be the same.
         """)
     end
@@ -59,12 +59,12 @@ function make(bp::BpMbConv, ksize, channels) # add dropout for stochastic depth
     bp.skip ? SkipConnection(Chain(layers...), +) : layers
 end
 
-function _mblayers(bp::BpMbConv, ksize, channels)
+function _mblayers(bp::MbConvBp, ksize, channels)
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expansion.expansion
     if bp.skip && in_chs !== out_chs
         error("""
-        If a 'BpMbConv' have a skip connection defined, the number fo input channels and
+        If a 'MbConvBp' have a skip connection defined, the number fo input channels and
         output channels must be the same.
         """)
     end
