@@ -3,7 +3,8 @@ wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
     - docs, docs, docs, docs
-    - showing blueprints is ugly => GarishPrint or custom ?
+    - renommage : mettre Bp en fin de nom
+    - showing blueprints is ugly => GarishPrint or custom dump ?
     - BpMBConv => BpMbConv
     - BpUDecoder => dispatch on make not on _make
     - BpDoubleConv with kwargs
@@ -58,7 +59,7 @@ export BpMaxDownsampler, BpMeanDownsampler, BpNearestUpsamplers, BpLinearUpsampl
 include("units/samplers.jl")
 
 export uchain, BpUEncoder, BpUDecoder, BpUBridge, BpUNet
-include("models/uchain.jl")
-include("models/unet.jl")
+include("models/unets/uchain.jl")
+include("models/unets/unet.jl")
 
 end

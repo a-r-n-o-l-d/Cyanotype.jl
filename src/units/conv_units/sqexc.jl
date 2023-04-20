@@ -29,7 +29,7 @@ function make(bp::BpSqueezeExcitation, channels)
         [
             GlobalMeanPool(),
             make(bp.conv1, channels => mid_chs),
-            make(bp.conv2, mid_chs => channels),
+            make(bp.conv2, mid_chs => channels)
         ]
     )
     SkipConnection(Chain(layers...), .*)

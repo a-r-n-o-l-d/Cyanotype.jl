@@ -17,7 +17,7 @@ end
 function BpMBConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
                   normalization=BpBatchNorm(activation=activation), kwargs...)
 
-    stride in [1, 2] || error("`stride` has to be 1 or 2 for `BpMBConv`")
+    stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `BpMBConv`")
 
     expansion = BpChannelExpansionConv(; activation=activation,
                                          expansion=ch_expansion,
