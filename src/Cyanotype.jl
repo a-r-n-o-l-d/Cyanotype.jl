@@ -24,7 +24,13 @@ using Reexport
 using Flux: zeros32, ones32, glorot_uniform, flatten
 using Statistics
 
-export make, CyFloat
+export make, spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
+       GroupNormBp, InstanceNormBp, ConvBp, DoubleConvBp, NConvBp, PointwiseConvBp,
+       ChannelExpansionConvBp, DepthwiseConvBp, HybridAtrouConvBp, SqueezeExcitationBp,
+       MbConvBp, PixelClassifierBp, ChannelAttentionBp, SpatialAttentionBp, CBAMBp,
+       FusedMbConvBp, LabelClassifierBp, MaxDownsamplerBp, MeanDownsamplerBp,
+       NearestUpsamplerBp, LinearUpsamplerBp, ConvTransposeUpsamplerBp,
+       PixelShuffleUpsamplerBp, uchain, UEncoderBp, UDecoderBp, UBridgeBp, UNetBp
 
 const CyFloat = Union{Float16, Float32, Float64}
 
@@ -39,12 +45,6 @@ make(::Nothing) = identity
 
 make(::Nothing, ::Any) = identity
 
-export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
-       GroupNormBp, InstanceNormBp, ConvBp, DoubleConvBp, NConvBp, PointwiseConvBp,
-       ChannelExpansionConvBp, DepthwiseConvBp, HybridAtrouConvBp, SqueezeExcitationBp,
-       MbConvBp, PixelClassifierBp, ChannelAttentionBp, SpatialAttentionBp, CBAMBp,
-       FusedMbConvBp, LabelClassifierBp
-
 include("utilities.jl")
 
 include("cyanotype.jl")
@@ -55,10 +55,7 @@ include("units/convolutions.jl")
 
 include("units/classifiers.jl")
 
-export MaxDownsamplerBp, MeanDownsamplerBp, NearestUpsamplerBp, LinearUpsamplerBp, ConvTransposeUpsamplerBp, PixelShuffleUpsamplerBp
 include("units/samplers.jl")
-
-export uchain, UEncoderBp, UDecoderBp, UBridgeBp, UNetBp
 
 include("models/unets/unet.jl")
 

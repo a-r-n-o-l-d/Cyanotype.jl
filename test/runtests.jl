@@ -1,4 +1,5 @@
 using Cyanotype
+using Cyanotype: CyFloat
 using Flux
 using Test
 using Aqua
