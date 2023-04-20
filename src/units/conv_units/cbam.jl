@@ -4,16 +4,16 @@
     """
 
     """
-    struct BpChannelAttention{GA<:Function} <: AbstractConvBp
+    struct ChannelAttentionBp{GA<:Function} <: AbstractConvBp
         reduction::Int
         shared_mlp::DoubleConvBp{PointwiseConvBp,PointwiseConvBp}
         gate_activation::GA
     end
 end
 
-function BpChannelAttention(; reduction, activation=relu, gate_activation=sigmoid,
+function ChannelAttentionBp(; reduction, activation=relu, gate_activation=sigmoid,
                               kwargs...)
-    BpChannelAttention(
+    ChannelAttentionBp(
         reduction,
         DoubleConvBp(
             conv1=PointwiseConvBp(; activation=activation, kwargs...),
@@ -23,7 +23,7 @@ function BpChannelAttention(; reduction, activation=relu, gate_activation=sigmoi
     )
 end
 
-function make(bp::BpChannelAttention, channels)
+function make(bp::ChannelAttentionBp, channels)
     mid_chs = channels ÷ bp.reduction
     shared_mlp = Chain(make(bp.shared_mlp, (channels, mid_chs, channels))...)
     SkipConnection(
@@ -65,13 +65,13 @@ make(bp::BpSpatialAttention, ksize) = SkipConnection(
 
     """
     struct BpCBAM <: AbstractConvBp
-        channel_gate::BpChannelAttention
+        channel_gate::ChannelAttentionBp
         spatial_gate::BpSpatialAttention
     end
 end
 
 BpCBAM(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = BpCBAM(
-    BpChannelAttention(;
+    ChannelAttentionBp(;
         reduction=reduction,
         activation=activation,
         gate_activation=gate_activation,
