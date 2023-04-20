@@ -1,8 +1,8 @@
-sp = BpMaxDownsampler()
+sp = MaxDownsamplerBp()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (2, 2, 4, 2)
 
-sp = BpMeanDownsampler()
+sp = MeanDownsamplerBp()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (2, 2, 4, 2)
 

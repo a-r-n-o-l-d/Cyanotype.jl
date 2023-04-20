@@ -7,13 +7,13 @@ abstract type AbstractBpUpsampler end
 @cyanotype begin
     """
     """
-    struct BpMaxDownsampler <: AbstractBpDownsampler
+    struct MaxDownsamplerBp <: AbstractBpDownsampler
         @volume
         wsize::Int = 2
     end
 end
 
-function make(bp::BpMaxDownsampler)
+function make(bp::MaxDownsamplerBp)
     ws = genk(bp.wsize, bp.volume)
     MaxPool(ws)
 end
@@ -21,13 +21,13 @@ end
 @cyanotype begin
     """
     """
-    struct BpMeanDownsampler <: AbstractBpDownsampler
+    struct MeanDownsamplerBp <: AbstractBpDownsampler
         @volume
         wsize::Int = 2
     end
 end
 
-function make(bp::BpMeanDownsampler)
+function make(bp::MeanDownsamplerBp)
     ws = genk(bp.wsize, bp.volume)
     MeanPool(ws)
 end

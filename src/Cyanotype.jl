@@ -55,7 +55,7 @@ include("units/convolutions.jl")
 
 include("units/classifiers.jl")
 
-export BpMaxDownsampler, BpMeanDownsampler, BpNearestUpsamplers, BpLinearUpsampler, BpConvTransposeUpsampler, BpPixelShuffleUpsampler
+export MaxDownsamplerBp, MeanDownsamplerBp, BpNearestUpsamplers, BpLinearUpsampler, BpConvTransposeUpsampler, BpPixelShuffleUpsampler
 include("units/samplers.jl")
 
 export uchain, BpUEncoder, BpUDecoder, BpUBridge, BpUNet
