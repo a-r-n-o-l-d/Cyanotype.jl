@@ -13,9 +13,9 @@
 end
 
 # BpMbConv(expkwargs, depkwargs, exckwargs, projkwargs; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
-# normalization=BpBatchNorm(activation=activation))
+# normalization=BatchNormBp(activation=activation))
 function BpMbConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
-                  normalization=BpBatchNorm(activation=activation), kwargs...)
+                  normalization=BatchNormBp(activation=activation), kwargs...)
 
     stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `BpMbConv`")
 

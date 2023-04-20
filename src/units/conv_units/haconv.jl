@@ -7,7 +7,7 @@
     """
     struct BpHybridAtrouConv{N,C<:BpConv} <: AbstractBpConv #BpHybridAtrouConv
         dilation_rates::NTuple{N,Int} = (1, 2, 3)
-        conv::C = BpConv(normalization=BpBatchNorm())
+        conv::C = BpConv(normalization=BatchNormBp())
     end
 end
 

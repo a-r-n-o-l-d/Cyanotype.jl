@@ -22,13 +22,13 @@ end
     """
     Wraps a Flux.Batchnorm
     """
-    struct BpBatchNorm{F<:CyFloat,A<:Function,I1<:Function,
+    struct BatchNormBp{F<:CyFloat,A<:Function,I1<:Function,
                               I2<:Function} <: AbstractBpNorm
         @activation(identity)
     end
 end
 
-function make(bp::BpBatchNorm, channels)
+function make(bp::BatchNormBp, channels)
     [BatchNorm(channels, bp.activation; kwargs(bp)...)]
 end
 
@@ -43,12 +43,12 @@ end
         )
 
     """
-        BpGroupNorm(; kwargs...)
+        GroupNormBp(; kwargs...)
 
     Describes a building process for a [`Groupnorm`](@ref Flux.Groupnorm) layer.
     make(channels, bp::CyGroupNorm)
     """
-    struct BpGroupNorm{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractBpNorm
+    struct GroupNormBp{F<:CyFloat,A<:Function,I1<:Function,I2<:Function} <: AbstractBpNorm
         @activation(identity)
         """
         `groups`: the number of groups passed to [`GroupNorm`](@ref Flux.GroupNorm)
@@ -58,7 +58,7 @@ end
     end
 end
 
-function make(bp::BpGroupNorm, channels)
+function make(bp::GroupNormBp, channels)
     [GroupNorm(channels, bp.groups, bp.activation; kwargs(bp)...)]
 end
 

@@ -39,8 +39,8 @@ make(::Nothing) = identity
 
 make(::Nothing, ::Any) = identity
 
-export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BpBatchNorm,
-       BpGroupNorm, BpInstanceNorm, BpConv, BpDoubleConv, BpNConv, BpPointwiseConv,
+export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
+       GroupNormBp, BpInstanceNorm, BpConv, BpDoubleConv, BpNConv, BpPointwiseConv,
        BpChannelExpansionConv, BpDepthwiseConv, BpHybridAtrouConv, BpSqueezeExcitation,
        BpMbConv, BpPixelClassifier, BpChannelAttention, BpSpatialAttention, BpCBAM,
        BpFusedMbConv, BpLabelClassifier
@@ -59,7 +59,7 @@ export BpMaxDownsampler, BpMeanDownsampler, BpNearestUpsamplers, BpLinearUpsampl
 include("units/samplers.jl")
 
 export uchain, BpUEncoder, BpUDecoder, BpUBridge, BpUNet
-include("models/unets/uchain.jl")
+
 include("models/unets/unet.jl")
 
 end

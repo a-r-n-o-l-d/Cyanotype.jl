@@ -1,4 +1,4 @@
-norm = BpBatchNorm()
+norm = BatchNormBp()
 baseconv = BpDoubleConv(conv1=BpConv(), conv2=BpConv())
 ups = BpPixelShuffleUpsampler()
 dws = BpMaxDownsampler()

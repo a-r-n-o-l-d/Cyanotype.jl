@@ -1,8 +1,8 @@
 conv = BpConv()
 norms = [
             nothing,
-            BpBatchNorm(),
-            BpGroupNorm(; groups = 2),
+            BatchNormBp(),
+            GroupNormBp(; groups = 2),
             BpInstanceNorm()
         ]
 #dw, revs = pres = [true false]
@@ -13,7 +13,7 @@ for n in norms, r in [true false], p in [true false], d in [true false]
     @test Flux.outputsize(m, (32, 32, 8, 16)) == (32, 32, 16, 16)
 end
 
-dc = BpDoubleConv(; conv1=BpConv(), conv2=BpConv(; normalization=BpBatchNorm()))
+dc = BpDoubleConv(; conv1=BpConv(), conv2=BpConv(; normalization=BatchNormBp()))
 
 model = Chain(make(dc, 3, (8, 16, 32))...)
 @test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 32, 16)
@@ -31,7 +31,7 @@ model = Chain(make(hac, 3, 4 => 16)...)
 bp = BpPointwiseConv()
 model = Chain(make(bp, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
-bp = BpPointwiseConv(normalization=BpBatchNorm())
+bp = BpPointwiseConv(normalization=BatchNormBp())
 model = Chain(make(bp, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 bp = BpPointwiseConv(activation=swish, init=Flux.glorot_normal)
@@ -41,19 +41,19 @@ model = Chain(make(bp, 4 => 16) |> flatten_layers)
 bp = BpChannelExpansionConv(expansion=2)
 model = Chain(make(bp, 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 8, 16)
-bp = BpChannelExpansionConv(expansion=2, normalization=BpBatchNorm())
+bp = BpChannelExpansionConv(expansion=2, normalization=BatchNormBp())
 model = Chain(make(bp, 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 8, 16)
-bp = BpChannelExpansionConv(expansion=1, normalization=BpBatchNorm())
+bp = BpChannelExpansionConv(expansion=1, normalization=BatchNormBp())
 @test make(bp, 4) == identity
 
 bp = BpDepthwiseConv()
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
-bp = BpDepthwiseConv(normalization=BpBatchNorm())
+bp = BpDepthwiseConv(normalization=BatchNormBp())
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
-bp = BpDepthwiseConv(normalization=BpBatchNorm(), depthwise=false, init=Flux.glorot_normal)
+bp = BpDepthwiseConv(normalization=BatchNormBp(), depthwise=false, init=Flux.glorot_normal)
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 

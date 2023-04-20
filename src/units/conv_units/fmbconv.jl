@@ -12,7 +12,7 @@
 end
 
 BpFusedMbConv(; stride, ch_expansion, skip=(stride == 1), activation=relu,
-                         normalization=BpBatchNorm(activation=activation),
+                         normalization=BatchNormBp(activation=activation),
                          kwargs...) = BpFusedMbConv(
     skip,
     ch_expansion,
