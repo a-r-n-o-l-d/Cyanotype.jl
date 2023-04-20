@@ -43,16 +43,16 @@ end
     """
 
     """
-    struct BpSpatialAttention <: AbstractConvBp
+    struct SpatialAttentionBp <: AbstractConvBp
         convolution::ConvBp
     end
 end
 
-BpSpatialAttention(; gate_activation=sigmoid, kwargs...) = BpSpatialAttention(
+SpatialAttentionBp(; gate_activation=sigmoid, kwargs...) = SpatialAttentionBp(
     ConvBp(; activation=gate_activation, kwargs...)
 )
 
-make(bp::BpSpatialAttention, ksize) = SkipConnection(
+make(bp::SpatialAttentionBp, ksize) = SkipConnection(
     Chain(
         Parallel(chcat, chmeanpool, chmaxpool),
         flatten_layers(make(bp.convolution, ksize, 2 => 1))...
@@ -64,26 +64,26 @@ make(bp::BpSpatialAttention, ksize) = SkipConnection(
     """
 
     """
-    struct BpCBAM <: AbstractConvBp
+    struct CBAMBp <: AbstractConvBp
         channel_gate::ChannelAttentionBp
-        spatial_gate::BpSpatialAttention
+        spatial_gate::SpatialAttentionBp
     end
 end
 
-BpCBAM(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = BpCBAM(
+CBAMBp(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = CBAMBp(
     ChannelAttentionBp(;
         reduction=reduction,
         activation=activation,
         gate_activation=gate_activation,
         kwargs...
     ),
-    BpSpatialAttention(;
+    SpatialAttentionBp(;
         gate_activation=gate_activation,
         kwargs...
     )
 )
 
-make(bp::BpCBAM, ksize, channels) = flatten_layers(
+make(bp::CBAMBp, ksize, channels) = flatten_layers(
     [
         make(bp.channel_gate, channels),
         make(bp.spatial_gate, ksize)
