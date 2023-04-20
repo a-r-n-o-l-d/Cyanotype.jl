@@ -5,10 +5,10 @@ include("effnetstage.jl")
 
     """
     struct EfficientNetBp{N,
-                          S<:Union{Nothing,AbstractBpConv},
+                          S<:Union{Nothing,AbstractConvBp},
                           B<:NTuple{N,EfficientNetStageBp},
-                          H<:Union{Nothing,AbstractBpConv},
-                          T<:Union{Nothing,BpLabelClassifier}}
+                          H<:Union{Nothing,AbstractConvBp},
+                          T<:Union{Nothing,LabelClassifierBp}}
         inchannels::Int = 3
         headchannels::Int = 1280
         stem::S
@@ -18,8 +18,8 @@ include("effnetstage.jl")
     end
 end
 
-function EfficientNetBp(config; inchannels=3, headchannels=1280, nclasses, include_stem=true, include_head=true,
-                        include_top=true) #activation
+function EfficientNetBp(config; inchannels=3, headchannels=1280, nclasses,
+                        include_stem=true, include_head=true, include_top=true) #activation
     stem = if include_stem
         ConvBp(; activation=swish, normalization=BatchNormBp(), stride=2)
     else
