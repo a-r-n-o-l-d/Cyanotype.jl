@@ -30,7 +30,8 @@ export make, spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, Batch
        MbConvBp, PixelClassifierBp, ChannelAttentionBp, SpatialAttentionBp, CBAMBp,
        FusedMbConvBp, LabelClassifierBp, MaxDownsamplerBp, MeanDownsamplerBp,
        NearestUpsamplerBp, LinearUpsamplerBp, ConvTransposeUpsamplerBp,
-       PixelShuffleUpsamplerBp, uchain, UEncoderBp, UDecoderBp, UBridgeBp, UNetBp
+       PixelShuffleUpsamplerBp, uchain, UEncoderBp, UDecoderBp, UBridgeBp, UNetBp,
+       EfficientNetStageBp
 
 const CyFloat = Union{Float16, Float32, Float64}
 
@@ -58,5 +59,7 @@ include("units/classifiers.jl")
 include("units/samplers.jl")
 
 include("models/unets/unet.jl")
+
+include("models/efficientnets/efficientnet.jl")
 
 end
