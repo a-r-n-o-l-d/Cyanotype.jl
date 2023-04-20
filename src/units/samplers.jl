@@ -35,13 +35,13 @@ end
 @cyanotype begin
     """
     """
-    struct BpNearestUpsamplers <: AbstractBpUpsampler
+    struct NearestUpsamplerBp <: AbstractBpUpsampler
         @volume
         scale::Int = 2
     end
 end
 
-function make(bp::BpNearestUpsamplers)
+function make(bp::NearestUpsamplerBp)
     sc = genk(bp.scale, bp.volume)
     Upsample(:nearest; scale = sc)
 end
@@ -49,13 +49,13 @@ end
 @cyanotype begin
     """
     """
-    struct BpLinearUpsampler <: AbstractBpUpsampler
+    struct LinearUpsamplerBp <: AbstractBpUpsampler
         @volume
         scale::Int = 2
     end
 end
 
-function make(bp::BpLinearUpsampler)
+function make(bp::LinearUpsamplerBp)
     if bp.volume
         Upsample(:trilinear; scale = (bp.scale, bp.scale, bp.scale))
     else

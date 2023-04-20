@@ -6,15 +6,15 @@ sp = MeanDownsamplerBp()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (2, 2, 4, 2)
 
-sp = BpNearestUpsamplers()
+sp = NearestUpsamplerBp()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (8, 8, 4, 2)
 
-sp = BpLinearUpsampler()
+sp = LinearUpsamplerBp()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (8, 8, 4, 2)
 
-sp = BpLinearUpsampler(volume=true)
+sp = LinearUpsamplerBp(volume=true)
 m = make(sp)
 @test m(ones(4, 4, 4, 4, 2)) |> size == (8, 8, 8, 4, 2)
 
