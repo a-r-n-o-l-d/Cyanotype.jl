@@ -66,34 +66,34 @@ end
 @cyanotype begin
     """
     """
-    struct BpConvTransposeUpsampler <: AbstractBpUpsampler
+    struct ConvTransposeUpsamplerBp <: AbstractBpUpsampler
         @volume
         scale::Int = 2
     end
 end
 
-function make(bp::BpConvTransposeUpsampler, channels::Pair)
+function make(bp::ConvTransposeUpsamplerBp, channels::Pair)
     k = genk(bp.scale, bp.volume)
     ConvTranspose(k, channels, stride=bp.scale)
 end
 
-make(bp::BpConvTransposeUpsampler, channels::Int) = make(bp, channels => channels)
+make(bp::ConvTransposeUpsamplerBp, channels::Int) = make(bp, channels => channels)
 
 @cyanotype constructor=false begin
     """
     """
-    struct BpPixelShuffleUpsampler <: AbstractBpUpsampler
+    struct PixelShuffleUpsamplerBp <: AbstractBpUpsampler
         expansion::ChannelExpansionConvBp
         scale::Int
     end
 end
 
-function BpPixelShuffleUpsampler(; scale=2, volume=false, normalization=BatchNormBp(), kwargs...)
+function PixelShuffleUpsamplerBp(; scale=2, volume=false, normalization=BatchNormBp(), kwargs...)
     e = volume ? scale^3 : scale^2
     expansion = ChannelExpansionConvBp(; expansion=e, volume=volume, normalization=normalization, kwargs...)
-    BpPixelShuffleUpsampler(expansion, scale)
+    PixelShuffleUpsamplerBp(expansion, scale)
 end
 
-function make(bp::BpPixelShuffleUpsampler, channels)
+function make(bp::PixelShuffleUpsamplerBp, channels)
     [make(bp.expansion, channels), PixelShuffle(bp.scale)] |> flatten_layers
 end

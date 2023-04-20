@@ -18,14 +18,14 @@ sp = LinearUpsamplerBp(volume=true)
 m = make(sp)
 @test m(ones(4, 4, 4, 4, 2)) |> size == (8, 8, 8, 4, 2)
 
-sp = BpConvTransposeUpsampler()
+sp = ConvTransposeUpsamplerBp()
 m = Chain(make(sp, 4))
 @test Flux.outputsize(m, (4, 4, 4, 2)) == (8, 8, 4, 2)
 
-sp = BpPixelShuffleUpsampler()
+sp = PixelShuffleUpsamplerBp()
 m = Chain(make(sp, 4)...)
 @test Flux.outputsize(m, (4, 4, 4, 2)) == (8, 8, 4, 2)
 
-sp = BpPixelShuffleUpsampler(volume=true)
+sp = PixelShuffleUpsamplerBp(volume=true)
 m = Chain(make(sp, 4)...)
 @test Flux.outputsize(m, (4, 4, 4, 4, 2)) == (8, 8, 8, 4, 2)

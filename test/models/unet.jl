@@ -1,6 +1,6 @@
 norm = BatchNormBp()
 baseconv = DoubleConvBp(conv1=ConvBp(), conv2=ConvBp())
-ups = BpPixelShuffleUpsampler()
+ups = PixelShuffleUpsamplerBp()
 dws = MaxDownsamplerBp()
 dec = BpUDecoder(convolution=baseconv, upsampler=ups)
 enc = BpUEncoder(convolution=DoubleConvBp(conv1=ConvBp(stride=2), conv2=ConvBp()), downsampler=nothing)
