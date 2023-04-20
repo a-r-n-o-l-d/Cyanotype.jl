@@ -31,11 +31,11 @@ function EfficientNetBp(config; inchannels=3, headchannels=1280, nclasses,
         nothing
     end
     top = if include_top
-        BpLabelClassifier(nclasses=nclasses)
+        LabelClassifierBp(nclasses=nclasses)
     else
         nothing
     end
-    BpEfficientNet(inchannels, headchannels, stem, _effnet_backbone(config), head, top)
+    EfficientNetBp(inchannels, headchannels, stem, _effnet_backbone(config), head, top)
 end
 
 function make(bp::EfficientNetBp)
