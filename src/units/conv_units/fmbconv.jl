@@ -2,7 +2,7 @@
     """
 
     """
-    struct BpFusedMbConv{P<:Union{Nothing,BpPointwiseConv}} <: AbstractConvBp
+    struct BpFusedMbConv{P<:Union{Nothing,PointwiseConvBp}} <: AbstractConvBp
         skip::Bool
         ch_expansion::Int
         convolution::ConvBp
@@ -17,7 +17,7 @@ BpFusedMbConv(; stride, ch_expansion, skip=(stride == 1), activation=relu,
     skip,
     ch_expansion,
     ConvBp(; stride=stride, activation=activation, normalization=normalization, kwargs...),
-    ch_expansion <= 1 ? nothing : BpPointwiseConv(; normalization=normalization, kwargs...)
+    ch_expansion <= 1 ? nothing : PointwiseConvBp(; normalization=normalization, kwargs...)
 )
 
 function make(bp::BpFusedMbConv, ksize, channels)

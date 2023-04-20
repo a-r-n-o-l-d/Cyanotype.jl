@@ -2,11 +2,11 @@
     """
 
     """
-    struct BpPointwiseConv <: AbstractConvBp
+    struct PointwiseConvBp <: AbstractConvBp
         conv::ConvBp
     end
 end
 
-BpPointwiseConv(; kwargs...) = BpPointwiseConv(ConvBp(; kwargs...))
+PointwiseConvBp(; kwargs...) = PointwiseConvBp(ConvBp(; kwargs...))
 
-make(bp::BpPointwiseConv, channels) = make(bp.conv, 1, channels)
+make(bp::PointwiseConvBp, channels) = make(bp.conv, 1, channels)

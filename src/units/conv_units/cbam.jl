@@ -6,7 +6,7 @@
     """
     struct BpChannelAttention{GA<:Function} <: AbstractConvBp
         reduction::Int
-        shared_mlp::DoubleConvBp{BpPointwiseConv,BpPointwiseConv}
+        shared_mlp::DoubleConvBp{PointwiseConvBp,PointwiseConvBp}
         gate_activation::GA
     end
 end
@@ -16,8 +16,8 @@ function BpChannelAttention(; reduction, activation=relu, gate_activation=sigmoi
     BpChannelAttention(
         reduction,
         DoubleConvBp(
-            conv1=BpPointwiseConv(; activation=activation, kwargs...),
-            conv2=BpPointwiseConv(; activation=identity, kwargs...)
+            conv1=PointwiseConvBp(; activation=activation, kwargs...),
+            conv2=PointwiseConvBp(; activation=identity, kwargs...)
         ),
         gate_activation
     )

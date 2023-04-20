@@ -8,7 +8,7 @@
         expansion::BpChannelExpansionConv
         depthwise::BpDepthwiseConv
         excitation::BpSqueezeExcitation
-        projection::BpPointwiseConv
+        projection::PointwiseConvBp
     end
 end
 
@@ -34,7 +34,7 @@ function BpMbConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activa
                                        reduction=se_reduction,
                                        kwargs...)
 
-    projection = BpPointwiseConv(; normalization=normalization, kwargs...)
+    projection = PointwiseConvBp(; normalization=normalization, kwargs...)
 
     BpMbConv(skip, expansion, depthwise, excitation, projection)
 end

@@ -6,13 +6,13 @@ abstract type AbstractBpClassifier end #<: AbstractConvBp
     struct BpPixelClassifier <: AbstractConvBp
         #@volume
         nclasses::Int
-        convolution::BpPointwiseConv
+        convolution::PointwiseConvBp
     end
 end
 
 function BpPixelClassifier(; nclasses, activation=nclasses > 2 ? identity : sigmoid, kwargs...)
     #act = nclasses > 2 ? identity : sigmoid
-    conv = BpPointwiseConv(; activation=activation, kwargs...)
+    conv = PointwiseConvBp(; activation=activation, kwargs...)
     BpPixelClassifier(nclasses, conv)
 end
 

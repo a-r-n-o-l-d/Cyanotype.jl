@@ -5,8 +5,8 @@
     struct BpSqueezeExcitation
         reduction::Int
         #convolution::DoubleConvBp{BpPointwiseConv,BpPointwiseConv}
-        conv1::BpPointwiseConv
-        conv2::BpPointwiseConv
+        conv1::PointwiseConvBp
+        conv2::PointwiseConvBp
     end
 end
 
@@ -18,8 +18,8 @@ function BpSqueezeExcitation(; activation=relu, gate_activation=sigmoid, reducti
         """)
     BpSqueezeExcitation(
         reduction,
-        BpPointwiseConv(; activation=activation, kwargs...),
-        BpPointwiseConv(; activation=gate_activation, kwargs...)
+        PointwiseConvBp(; activation=activation, kwargs...),
+        PointwiseConvBp(; activation=gate_activation, kwargs...)
     )
 end
 

@@ -41,13 +41,13 @@ end
     """
     Template describing a module with N `NConvBp` repeated.
     """
-    struct BpNConv{C<:AbstractConvBp} <: AbstractConvBp
+    struct NConvBp{C<:AbstractConvBp} <: AbstractConvBp
         convolution::C
         nrepeat::Int
     end
 end
 
-function make(bp::BpNConv, ksize, channels)
+function make(bp::NConvBp, ksize, channels)
     layers = []
     in_chs, out_chs = channels
     for _ in 1:bp.nrepeat
