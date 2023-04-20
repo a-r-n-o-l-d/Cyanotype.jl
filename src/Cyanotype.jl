@@ -7,7 +7,7 @@ To do :
     - showing blueprints is ugly => GarishPrint or custom dump ?
     - BpMBConv => BpMbConv
     - BpUDecoder => dispatch on make not on _make
-    - BpDoubleConv with kwargs
+    - DoubleConvBp with kwargs
     x make without kwargs
     - cleaning
     x replace NoNorm by nothing
@@ -15,7 +15,7 @@ To do :
     x volmetric -> volume (more clear)
     - spread => broadcast(?)
     x activation identity by default
-    x BpDConv => BpDoubleConv
+    x BpDConv => DoubleConvBp
 =#
 module Cyanotype
 
@@ -40,7 +40,7 @@ make(::Nothing) = identity
 make(::Nothing, ::Any) = identity
 
 export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
-       GroupNormBp, InstanceNormBp, ConvBp, BpDoubleConv, BpNConv, BpPointwiseConv,
+       GroupNormBp, InstanceNormBp, ConvBp, DoubleConvBp, BpNConv, BpPointwiseConv,
        BpChannelExpansionConv, BpDepthwiseConv, BpHybridAtrouConv, BpSqueezeExcitation,
        BpMbConv, BpPixelClassifier, BpChannelAttention, BpSpatialAttention, BpCBAM,
        BpFusedMbConv, BpLabelClassifier

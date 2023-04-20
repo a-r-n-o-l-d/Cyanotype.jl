@@ -5,7 +5,7 @@ include("uchain.jl")
 
     """
     struct BpUEncoder{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler}}
-        convolution::C #BpDoubleConv
+        convolution::C #DoubleConvBp
         downsampler::D #nothing si stride=2
     end
 end
@@ -40,7 +40,7 @@ make(bp::BpUDecoder, ksize, channels) = flatten_layers(
 
     """
     struct BpUBridge{D<:Union{Nothing,AbstractBpDownsampler},U<:AbstractBpUpsampler} #,P<:BpPixelClassifierBp
-        convolution::BpDoubleConv
+        convolution::DoubleConvBp
         downsampler::D #nothing si stride=2
         upsampler::U
     end

@@ -1,11 +1,11 @@
 # to refactor
 @cyanotype begin
     """
-    BpDoubleConv(; kwargs)
+    DoubleConvBp(; kwargs)
 
     Describes a convolutionnal module formed by two successive convolutionnal modules.
     """
-    struct BpDoubleConv{C1<:AbstractConvBp,C2<:AbstractConvBp} <: AbstractConvBp
+    struct DoubleConvBp{C1<:AbstractConvBp,C2<:AbstractConvBp} <: AbstractConvBp
         #@volume #enlever
         conv1::C1         #firstconv
         conv2::C2 = conv1 #secondconv
@@ -14,7 +14,7 @@ end
 
 # channels::Pair in_chs=>out_chs out_chs=>out_chs
 # channels::NTuple{3} in_chs=>mid_chs mid_chs=>out_chs
-function make(bp::BpDoubleConv, ksize, channels::NTuple{3})
+function make(bp::DoubleConvBp, ksize, channels::NTuple{3})
     # convolution1.vol == convolution2.vol || error("")
     #c1 = spread(bp.conv1; vol = bp.volume) #cyanotype(bp.convolution1; vol = bp.volume)
     #c2 = spread(bp.conv2; vol = bp.volume) #cyanotype(bp.convolution2; vol = bp.volume)
@@ -25,7 +25,7 @@ function make(bp::BpDoubleConv, ksize, channels::NTuple{3})
     ] |> flatten_layers
 end
 
-function make(bp::BpDoubleConv, channels::NTuple{3})
+function make(bp::DoubleConvBp, channels::NTuple{3})
     # convolution1.vol == convolution2.vol || error("")
     in_chs, mid_chs, out_chs = channels
     flatten_layers(

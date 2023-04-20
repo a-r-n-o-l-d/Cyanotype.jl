@@ -13,7 +13,7 @@ for n in norms, r in [true false], p in [true false], d in [true false]
     @test Flux.outputsize(m, (32, 32, 8, 16)) == (32, 32, 16, 16)
 end
 
-dc = BpDoubleConv(; conv1=ConvBp(), conv2=ConvBp(; normalization=BatchNormBp()))
+dc = DoubleConvBp(; conv1=ConvBp(), conv2=ConvBp(; normalization=BatchNormBp()))
 
 model = Chain(make(dc, 3, (8, 16, 32))...)
 @test Flux.outputsize(model, (32, 32, 8, 16)) == (32, 32, 32, 16)
