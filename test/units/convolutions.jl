@@ -47,13 +47,13 @@ model = Chain(make(bp, 4) |> flatten_layers)
 bp = ChannelExpansionConvBp(expansion=1, normalization=BatchNormBp())
 @test make(bp, 4) == identity
 
-bp = BpDepthwiseConv()
+bp = DepthwiseConvBp()
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
-bp = BpDepthwiseConv(normalization=BatchNormBp())
+bp = DepthwiseConvBp(normalization=BatchNormBp())
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
-bp = BpDepthwiseConv(normalization=BatchNormBp(), depthwise=false, init=Flux.glorot_normal)
+bp = DepthwiseConvBp(normalization=BatchNormBp(), depthwise=false, init=Flux.glorot_normal)
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 

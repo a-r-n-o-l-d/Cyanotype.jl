@@ -6,7 +6,7 @@
         skip::Bool
         #dropout
         expansion::ChannelExpansionConvBp
-        depthwise::BpDepthwiseConv
+        depthwise::DepthwiseConvBp
         excitation::BpSqueezeExcitation
         projection::PointwiseConvBp
     end
@@ -24,7 +24,7 @@ function BpMbConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activa
                                          normalization=normalization,
                                          kwargs...)
 
-    depthwise = BpDepthwiseConv(; activation=activation,
+    depthwise = DepthwiseConvBp(; activation=activation,
                                   stride=stride,
                                   normalization=normalization,
                                   kwargs...)
