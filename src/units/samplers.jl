@@ -83,14 +83,14 @@ make(bp::BpConvTransposeUpsampler, channels::Int) = make(bp, channels => channel
     """
     """
     struct BpPixelShuffleUpsampler <: AbstractBpUpsampler
-        expansion::BpChannelExpansionConv
+        expansion::ChannelExpansionConvBp
         scale::Int
     end
 end
 
 function BpPixelShuffleUpsampler(; scale=2, volume=false, normalization=BatchNormBp(), kwargs...)
     e = volume ? scale^3 : scale^2
-    expansion = BpChannelExpansionConv(; expansion=e, volume=volume, normalization=normalization, kwargs...)
+    expansion = ChannelExpansionConvBp(; expansion=e, volume=volume, normalization=normalization, kwargs...)
     BpPixelShuffleUpsampler(expansion, scale)
 end
 

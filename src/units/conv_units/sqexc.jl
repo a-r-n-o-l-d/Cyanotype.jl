@@ -4,7 +4,7 @@
     """
     struct BpSqueezeExcitation
         reduction::Int
-        #convolution::DoubleConvBp{BpPointwiseConv,BpPointwiseConv}
+        #convolution::DoubleConvBp{PointwiseConvBp,PointwiseConvBp}
         conv1::PointwiseConvBp
         conv2::PointwiseConvBp
     end

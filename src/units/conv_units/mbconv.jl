@@ -5,7 +5,7 @@
     struct BpMbConv <: AbstractConvBp
         skip::Bool
         #dropout
-        expansion::BpChannelExpansionConv
+        expansion::ChannelExpansionConvBp
         depthwise::BpDepthwiseConv
         excitation::BpSqueezeExcitation
         projection::PointwiseConvBp
@@ -19,7 +19,7 @@ function BpMbConv(; stride, ch_expansion, se_reduction, skip=stride == 1, activa
 
     stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `BpMbConv`")
 
-    expansion = BpChannelExpansionConv(; activation=activation,
+    expansion = ChannelExpansionConvBp(; activation=activation,
                                          expansion=ch_expansion,
                                          normalization=normalization,
                                          kwargs...)

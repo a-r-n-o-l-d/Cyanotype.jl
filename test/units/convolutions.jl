@@ -38,13 +38,13 @@ bp = PointwiseConvBp(activation=swish, init=Flux.glorot_normal)
 model = Chain(make(bp, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
-bp = BpChannelExpansionConv(expansion=2)
+bp = ChannelExpansionConvBp(expansion=2)
 model = Chain(make(bp, 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 8, 16)
-bp = BpChannelExpansionConv(expansion=2, normalization=BatchNormBp())
+bp = ChannelExpansionConvBp(expansion=2, normalization=BatchNormBp())
 model = Chain(make(bp, 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 8, 16)
-bp = BpChannelExpansionConv(expansion=1, normalization=BatchNormBp())
+bp = ChannelExpansionConvBp(expansion=1, normalization=BatchNormBp())
 @test make(bp, 4) == identity
 
 bp = BpDepthwiseConv()

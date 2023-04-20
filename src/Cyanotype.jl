@@ -41,7 +41,7 @@ make(::Nothing, ::Any) = identity
 
 export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
        GroupNormBp, InstanceNormBp, ConvBp, DoubleConvBp, NConvBp, PointwiseConvBp,
-       BpChannelExpansionConv, BpDepthwiseConv, BpHybridAtrouConv, BpSqueezeExcitation,
+       ChannelExpansionConvBp, BpDepthwiseConv, BpHybridAtrouConv, BpSqueezeExcitation,
        BpMbConv, BpPixelClassifier, BpChannelAttention, BpSpatialAttention, BpCBAM,
        BpFusedMbConv, BpLabelClassifier
 
