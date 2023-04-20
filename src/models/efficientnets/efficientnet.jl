@@ -44,9 +44,7 @@ function make(bp::EfficientNetBp)
     layers = []
     out_chs = bp.stemchannels
     push!(layers, make(bp.stem, 3, bp.inchannels => out_chs))
-    #println(Chain(layers...))
     for s in bp.backbone
-        #println(out_chs)
         push!(layers, make(s, out_chs))
         out_chs = s.outchannels
     end
