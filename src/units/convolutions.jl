@@ -1,4 +1,4 @@
-abstract type AbstractBpConv <: AbstractBlueprint end
+abstract type AbstractConvBp <: AbstractBlueprint end
 
 include("conv_units/conv.jl")
 include("conv_units/compconv.jl")

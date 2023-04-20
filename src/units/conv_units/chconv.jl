@@ -2,7 +2,7 @@
     """
 
     """
-    struct BpChannelExpansionConv <: AbstractBpConv
+    struct BpChannelExpansionConv <: AbstractConvBp
         expansion::Int
         conv::BpPointwiseConv
     end

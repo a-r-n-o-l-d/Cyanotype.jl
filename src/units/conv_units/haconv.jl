@@ -5,9 +5,9 @@
     [example](@ref https://doi.org/10.1016/j.image.2019.115664)
     [example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
     """
-    struct BpHybridAtrouConv{N,C<:BpConv} <: AbstractBpConv #BpHybridAtrouConv
+    struct BpHybridAtrouConv{N,C<:ConvBp} <: AbstractConvBp #BpHybridAtrouConv
         dilation_rates::NTuple{N,Int} = (1, 2, 3)
-        conv::C = BpConv(normalization=BatchNormBp())
+        conv::C = ConvBp(normalization=BatchNormBp())
     end
 end
 

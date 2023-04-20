@@ -2,10 +2,10 @@
     """
 
     """
-    struct BpFusedMbConv{P<:Union{Nothing,BpPointwiseConv}} <: AbstractBpConv
+    struct BpFusedMbConv{P<:Union{Nothing,BpPointwiseConv}} <: AbstractConvBp
         skip::Bool
         ch_expansion::Int
-        convolution::BpConv
+        convolution::ConvBp
         #dropout
         projection::P # nothing if ch_expansion == 1
     end
@@ -16,7 +16,7 @@ BpFusedMbConv(; stride, ch_expansion, skip=(stride == 1), activation=relu,
                          kwargs...) = BpFusedMbConv(
     skip,
     ch_expansion,
-    BpConv(; stride=stride, activation=activation, normalization=normalization, kwargs...),
+    ConvBp(; stride=stride, activation=activation, normalization=normalization, kwargs...),
     ch_expansion <= 1 ? nothing : BpPointwiseConv(; normalization=normalization, kwargs...)
 )
 

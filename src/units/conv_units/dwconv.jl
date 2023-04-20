@@ -2,8 +2,8 @@
     """
 
     """
-    struct BpDepthwiseConv <: AbstractBpConv
-        conv::BpConv
+    struct BpDepthwiseConv <: AbstractConvBp
+        conv::ConvBp
     end
 end
 
@@ -12,7 +12,7 @@ function BpDepthwiseConv(; kwargs...)
     #if haskey(kw, :depthwise)
         #kw[:depthwise] = true
     #end
-    BpDepthwiseConv(BpConv(; depthwise=true, kw...))
+    BpDepthwiseConv(ConvBp(; depthwise=true, kw...))
 end
 
 make(bp::BpDepthwiseConv, ksize, channels) = make(bp.conv, ksize, channels)

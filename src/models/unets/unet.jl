@@ -4,7 +4,7 @@ include("uchain.jl")
     """
 
     """
-    struct BpUEncoder{C<:AbstractBpConv,D<:Union{Nothing,AbstractBpDownsampler}}
+    struct BpUEncoder{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler}}
         convolution::C #BpDoubleConv
         downsampler::D #nothing si stride=2
     end
@@ -22,7 +22,7 @@ make(bp::BpUEncoder, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUDecoder{C<:AbstractBpConv,U<:AbstractBpUpsampler}
+    struct BpUDecoder{C<:AbstractConvBp,U<:AbstractBpUpsampler}
         convolution::C
         upsampler::U
     end
@@ -58,9 +58,9 @@ make(bp::BpUBridge, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUNet{S<:Union{Nothing,AbstractBpConv},
-                  P<:Union{Nothing,AbstractBpConv},
-                  H<:Union{Nothing,AbstractBpConv}}
+    struct BpUNet{S<:Union{Nothing,AbstractConvBp},
+                  P<:Union{Nothing,AbstractConvBp},
+                  H<:Union{Nothing,AbstractConvBp}}
         inchannels::Int = 3
         nlevels::Int = 4
         basewidth::Int = 64

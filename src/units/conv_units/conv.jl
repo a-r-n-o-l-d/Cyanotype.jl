@@ -12,12 +12,12 @@ const CyPad = Union{SamePad,Int}
         )
 
     """
-    BpConv(; kwargs...)
+    ConvBp(; kwargs...)
 
     A cyanotype blueprint describing a convolutionnal module or layer depending om the value
     of `normalization` argument.
     """
-    struct BpConv{N<:Union{Nothing,AbstractNormBp},A,I<:Function,P<:Union{SamePad,Int}} <: AbstractBpConv
+    struct ConvBp{N<:Union{Nothing,AbstractNormBp},A,I<:Function,P<:Union{SamePad,Int}} <: AbstractConvBp
         @volume
         @activation(identity)
         """
@@ -43,10 +43,10 @@ const CyPad = Union{SamePad,Int}
     end
 end
 
-make(bp::BpConv, ksize, channels::Int) = make(bp, ksize, channels => channels)
+make(bp::ConvBp, ksize, channels::Int) = make(bp, ksize, channels => channels)
 
 # Regular convolutionnal layer
-function make(bp::BpConv{<:Nothing}, ksize, channels::Pair)
+function make(bp::ConvBp{<:Nothing}, ksize, channels::Pair)
     k = genk(ksize, bp.volume)
     kw = kwargs(bp)
     if bp.depthwise
@@ -56,7 +56,7 @@ function make(bp::BpConv{<:Nothing}, ksize, channels::Pair)
 end
 
 # Convolutionnal unit: convolutionnal layer & normalization layer
-function make(bp::BpConv{<:AbstractNormBp}, ksize, channels::Pair)
+function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
     k = genk(ksize, bp.volume)
     layers = []
     in_chs, out_chs = channels

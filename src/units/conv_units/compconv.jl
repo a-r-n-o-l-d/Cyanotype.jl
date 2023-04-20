@@ -5,7 +5,7 @@
 
     Describes a convolutionnal module formed by two successive convolutionnal modules.
     """
-    struct BpDoubleConv{C1<:AbstractBpConv,C2<:AbstractBpConv} <: AbstractBpConv
+    struct BpDoubleConv{C1<:AbstractConvBp,C2<:AbstractConvBp} <: AbstractConvBp
         #@volume #enlever
         conv1::C1         #firstconv
         conv2::C2 = conv1 #secondconv
@@ -41,7 +41,7 @@ end
     """
     Template describing a module with N `NConvBp` repeated.
     """
-    struct BpNConv{C<:AbstractBpConv} <: AbstractBpConv
+    struct BpNConv{C<:AbstractConvBp} <: AbstractConvBp
         convolution::C
         nrepeat::Int
     end

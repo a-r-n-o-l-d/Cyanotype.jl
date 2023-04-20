@@ -2,7 +2,7 @@
     """
 
     """
-    struct BpMbConv <: AbstractBpConv
+    struct BpMbConv <: AbstractConvBp
         skip::Bool
         #dropout
         expansion::BpChannelExpansionConv

@@ -1,9 +1,9 @@
-abstract type AbstractBpClassifier end #<: AbstractBpConv
+abstract type AbstractBpClassifier end #<: AbstractConvBp
 
 @cyanotype constructor=false begin
     """
     """
-    struct BpPixelClassifier <: AbstractBpConv
+    struct BpPixelClassifier <: AbstractConvBp
         #@volume
         nclasses::Int
         convolution::BpPointwiseConv
