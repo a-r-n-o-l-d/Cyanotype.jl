@@ -3,20 +3,20 @@ abstract type AbstractBpClassifier end #<: AbstractConvBp
 @cyanotype constructor=false begin
     """
     """
-    struct BpPixelClassifier <: AbstractConvBp
+    struct PixelClassifierBp <: AbstractConvBp
         #@volume
         nclasses::Int
         convolution::PointwiseConvBp
     end
 end
 
-function BpPixelClassifier(; nclasses, activation=nclasses > 2 ? identity : sigmoid, kwargs...)
+function PixelClassifierBp(; nclasses, activation=nclasses > 2 ? identity : sigmoid, kwargs...)
     #act = nclasses > 2 ? identity : sigmoid
     conv = PointwiseConvBp(; activation=activation, kwargs...)
-    BpPixelClassifier(nclasses, conv)
+    PixelClassifierBp(nclasses, conv)
 end
 
-function make(bp::BpPixelClassifier, channels)
+function make(bp::PixelClassifierBp, channels)
     k = genk(1, bp.convolution.conv.volume)
     layers = []
     if bp.nclasses > 2
