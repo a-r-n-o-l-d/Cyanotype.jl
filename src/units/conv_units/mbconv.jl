@@ -61,7 +61,8 @@ function make(bp::MbConvBp, ksize, channels) # add dropout for stochastic depth
         if iszero(dropout)
             SkipConnection(Chain(layers...), +)
         else
-            Parallel(+, Chain(layers...), Dropout(dropout, dims=4)) #!!!!!! dims=5 if volume, on drop sur le batch
+            d = bp.projection.conv.volume ? 5 : 4
+            Parallel(+, Chain(layers...), Dropout(dropout, dims=d)) #!!!!!! dims=5 if volume, on drop sur le batch
         end
     else
         layers
