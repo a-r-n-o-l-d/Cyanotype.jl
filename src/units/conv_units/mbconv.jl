@@ -57,7 +57,7 @@ function make(bp::MbConvBp, ksize, channels) # add dropout for stochastic depth
             make(bp.projection, mid_chs => out_chs)
         ]
     )
-    if bp.skip && in_chs == out_chs
+    #=if bp.skip && in_chs == out_chs
         if iszero(dropout)
             SkipConnection(Chain(layers...), +)
         else
@@ -66,7 +66,7 @@ function make(bp::MbConvBp, ksize, channels) # add dropout for stochastic depth
         end
     else
         layers
-    end
+    end=#
     bp.skip && in_chs == out_chs ? SkipConnection(Chain(layers...), +) : layers
 end
 

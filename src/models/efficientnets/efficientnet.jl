@@ -41,7 +41,7 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
 end
 
 function make(bp::EfficientNetBp) #dropout
-    #LinRange(start_value, drop_prob, depth + 1)[1:depth]
+    #LinRange(start_value, drop_prob, depth + 1)[1:depth] drop_prob=0.2
     layers = []
     out_chs = bp.stemchannels
     push!(layers, make(bp.stem, 3, bp.inchannels => out_chs))
