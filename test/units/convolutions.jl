@@ -81,14 +81,6 @@ cbam = BpCBAM(reduction=2)
 layers = Chain(flatten_layers(make(cbam, 3, 16))...)
 @test Flux.outputsize(layers, (32, 32, 16, 16)) == (32, 32, 16, 16)
 
-pc = BpPixelClassifier(; nclasses=1)
-m = Chain(make(pc, 16)...)
-@test Flux.outputsize(m, (4, 4, 16, 16)) == (4, 4, 1, 16)
-
-pc = BpPixelClassifier(; nclasses=4)
-m = Chain(make(pc, 16)...)
-@test Flux.outputsize(m, (4, 4, 16, 16)) == (4, 4, 4, 16)
-
 bp = BpFusedMBConv(stride=2, ch_expansion=6)
 model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (16, 16, 4, 16)

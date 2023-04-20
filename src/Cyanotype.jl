@@ -20,7 +20,7 @@ module Cyanotype
 
 using Reexport
 @reexport using Flux
-using Flux: zeros32, ones32, glorot_uniform
+using Flux: zeros32, ones32, glorot_uniform, flatten
 using Statistics
 
 export make, CyFloat
@@ -42,7 +42,7 @@ export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BpBatchNorm
        BpGroupNorm, BpInstanceNorm, BpConv, BpDoubleConv, BpNConv, BpPointwiseConv,
        BpChannelExpansionConv, BpDepthwiseConv, BpHybridAtrouConv, BpSqueezeExcitation,
        BpMBConv, BpPixelClassifier, BpChannelAttention, BpSpatialAttention, BpCBAM,
-       BpFusedMBConv
+       BpFusedMBConv, BpLabelClassifier
 
 include("utilities.jl")
 
@@ -51,6 +51,8 @@ include("cyanotype.jl")
 include("units/normalizations.jl")
 
 include("units/convolutions.jl")
+
+include("units/classifiers.jl")
 
 export BpMaxDownsampler, BpMeanDownsampler, BpNearestUpsamplers, BpLinearUpsampler, BpConvTransposeUpsampler, BpPixelShuffleUpsampler
 include("units/samplers.jl")

@@ -38,6 +38,10 @@ using Aqua
         include("units/samplers.jl")
     end
 
+    @testset verbose = true "Classifiers" begin
+        include("units/classifiers.jl")
+    end
+
     @testset verbose = true "UNet" begin
         include("models/uchain.jl")
         include("models/unet.jl")

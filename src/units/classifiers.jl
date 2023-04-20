@@ -1,9 +1,9 @@
-abstract type AbstractBpClassifier <: AbstractBpConv end
+abstract type AbstractBpClassifier end #<: AbstractBpConv
 
 @cyanotype constructor=false begin
     """
     """
-    struct BpPixelClassifier <: AbstractBpClassifier
+    struct BpPixelClassifier <: AbstractBpConv
         #@volume
         nclasses::Int
         convolution::BpPointwiseConv
@@ -32,3 +32,22 @@ function make(bp::BpPixelClassifier, channels)
     end #else Conv(k, channels=>1, sigmoid)
     flatten_layers(layers)
 end
+
+@cyanotype begin
+    """
+    """
+    struct BpLabelClassifier
+        nclasses::Int
+        dropout::Real = 0.0
+    end
+end
+
+make(bp::BpLabelClassifier, channels) = flatten_layers(
+    [
+        GlobalMeanPool(),
+        flatten,
+        iszero(bp.dropout) ? identity : Dropout(bp.dropout),
+        Dense(channels => bp.nclasses, bp.nclasses == 1 ? sigmoid : identity),
+        bp.nclasses == 1 ? identity : softmax
+    ]
+)
