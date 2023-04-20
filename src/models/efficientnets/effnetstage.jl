@@ -55,6 +55,10 @@ function make(bp::EfficientNetStageBp, channels::Int)
     flatten_layers(layers)
 end
 
+############################################################################################
+#                                   INTERNAL FUNCTIONS                                     #
+############################################################################################
+
 # From Metalhead.jl
 # utility function for making sure that all layers have a channel size divisible by 8
 # used by MobileNet variants

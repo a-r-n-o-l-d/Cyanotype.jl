@@ -1,6 +1,6 @@
 include("effnetstage.jl")
 
-@cyanotype begin #constructor=false
+@cyanotype constructor=false begin
     """
 
     """
@@ -10,6 +10,7 @@ include("effnetstage.jl")
                           H<:Union{Nothing,AbstractBpConv},
                           T<:Union{Nothing,BpLabelClassifier}}
         inchannels::Int = 3
+        headchannels::Int = 1280
         stem::S
         backbone::B
         head::H
@@ -17,8 +18,8 @@ include("effnetstage.jl")
     end
 end
 
-function EfficientNetBp(config; inchannels, nclasses, include_stem=true, include_head=true,
-                        include_top=true)
+function EfficientNetBp(config; inchannels=3, headchannels=1280, nclasses, include_stem=true, include_head=true,
+                        include_top=true) #activation
     stem = if include_stem
         ConvBp(; activation=swish, normalization=BatchNormBp(), stride=2)
     else
@@ -34,14 +35,24 @@ function EfficientNetBp(config; inchannels, nclasses, include_stem=true, include
     else
         nothing
     end
-    BpEfficientNet(;
-        inchannels=inchannels,
-        stem=stem,
-        backbone=_effnet_backbone(config),
-        head=head,
-        top=top
-    )
+    BpEfficientNet(inchannels, headchannels, stem, _effnet_backbone(config), head, top)
 end
+
+function make(bp::EfficientNetBp)
+    layers = []
+    out_chs = first(bp.backbone).outchannels
+    push!(layers, make(bp.stem, 3, bp.inchannels => out_chs))
+    for s in bp.backbone
+        push!(layers, make(s, out_chs))
+        out_chs = s.outchannels
+    end
+    push!(layers, make(bp.head, 3, out_chs => bp.headchannels))
+    flatten_layers(layers)
+end
+
+############################################################################################
+#                                   INTERNAL FUNCTIONS                                     #
+############################################################################################
 
 function _effnet_backbone(config)
     if config ∈ [:b0, :b1, :b2, :b3, :b4, :b5, :b6, :b7, :b8]

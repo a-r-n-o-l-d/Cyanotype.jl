@@ -2,6 +2,7 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
+    - spread avec type de blueprint sur lesquel on change une options : spread(bp, ConvBp; activation=swish)
     - docs, docs, docs, docs
     - renommage : mettre Bp en fin de nom
     - showing blueprints is ugly => GarishPrint or custom dump ?
