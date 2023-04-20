@@ -43,7 +43,7 @@ export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp
        GroupNormBp, InstanceNormBp, ConvBp, DoubleConvBp, NConvBp, PointwiseConvBp,
        ChannelExpansionConvBp, DepthwiseConvBp, HybridAtrouConvBp, SqueezeExcitationBp,
        MbConvBp, PixelClassifierBp, ChannelAttentionBp, SpatialAttentionBp, CBAMBp,
-       BpFusedMbConv, BpLabelClassifier
+       FusedMbConvBp, BpLabelClassifier
 
 include("utilities.jl")
 

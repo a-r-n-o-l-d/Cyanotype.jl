@@ -2,7 +2,7 @@
     """
 
     """
-    struct BpFusedMbConv{P<:Union{Nothing,PointwiseConvBp}} <: AbstractConvBp
+    struct FusedMbConvBp{P<:Union{Nothing,PointwiseConvBp}} <: AbstractConvBp
         skip::Bool
         ch_expansion::Int
         convolution::ConvBp
@@ -11,21 +11,21 @@
     end
 end
 
-BpFusedMbConv(; stride, ch_expansion, skip=(stride == 1), activation=relu,
+FusedMbConvBp(; stride, ch_expansion, skip=(stride == 1), activation=relu,
                          normalization=BatchNormBp(activation=activation),
-                         kwargs...) = BpFusedMbConv(
+                         kwargs...) = FusedMbConvBp(
     skip,
     ch_expansion,
     ConvBp(; stride=stride, activation=activation, normalization=normalization, kwargs...),
     ch_expansion <= 1 ? nothing : PointwiseConvBp(; normalization=normalization, kwargs...)
 )
 
-function make(bp::BpFusedMbConv, ksize, channels)
+function make(bp::FusedMbConvBp, ksize, channels)
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.ch_expansion
     if bp.skip && in_chs !== out_chs
         error("""
-        If a 'BpFusedMbConv' have a skip connection defined, the number fo input channels and
+        If a 'FusedMbConvBp' have a skip connection defined, the number fo input channels and
         output channels must be the same.
         """)
     end
