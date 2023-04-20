@@ -40,7 +40,7 @@ make(::Nothing) = identity
 make(::Nothing, ::Any) = identity
 
 export spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
-       GroupNormBp, BpInstanceNorm, BpConv, BpDoubleConv, BpNConv, BpPointwiseConv,
+       GroupNormBp, InstanceNormBp, BpConv, BpDoubleConv, BpNConv, BpPointwiseConv,
        BpChannelExpansionConv, BpDepthwiseConv, BpHybridAtrouConv, BpSqueezeExcitation,
        BpMbConv, BpPixelClassifier, BpChannelAttention, BpSpatialAttention, BpCBAM,
        BpFusedMbConv, BpLabelClassifier

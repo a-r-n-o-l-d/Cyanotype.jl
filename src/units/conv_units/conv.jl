@@ -17,7 +17,7 @@ const CyPad = Union{SamePad,Int}
     A cyanotype blueprint describing a convolutionnal module or layer depending om the value
     of `normalization` argument.
     """
-    struct BpConv{N<:Union{Nothing,AbstractBpNorm},A,I<:Function,P<:Union{SamePad,Int}} <: AbstractBpConv
+    struct BpConv{N<:Union{Nothing,AbstractNormBp},A,I<:Function,P<:Union{SamePad,Int}} <: AbstractBpConv
         @volume
         @activation(identity)
         """
@@ -56,7 +56,7 @@ function make(bp::BpConv{<:Nothing}, ksize, channels::Pair)
 end
 
 # Convolutionnal unit: convolutionnal layer & normalization layer
-function make(bp::BpConv{<:AbstractBpNorm}, ksize, channels::Pair)
+function make(bp::BpConv{<:AbstractNormBp}, ksize, channels::Pair)
     k = genk(ksize, bp.volume)
     layers = []
     in_chs, out_chs = channels

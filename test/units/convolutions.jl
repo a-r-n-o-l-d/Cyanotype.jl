@@ -3,7 +3,7 @@ norms = [
             nothing,
             BatchNormBp(),
             GroupNormBp(; groups = 2),
-            BpInstanceNorm()
+            InstanceNormBp()
         ]
 #dw, revs = pres = [true false]
 for n in norms, r in [true false], p in [true false], d in [true false]
