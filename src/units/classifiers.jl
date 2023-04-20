@@ -36,13 +36,13 @@ end
 @cyanotype begin
     """
     """
-    struct BpLabelClassifier
+    struct LabelClassifierBp
         nclasses::Int
         dropout::Real = 0.0
     end
 end
 
-make(bp::BpLabelClassifier, channels) = flatten_layers(
+make(bp::LabelClassifierBp, channels) = flatten_layers(
     [
         GlobalMeanPool(),
         flatten,

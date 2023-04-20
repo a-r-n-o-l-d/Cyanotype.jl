@@ -6,6 +6,6 @@ pc = PixelClassifierBp(; nclasses=4)
 m = Chain(make(pc, 16)...)
 @test Flux.outputsize(m, (4, 4, 16, 16)) == (4, 4, 4, 16)
 
-lc = BpLabelClassifier(; nclasses=7)
+lc = LabelClassifierBp(; nclasses=7)
 m = Chain(make(lc, 16)...)
 @test Flux.outputsize(m, (4, 4, 16, 16)) == (7, 16)
