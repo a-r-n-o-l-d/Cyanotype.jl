@@ -4,13 +4,13 @@ include("uchain.jl")
     """
 
     """
-    struct BpUEncoder{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler}}
+    struct UEncoderBp{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler}}
         convolution::C #DoubleConvBp
         downsampler::D #nothing si stride=2
     end
 end
 
-make(bp::BpUEncoder, ksize, channels) = flatten_layers(
+make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     [
         make(bp.downsampler),
         make(bp.convolution, ksize, channels)
@@ -22,13 +22,13 @@ make(bp::BpUEncoder, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUDecoder{C<:AbstractConvBp,U<:AbstractBpUpsampler}
+    struct UDecoderBp{C<:AbstractConvBp,U<:AbstractBpUpsampler}
         convolution::C
         upsampler::U
     end
 end
 
-make(bp::BpUDecoder, ksize, channels) = flatten_layers(
+make(bp::UDecoderBp, ksize, channels) = flatten_layers(
     [
         make(bp.convolution, ksize, channels),
         _make(bp.upsampler, channels)
@@ -39,14 +39,14 @@ make(bp::BpUDecoder, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUBridge{D<:Union{Nothing,AbstractBpDownsampler},U<:AbstractBpUpsampler} #,P<:BpPixelClassifierBp
+    struct UBridgeBp{D<:Union{Nothing,AbstractBpDownsampler},U<:AbstractBpUpsampler} #,P<:BpPixelClassifierBp
         convolution::DoubleConvBp
         downsampler::D #nothing si stride=2
         upsampler::U
     end
 end
 
-make(bp::BpUBridge, ksize, channels) = flatten_layers(
+make(bp::UBridgeBp, ksize, channels) = flatten_layers(
     [
         make(bp.downsampler),
         make(bp.convolution, ksize, channels),
@@ -58,7 +58,7 @@ make(bp::BpUBridge, ksize, channels) = flatten_layers(
     """
 
     """
-    struct BpUNet{S<:Union{Nothing,AbstractConvBp},
+    struct UNetBp{S<:Union{Nothing,AbstractConvBp},
                   P<:Union{Nothing,AbstractConvBp},
                   H<:Union{Nothing,AbstractConvBp}}
         inchannels::Int = 3
@@ -66,16 +66,16 @@ make(bp::BpUBridge, ksize, channels) = flatten_layers(
         basewidth::Int = 64
         expansion::Int = 2
         ksize::Int = 3
-        encoder::BpUEncoder
-        decoder::BpUDecoder
-        bridge::BpUBridge
+        encoder::UEncoderBp
+        decoder::UDecoderBp
+        bridge::UBridgeBp
         stem::S = nothing # si nothing => encoder
         path::P = nothing #  => connection path CBAM, convpath
         head::H = nothing
     end
 end
 
-function make(bp::BpUNet)
+function make(bp::UNetBp)
     # Build encoders and decoders for each level
     enc, dec, pth = [], [], []
     for l ∈ 1:bp.nlevels

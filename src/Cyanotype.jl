@@ -6,7 +6,7 @@ To do :
     - renommage : mettre Bp en fin de nom
     - showing blueprints is ugly => GarishPrint or custom dump ?
     - BpMBConv => BpMbConv
-    - BpUDecoder => dispatch on make not on _make
+    - UDecoderBp => dispatch on make not on _make
     - DoubleConvBp with kwargs
     x make without kwargs
     - cleaning
@@ -58,7 +58,7 @@ include("units/classifiers.jl")
 export MaxDownsamplerBp, MeanDownsamplerBp, NearestUpsamplerBp, LinearUpsamplerBp, ConvTransposeUpsamplerBp, PixelShuffleUpsamplerBp
 include("units/samplers.jl")
 
-export uchain, BpUEncoder, BpUDecoder, BpUBridge, BpUNet
+export uchain, UEncoderBp, UDecoderBp, UBridgeBp, UNetBp
 
 include("models/unets/unet.jl")
 
