@@ -5,13 +5,13 @@
     [example](@ref https://doi.org/10.1016/j.image.2019.115664)
     [example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
     """
-    struct BpHybridAtrouConv{N,C<:ConvBp} <: AbstractConvBp #BpHybridAtrouConv
+    struct HybridAtrouConvBp{N,C<:ConvBp} <: AbstractConvBp #HybridAtrouConvBp
         dilation_rates::NTuple{N,Int} = (1, 2, 3)
         conv::C = ConvBp(normalization=BatchNormBp())
     end
 end
 
-function make(bp::BpHybridAtrouConv, ksize, channels)
+function make(bp::HybridAtrouConvBp, ksize, channels)
     check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")
     layers = []
     in_chs, out_chs = channels
