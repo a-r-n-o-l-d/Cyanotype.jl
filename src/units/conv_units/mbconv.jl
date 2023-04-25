@@ -31,7 +31,7 @@ function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, activa
 
     excitation = SqueezeExcitationBp(; activation=activation,
                                        gate_activation=hardσ,
-                                       reduction=se_reduction,
+                                       reduction=se_reduction * ch_expansion,
                                        kwargs...)
 
     projection = PointwiseConvBp(; normalization=normalization, kwargs...)
