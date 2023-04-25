@@ -8,7 +8,7 @@
         ksize::Int
         outchannels::Int
         nrepeat::Int
-        convolution::C # BpMBConv(; stride, ch_expansion, se_reduction, activation)
+        convolution::C
         widthscaling::R1 = nothing
         depthscaling::R2 = nothing
     end
@@ -31,7 +31,7 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expansion, stride, nrepeat
                     reduction, wscaling=nothing, dscaling=nothing) = EfficientNetStageBp(
     ksize=ksize,
     outchannels=_out_channels(wscaling, out_chs),
-    nrepeat=_nrepeats(dscaling, nrepeat), #isnothing(dscaling) ? nrepeat : ceil(Int, nrepeat * dscaling)
+    nrepeat=_nrepeats(dscaling, nrepeat),
     widthscaling=wscaling,
     depthscaling=dscaling,
     convolution=MbConvBp(
@@ -44,10 +44,8 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expansion, stride, nrepeat
 
 function make(bp::EfficientNetStageBp, channels::Int)
     in_chs = _round_channels(channels)
-    #out_chs = isnothing(bp.widthscaling) ? _round_channels(bp.outchannels) : _round_channels(bp.outchannels * bp.widthscaling)
     layers = []
     push!(layers, make(bp.convolution, bp.ksize, in_chs => bp.outchannels))
-    #nrepeat = isnothing(bp.depthscaling) ? bp.nrepeat - 1 : ceil(Int, bp.nrepeat * bp.depthscaling) - 1
     for _ in 1:bp.nrepeat
         conv = spread(bp.convolution; stride = 1, skip=true)
         push!(layers, make(conv, bp.ksize, bp.outchannels => bp.outchannels))
