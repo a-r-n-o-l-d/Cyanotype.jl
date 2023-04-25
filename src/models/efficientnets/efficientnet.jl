@@ -25,6 +25,7 @@ end
 
 function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280, nclasses,
                         include_stem=true, include_head=true, include_top=true) #activation
+    _check_effnet_config(config)
     stem = if include_stem
         ConvBp(; activation=swish, normalization=BatchNormBp(), stride=2)
     else
@@ -68,18 +69,23 @@ end
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
+function _check_effnet_config(config)
+    if config ∉ EFFNETV1 && config ∉ EFFNETV2
+       error(
+            """
+            $config is not a valid configuration, 'config' must be in $EFFNETV1
+            (EfficientNetV1 architecture) or in $EFFNETV2 (EfficientNetV2 architecture).
+            """
+        )
+    end
+end
+
 function _effnet_backbone(config)
     if config ∈ EFFNETV1
         wsc, dsc = _effnetv1_scaling(config)
         _effnetv1_backbone(wsc, dsc)
     elseif config ∈ EFFNETV2
         _effnetv2_backbone(config)
-    else
-       error(
-            """
-            $config is not a valid configuration
-            """
-        )
     end
 end
 
