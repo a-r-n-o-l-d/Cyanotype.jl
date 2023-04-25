@@ -30,7 +30,7 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
     if include_top && !include_head
         error(
             """
-            You must set '!include_head' to true if you want to include top layers.
+            You must set 'include_head' to true if you want to include top layers.
             """
         )
     end
