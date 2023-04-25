@@ -24,30 +24,44 @@ const EFFNETV2 = [:small, :medium, :large, :xlarge]
 end
 
 function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280, nclasses,
-                        include_stem=true, include_head=true, include_top=true) #activation
-    _check_effnet_config(config)
+                        include_stem=true, include_head=include_top, include_top=true) #activation
+    # Sanity check
+     _check_effnet_config(config)
+    if include_top && !include_head
+        error(
+            """
+            You must set '!include_head' to true if you want to include top layers.
+            """
+        )
+    end
+
     stem = if include_stem
         ConvBp(; activation=swish, normalization=BatchNormBp(), stride=2)
     else
         nothing
     end
+
     head = if include_head
         ConvBp(; activation=swish, normalization=BatchNormBp())
     else
         nothing
     end
+
     top = if include_top
         LabelClassifierBp(nclasses=nclasses)
     else
         nothing
     end
+
     bb = _effnet_backbone(config)
+
     stem_chs = if config ∈ EFFNETV1
         wsc, _ = _effnetv1_scaling(config)
         _round_channels(stemchannels * wsc)
     elseif config ∈ EFFNETV2
         first(bb).outchannels
     end
+
     EfficientNetBp(inchannels, stem_chs, headchannels, stem, bb, head, top)
 end
 

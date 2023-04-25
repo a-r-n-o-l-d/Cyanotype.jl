@@ -48,6 +48,8 @@ make(::Nothing) = identity
 
 make(::Nothing, ::Any) = identity
 
+make(::Nothing, ::Any, ::Any) = identity
+
 include("utilities.jl")
 
 include("cyanotype.jl")
