@@ -53,16 +53,22 @@ end
 
 function make(bp::EfficientNetBp) #dropout
     #LinRange(start_value, drop_prob, depth + 1)[1:depth] drop_prob=0.2
-    layers = []
+
     out_chs = bp.stemchannels
-    push!(layers, make(bp.stem, 3, bp.inchannels => out_chs))
+    #push!(layers, make(bp.stem, 3, bp.inchannels => out_chs))
+    stem = Chain(flatten_layers(make(bp.stem, 3, bp.inchannels => out_chs))...)
+    layers = []
     for s in bp.backbone
         push!(layers, Chain(make(s, out_chs))...)
         out_chs = s.outchannels
     end
-    push!(layers, make(bp.head, 1, out_chs => bp.headchannels))
-    push!(layers, make(bp.top, bp.headchannels))
-    Chain(flatten_layers(layers)...)
+    backbone = Chain(flatten_layers(layers)...)
+    #push!(layers, make(bp.head, 1, out_chs => bp.headchannels))
+    head = Chain(flatten_layers(make(bp.head, 1, out_chs => bp.headchannels))...)
+    #push!(layers, make(bp.top, bp.headchannels))
+    top = Chain(flatten_layers(make(bp.top, bp.headchannels))...)
+    #Chain(flatten_layers(layers)...)
+    Chain(stem=stem, backbone=backbone, head=head, top=top)
 end
 
 ############################################################################################
