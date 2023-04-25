@@ -1,5 +1,9 @@
 include("effnetstage.jl")
 
+const EFFNETV1 = [:b0, :b1, :b2, :b3, :b4, :b5, :b6, :b7, :b8]
+
+const EFFNETV2 = [:small, :medium, :large, :xlarge]
+
 @cyanotype constructor=false begin
     """
 
@@ -37,10 +41,10 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
         nothing
     end
     bb = _effnet_backbone(config)
-    stem_chs = if config ∈ [:b0, :b1, :b2, :b3, :b4, :b5, :b6, :b7, :b8]
+    stem_chs = if config ∈ EFFNETV1
         wsc, _ = _effnetv1_scaling(config)
         _round_channels(stemchannels * wsc)
-    elseif config ∈ [:small, :medium, :large, :xlarge]
+    elseif config ∈ EFFNETV2
         first(bb).outchannels
     end
     EfficientNetBp(inchannels, stem_chs, headchannels, stem, bb, head, top)
@@ -65,10 +69,10 @@ end
 ############################################################################################
 
 function _effnet_backbone(config)
-    if config ∈ [:b0, :b1, :b2, :b3, :b4, :b5, :b6, :b7, :b8]
+    if config ∈ EFFNETV1
         wsc, dsc = _effnetv1_scaling(config)
         _effnetv1_backbone(wsc, dsc)
-    elseif config ∈ [:small, :medium, :large, :xlarge]
+    elseif config ∈ EFFNETV2
         _effnetv2_backbone(config)
     else
        error(
@@ -110,29 +114,6 @@ _effnetv1_backbone(wsc, dsc) = (
     EfficientNetStageBp(MbConvBp, 5, 192, 6, 2, 4, 4, wsc, dsc),
     EfficientNetStageBp(MbConvBp, 3, 320, 6, 1, 1, 4, wsc, dsc)
 )
-
-#=function _effnetv1_backbone(config)
-    if config == :b0
-        _effnetv1_backbone(1.0, 1.0)
-    elseif config == :b1
-        _effnetv1_backbone(1.0, 1.1)
-    elseif config == :b2
-        _effnetv1_backbone(1.1, 1.2)
-    elseif config == :b3
-        _effnetv1_backbone(1.2, 1.4)
-    elseif config == :b4
-        _effnetv1_backbone(1.4, 1.8)
-    elseif config == :b5
-        _effnetv1_backbone(1.6, 2.2)
-    elseif config == :b6
-        _effnetv1_backbone(1.8, 2.6)
-    elseif config == :b7
-        _effnetv1_backbone(2.0, 3.1)
-    elseif config == :b8
-        _effnetv1_backbone(2.2, 3.6)
-    end
-end
-=#
 
 function _effnetv2_backbone(config)
     if config == :small
