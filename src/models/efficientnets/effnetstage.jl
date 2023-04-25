@@ -30,8 +30,8 @@ EfficientNetStageBp(::Type{FusedMbConvBp}, ksize, out_chs, expansion, stride,
 EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expansion, stride, nrepeat,
                     reduction, wscaling=nothing, dscaling=nothing) = EfficientNetStageBp(
     ksize=ksize,
-    outchannels=out_chs,
-    nrepeat=nrepeat, #isnothing(dscaling) ? nrepeat : ceil(Int, nrepeat * dscaling)
+    outchannels=_out_channels(wscaling, out_chs),
+    nrepeat=_nrepeats(dscaling, nrepeat), #isnothing(dscaling) ? nrepeat : ceil(Int, nrepeat * dscaling)
     widthscaling=wscaling,
     depthscaling=dscaling,
     convolution=MbConvBp(
@@ -44,13 +44,13 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expansion, stride, nrepeat
 
 function make(bp::EfficientNetStageBp, channels::Int)
     in_chs = _round_channels(channels)
-    out_chs = isnothing(bp.widthscaling) ? _round_channels(bp.outchannels) : _round_channels(bp.outchannels * bp.widthscaling)
+    #out_chs = isnothing(bp.widthscaling) ? _round_channels(bp.outchannels) : _round_channels(bp.outchannels * bp.widthscaling)
     layers = []
-    push!(layers, make(bp.convolution, bp.ksize, in_chs => out_chs))
-    nrepeat = isnothing(bp.depthscaling) ? bp.nrepeat - 1 : ceil(Int, bp.nrepeat * bp.depthscaling) - 1
-    for _ in 1:nrepeat
+    push!(layers, make(bp.convolution, bp.ksize, in_chs => bp.outchannels))
+    #nrepeat = isnothing(bp.depthscaling) ? bp.nrepeat - 1 : ceil(Int, bp.nrepeat * bp.depthscaling) - 1
+    for _ in 1:bp.nrepeat
         conv = spread(bp.convolution; stride = 1, skip=true)
-        push!(layers, make(conv, bp.ksize, out_chs => out_chs))
+        push!(layers, make(conv, bp.ksize, bp.outchannels => bp.outchannels))
     end
     flatten_layers(layers)
 end
@@ -58,6 +58,18 @@ end
 ############################################################################################
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
+
+_nrepeats(::Type{Nothing}, n) = n - 1
+
+_nrepeats(scaling, n) = ceil(Int, n * scaling) - 1
+
+function _out_channels(scaling, channels)
+    if isnothing(scaling)
+        _round_channels(channels)
+    else
+        _round_channels(channels * scaling)
+    end
+end
 
 # From Metalhead.jl
 # utility function for making sure that all layers have a channel size divisible by 8

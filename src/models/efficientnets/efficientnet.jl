@@ -37,7 +37,9 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
         nothing
     end
     bb = _effnet_backbone(config)
-    EfficientNetBp(inchannels, stemchannels, headchannels, stem, bb, head, top)
+    wsc, _ = _effnetv1_scaling(config)
+    stem_chs = _round_channels(stemchannels * wsc)
+    EfficientNetBp(inchannels, stem_chs, headchannels, stem, bb, head, top)
 end
 
 function make(bp::EfficientNetBp) #dropout
@@ -60,7 +62,8 @@ end
 
 function _effnet_backbone(config)
     if config ∈ [:b0, :b1, :b2, :b3, :b4, :b5, :b6, :b7, :b8]
-        _effnetv1_backbone(config)
+        wsc, dsc = _effnetv1_scaling(config)
+        _effnetv1_backbone(wsc, dsc)
     elseif config ∈ [:small, :medium, :large, :xlarge]
         _effnetv2_backbone(config)
     else
@@ -69,6 +72,28 @@ function _effnet_backbone(config)
             $config is not an accepted configuration
             """
         )
+    end
+end
+
+function _effnetv1_scaling(config)
+    if config == :b0
+        (1.0, 1.0)
+    elseif config == :b1
+        (1.0, 1.1)
+    elseif config == :b2
+        (1.1, 1.2)
+    elseif config == :b3
+        (1.2, 1.4)
+    elseif config == :b4
+        (1.4, 1.8)
+    elseif config == :b5
+        (1.6, 2.2)
+    elseif config == :b6
+        (1.8, 2.6)
+    elseif config == :b7
+        (2.0, 3.1)
+    elseif config == :b8
+        (2.2, 3.6)
     end
 end
 
@@ -82,7 +107,7 @@ _effnetv1_backbone(wsc, dsc) = (
     EfficientNetStageBp(MbConvBp, 3, 320, 6, 1, 1, 4, wsc, dsc)
 )
 
-function _effnetv1_backbone(config)
+#=function _effnetv1_backbone(config)
     if config == :b0
         _effnetv1_backbone(1.0, 1.0)
     elseif config == :b1
@@ -103,6 +128,7 @@ function _effnetv1_backbone(config)
         _effnetv1_backbone(2.2, 3.6)
     end
 end
+=#
 
 function _effnetv2_backbone(config)
     if config == :small
