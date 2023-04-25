@@ -37,8 +37,12 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
         nothing
     end
     bb = _effnet_backbone(config)
-    wsc, _ = _effnetv1_scaling(config)
-    stem_chs = _round_channels(stemchannels * wsc)
+    stem_chs = if config ∈ [:b0, :b1, :b2, :b3, :b4, :b5, :b6, :b7, :b8]
+        wsc, _ = _effnetv1_scaling(config)
+        _round_channels(stemchannels * wsc)
+    elseif config ∈ [:small, :medium, :large, :xlarge]
+        first(bb).outchannels
+    end
     EfficientNetBp(inchannels, stem_chs, headchannels, stem, bb, head, top)
 end
 
@@ -69,7 +73,7 @@ function _effnet_backbone(config)
     else
        error(
             """
-            $config is not an accepted configuration
+            $config is not a valid configuration
             """
         )
     end
@@ -98,10 +102,10 @@ function _effnetv1_scaling(config)
 end
 
 _effnetv1_backbone(wsc, dsc) = (
-    EfficientNetStageBp(MbConvBp, 3, 16, 1, 1, 1, 4, wsc, dsc),
-    EfficientNetStageBp(MbConvBp, 3, 24, 6, 2, 2, 4, wsc, dsc),
-    EfficientNetStageBp(MbConvBp, 5, 40, 6, 2, 2, 4, wsc, dsc),
-    EfficientNetStageBp(MbConvBp, 3, 80, 6, 2, 3, 4, wsc, dsc),
+    EfficientNetStageBp(MbConvBp, 3, 16,  1, 1, 1, 4, wsc, dsc),
+    EfficientNetStageBp(MbConvBp, 3, 24,  6, 2, 2, 4, wsc, dsc),
+    EfficientNetStageBp(MbConvBp, 5, 40,  6, 2, 2, 4, wsc, dsc),
+    EfficientNetStageBp(MbConvBp, 3, 80,  6, 2, 3, 4, wsc, dsc),
     EfficientNetStageBp(MbConvBp, 5, 112, 6, 1, 3, 4, wsc, dsc),
     EfficientNetStageBp(MbConvBp, 5, 192, 6, 2, 4, 4, wsc, dsc),
     EfficientNetStageBp(MbConvBp, 3, 320, 6, 1, 1, 4, wsc, dsc)

@@ -18,7 +18,7 @@ EfficientNetStageBp(::Type{FusedMbConvBp}, ksize, out_chs, expansion, stride,
                     nrepeat) = EfficientNetStageBp(
     ksize=ksize,
     outchannels=out_chs,
-    nrepeat=nrepeat,
+    nrepeat=_nrepeats(nrepeat),
     convolution=FusedMbConvBp(
         stride=stride,
         ch_expansion=expansion,
@@ -59,7 +59,9 @@ end
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
 
-_nrepeats(::Type{Nothing}, n) = n - 1
+_nrepeats(n) = n - 1
+
+_nrepeats(::Nothing, n) = n - 1
 
 _nrepeats(scaling, n) = ceil(Int, n * scaling) - 1
 
