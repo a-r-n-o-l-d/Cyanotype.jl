@@ -9,13 +9,13 @@ to modify all nested cyanotypes at once.
 using GarishPrint
 
 # Create a blueprint for a Hybrid A-trou Convolution module
-hac = CyHybridAtrouConv();
+hac = HybridAtrouConvBp();
 # By default activation functions are relu
 pprint(hac)
 
 # Create a blueprint for a double convolution module with the second convolution as a usual
 # convolutionnal layer
-conv2 = CyDoubleConv(; convolution1 = hac, convolution2 = CyConv());
+conv2 = DoubleConvBp(; convolution1 = hac, convolution2 = ConvBp());
 # By default activation functions are relu
 pprint(conv2)
 
