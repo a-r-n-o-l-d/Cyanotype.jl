@@ -23,7 +23,7 @@ const EFFNETV2 = [:small, :medium, :large, :xlarge]
     end
 end
 
-function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280, nclasses,
+function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280, nclasses=1000,
                         include_stem=true, include_top=true, include_head=include_top) #activation
     # Sanity check
      _check_effnet_config(config)

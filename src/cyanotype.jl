@@ -181,6 +181,7 @@ function _cyanotype(mod, doc, kmexp, head, body, cons=true)
         $(_getfields_func(mod, name, fnames))
         $(_cyanotype_func(mod, name))
         $(_kwargs_func(mod, name))
+        $(_show_func(name))
     end
 end
 
@@ -318,6 +319,18 @@ function _kwargs_func(mod, name)
                 push!(kwargs, arg=>fields[kmap.fnames[i]])
             end
             kwargs
+        end
+    end
+end
+
+function _show_func(name)
+    quote
+        function Base.show(io::IO, bp::$name)
+            dump(
+                IOContext(io, :limit => true, :compact => true, :color => true),
+                bp,
+                maxdepth=1
+            )
         end
     end
 end
