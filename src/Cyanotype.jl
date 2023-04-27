@@ -5,8 +5,8 @@ To do :
     - tool to check if AbstractConvBp (and fields) is volumetric
     - spread avec type de blueprint sur lesquel on change une options : spread(bp, ConvBp; activation=swish)
     - docs, docs, docs, docs
-    - renommage : mettre Bp en fin de nom
-    - showing blueprints is ugly => GarishPrint or custom dump ?
+    x renommage : mettre Bp en fin de nom
+    - showing blueprints is ugly => GarishPrint or custom dump ? cyanotype _show_func
     - BpMBConv => BpMbConv
     - UDecoderBp => dispatch on make not on _make
     - DoubleConvBp with kwargs
