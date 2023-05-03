@@ -40,7 +40,7 @@ function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, activa
 end
 
 #function make(bp::MbConvBp, ksize, channels, dropout=0.0)
-function make(bp::MbConvBp, ksize, channels) # add dropout for stochastic depth
+function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stochastic depth
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expansion.expansion
     #=if bp.skip && in_chs !== out_chs
@@ -57,28 +57,22 @@ function make(bp::MbConvBp, ksize, channels) # add dropout for stochastic depth
             make(bp.projection, mid_chs => out_chs)
         ]
     )
-    #=if bp.skip && in_chs == out_chs
+    if bp.skip && in_chs == out_chs
         if iszero(dropout)
             SkipConnection(Chain(layers...), +)
         else
             d = bp.projection.conv.volume ? 5 : 4
-            Parallel(+, Chain(layers...), Dropout(dropout, dims=d)) #!!!!!! dims=5 if volume, on drop sur le batch
+            Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
         end
     else
         layers
-    end=#
-    bp.skip && in_chs == out_chs ? SkipConnection(Chain(layers...), +) : layers
+    end
+    #bp.skip && in_chs == out_chs ? SkipConnection(Chain(layers...), +) : layers
 end
 
 function _mblayers(bp::MbConvBp, ksize, channels)
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expansion.expansion
-    #=if bp.skip && in_chs !== out_chs
-        error("""
-        If a 'MbConvBp' have a skip connection defined, the number fo input channels and
-        output channels must be the same.
-        """)
-    end=#
     flatten_layers(
         [
             make(bp.expansion, in_chs),
