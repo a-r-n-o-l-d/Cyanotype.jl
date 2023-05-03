@@ -25,6 +25,11 @@ function make(bp::DoubleConvBp, ksize, channels::NTuple{3})
     ] |> flatten_layers
 end
 
+function make(bp::DoubleConvBp, ksize, channels::Pair)
+    in_chs, out_chs = channels
+    make(bp, ksize, (in_chs, out_chs, out_chs))
+end
+
 function make(bp::DoubleConvBp, channels::NTuple{3})
     # convolution1.vol == convolution2.vol || error("")
     in_chs, mid_chs, out_chs = channels
