@@ -41,13 +41,13 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expansion, stride, nrepeat
     )
 )
 
-function make(bp::EfficientNetStageBp, channels::Int)
+function make(bp::EfficientNetStageBp, channels::Int, dropouts=zeros(bp.nrepeat + 1))
     in_chs = _round_channels(channels)
     layers = []
-    push!(layers, make(bp.convolution, bp.ksize, in_chs => bp.outchannels))
-    for _ in 1:bp.nrepeat
+    push!(layers, make(bp.convolution, bp.ksize, in_chs => bp.outchannels, dropouts[1]))
+    for d in dropouts[2:end] #_ in 1:bp.nrepeat
         conv = spread(bp.convolution; stride = 1, skip=true)
-        push!(layers, make(conv, bp.ksize, bp.outchannels => bp.outchannels))
+        push!(layers, make(conv, bp.ksize, bp.outchannels => bp.outchannels, d))
     end
     flatten_layers(layers)
 end

@@ -17,7 +17,6 @@ make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     ]
 )
 
-
 @cyanotype begin
     """
 
@@ -71,7 +70,8 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
         bridge::UBridgeBp
         stem::S = nothing # si nothing => encoder
         path::P = nothing #  => connection path CBAM, convpath
-        head::H = nothing
+        head::H = nothing # si nothing => decoder
+        #top::T = nothing
     end
 end
 
@@ -79,9 +79,10 @@ function make(bp::UNetBp)
     # Build encoders and decoders for each level
     enc, dec, pth = [], [], []
     for l ∈ 1:bp.nlevels
-        enc_chs, dec_chs = _level_encodec(bp, 3, l)
-        push!.((enc, dec), (enc_chs, dec_chs))
+        enclvl, declvl = _level_encodec(bp, 3, l)
+        push!.((enc, dec), (enclvl, declvl))
         if !isnothing(bp.path)
+            enc_chs, _ = _level_channels(bp, l)
             push!(pth, make(bp.path, bp.ksize, last(enc_chs)))
         else
             push!(pth, bp.path)
@@ -94,6 +95,10 @@ end
 ############################################################################################
 #                                   INTERNAL FUNCTIONS                                     #
 ############################################################################################
+
+_make(bp, ksize, channels) = make(bp, ksize, channels)
+
+_make(bp::ChannelAttentionBp, ksize, channels) = make(bp, channels)
 
 _make(bp::PixelShuffleUpsamplerBp, channels) = make(bp, last(channels))
 

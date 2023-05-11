@@ -66,14 +66,22 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
 end
 
 function make(bp::EfficientNetBp) #dropout
-    #LinRange(start_value, drop_prob, depth + 1)[1:depth] drop_prob=0.2
-
+    #
+    drop_prob = 0.2
+    block_repeats = 0
+    for s in bp.backbone
+        block_repeats = block_repeats + s.nrepeat + 1
+    end
+    dropouts = LinRange(0, drop_prob, block_repeats + 1)[1:block_repeats]
     out_chs = bp.stemchannels
     stem = Chain(flatten_layers(make(bp.stem, 3, bp.inchannels => out_chs))...)
     layers = []
+    block_idx = 1
     for s in bp.backbone
-        push!(layers, Chain(make(s, out_chs))...)
+        dps = dropouts[block_idx:block_idx + s.nrepeat]
+        push!(layers, Chain(make(s, out_chs, dps))...)
         out_chs = s.outchannels
+        block_idx = block_idx + s.nrepeat + 1
     end
     backbone = Chain(flatten_layers(layers)...)
     head = Chain(flatten_layers(make(bp.head, 1, out_chs => bp.headchannels))...)

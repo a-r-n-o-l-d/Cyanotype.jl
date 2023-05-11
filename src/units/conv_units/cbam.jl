@@ -30,7 +30,7 @@ function make(bp::ChannelAttentionBp, channels)
         Chain(
             Parallel(
                 +,
-                Chain(GlobalMeanPool(), shared_mlp),
+                Chain(GlobalMeanPool(), shared_mlp), #AdaptiveMeanPool(genk(1, bp.volume)),
                 Chain(GlobalMaxPool(), shared_mlp)
             ),
             bp.gate_activation
