@@ -59,7 +59,8 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
     """
     struct UNetBp{S<:Union{Nothing,AbstractConvBp},
                   P<:Union{Nothing,AbstractConvBp},
-                  H<:Union{Nothing,AbstractConvBp}}
+                  H<:Union{Nothing,AbstractConvBp},
+                  T<:Union{Nothing,AbstractConvBp}}
         inchannels::Int = 3
         nlevels::Int = 4
         basewidth::Int = 64
@@ -71,7 +72,7 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
         stem::S = nothing # si nothing => encoder
         path::P = nothing #  => connection path CBAM, convpath
         head::H = nothing # si nothing => decoder
-        #top::T = nothing
+        top::T = nothing
     end
 end
 
@@ -79,7 +80,7 @@ function make(bp::UNetBp)
     # Build encoders and decoders for each level
     enc, dec, pth = [], [], []
     for l ∈ 1:bp.nlevels
-        enclvl, declvl = _level_encodec(bp, 3, l)
+        enclvl, declvl = _level_encodec(bp, bp.ksize, l)
         push!.((enc, dec), (enclvl, declvl))
         if !isnothing(bp.path)
             enc_chs, _ = _level_channels(bp, l)
@@ -113,7 +114,16 @@ _make(bp, channels) = make(bp)
 #  mce = expansion^(lvl - 1) * basewidth
 function _level_channels(bp, level)
     # encoder channels: input, middle, ouptput = (in_enc, mid_enc, out_enc)
-    in_enc = (level == 1) ? bp.inchannels : bp.expansion^(level - 2) * bp.basewidth
+    if level == 1
+        if isnothing(bp.stem)
+            in_enc = bp.inchannels
+        else
+            in_enc = bp.basewidth
+        end
+    else
+        in_enc = bp.expansion^(level - 2) * bp.basewidth
+    end
+    #in_enc = (level == 1) ? bp.inchannels : bp.expansion^(level - 2) * bp.basewidth
     mid_enc = out_enc = bp.expansion^(level - 1) * bp.basewidth
     # decoder channels: input, middle, ouptput = (icd, mcd, ocd)
     in_dec, mid_dec = 2 * out_enc, out_enc
@@ -137,17 +147,21 @@ function _level_encodec(bp, ksize, level) #
     enc_chs, dec_chs = _level_channels(bp, level)
     if level == 1
         if !isnothing(bp.stem)
-            enc = make(bp.stem, ksize, enc_chs)
+            enc = [
+                    make(bp.stem, ksize, enc_chs),
+                    make(bp.encoder.convolution, ksize, enc_chs)
+                  ]
         elseif isnothing(bp.encoder.downsampler) && isnothing(bp.stem)
             # if downsampling is done with a strided convolution
-            encoder = spread(bp.encoder; stride=1)
-            enc = make(encoder, ksize, enc_chs)
+            e = spread(bp.encoder; stride=1)
+            enc = make(e, ksize, enc_chs)
         else
             enc = make(bp.encoder.convolution, ksize, enc_chs)
         end
         dec = [
                 make(bp.decoder.convolution, ksize, dec_chs),
-                make(bp.head, last(dec_chs))
+                make(bp.head, ksize, last(dec_chs)),
+                make(bp.top, last(dec_chs))
               ]
     else
         enc = make(bp.encoder, ksize, enc_chs)
