@@ -14,7 +14,7 @@ end
     KwargsMapping(
             flfunc = :BatchNorm,
             fnames = (:initshift, :initscale, :affine, :trackstats,  :epsilon, :momentum),
-            flargs = (:initβ,     :initγ,     :affine, :track_stats, :ϵ,       :momentum),
+            flargs = (:initβ,     :initγ,     :affine, :track_stats, :eps,       :momentum),
             ftypes = (:I1,        :I2,        Bool,    Bool,         :F,       :F),
             defval  = (zeros32,   ones32,     true,    true,         1f-5,     0.1f0)
         )
@@ -37,7 +37,7 @@ end
     KwargsMapping(
             flfunc = :GroupNorm,
             fnames = (:initshift, :initscale, :affine, :trackstats,  :epsilon, :momentum),
-            flargs = (:initβ,     :initγ,     :affine, :track_stats, :ϵ,       :momentum),
+            flargs = (:initβ,     :initγ,     :affine, :track_stats, :eps,       :momentum),
             ftypes = (:I1,        :I2,         Bool,    Bool,        :F,       :F),
             defval  = (zeros32,   ones32,      true,    false,       1f-5,     0.1f0)
         )
@@ -66,7 +66,7 @@ end
     KwargsMapping(
             flfunc = :InstanceNorm,
             fnames = (:initshift, :initscale, :affine, :trackstats,  :epsilon, :momentum),
-            flargs = (:initβ,     :initγ,     :affine, :track_stats, :ϵ,       :momentum),
+            flargs = (:initβ,     :initγ,     :affine, :track_stats, :eps,       :momentum),
             ftypes = (:I1,        :I2,        Bool,    Bool,         :F,       :F),
             defval  = (zeros32,    ones32,    false,   false,        1f-5,     0.1f0)
         )
