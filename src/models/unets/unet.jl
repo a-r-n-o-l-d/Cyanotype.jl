@@ -148,7 +148,7 @@ function _level_encodec(bp, ksize, level) #
     if level == 1
         if !isnothing(bp.stem)
             enc = [
-                    make(bp.stem, ksize, enc_chs),
+                    make(bp.stem, ksize, bp.inchannels => last(enc_chs)),
                     make(bp.encoder.convolution, ksize, enc_chs)
                   ]
         elseif isnothing(bp.encoder.downsampler) && isnothing(bp.stem)
