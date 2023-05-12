@@ -1,4 +1,4 @@
-@cyanotype begin
+@cyanotype constructor=false begin
     """
     aka Hybrid Dilated Convolution
     [paper](@ref https://doi.org/10.1109/WACV.2018.00163)
@@ -6,10 +6,16 @@
     [example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
     """
     struct HybridAtrouConvBp{N,C<:ConvBp} <: AbstractConvBp #HybridAtrouConvBp
-        dilation_rates::NTuple{N,Int} = (1, 2, 3)
-        conv::C = ConvBp(normalization=BatchNormBp())
+        dilation_rates::NTuple{N,Int} # = (1, 2, 3)
+        conv::C # = ConvBp(normalization=BatchNormBp())
     end
 end
+
+HybridAtrouConvBp(; dilation_rates=(1, 2, 3),
+                    normalization=BatchNormBp(), kwargs...) = HybridAtrouConvBp(
+    dilation_rates,
+    ConvBp(; normalization=normalization, kwargs...)
+)
 
 function make(bp::HybridAtrouConvBp, ksize, channels)
     check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")
