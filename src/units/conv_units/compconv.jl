@@ -41,6 +41,10 @@ function make(bp::DoubleConvBp, channels::NTuple{3})
     )
 end
 
+function make(bp::DoubleConvBp, ksize, channels::Int)
+    make(bp, ksize, channels => channels)
+end
+
 # Peut-etre inutile
 @cyanotype begin
     """

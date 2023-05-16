@@ -23,7 +23,7 @@ function make(bp::HybridAtrouConvBp, ksize, channels)
     in_chs, out_chs = channels
     for dr in bp.dilation_rates
         c = cyanotype(bp.conv; dilation = dr)
-        push!(layers, make(c, ksize, in_chs=>out_chs)...)
+        push!(layers, flatten_layers(make(c, ksize, in_chs=>out_chs)))
         in_chs = out_chs
     end
     flatten_layers(layers)
