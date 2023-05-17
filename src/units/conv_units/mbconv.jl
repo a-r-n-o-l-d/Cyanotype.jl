@@ -70,6 +70,10 @@ function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stocha
     #bp.skip && in_chs == out_chs ? SkipConnection(Chain(layers...), +) : layers
 end
 
+function make(bp::MbConvBp, ksize, channels::Int, dropout=0)
+    make(bp, ksize, channels => channels, dropout)
+end
+
 function _mblayers(bp::MbConvBp, ksize, channels)
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expansion.expansion

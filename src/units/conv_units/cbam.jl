@@ -23,7 +23,7 @@ function ChannelAttentionBp(; reduction, activation=relu, gate_activation=sigmoi
     )
 end
 
-function make(bp::ChannelAttentionBp, channels)
+function make(bp::ChannelAttentionBp, channels::Int)
     mid_chs = channels ÷ bp.reduction
     shared_mlp = Chain(make(bp.shared_mlp, (channels, mid_chs, channels))...)
     SkipConnection(
@@ -38,6 +38,8 @@ function make(bp::ChannelAttentionBp, channels)
         .*
     )
 end
+
+#make(bp::ChannelAttentionBp, channels::Int) = make(bp,  channels => channels)
 
 @cyanotype constructor=false begin
     """

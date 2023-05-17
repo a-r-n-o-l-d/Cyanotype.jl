@@ -5,7 +5,7 @@
 
     Describes a convolutionnal module formed by two successive convolutionnal modules.
     """
-    struct DoubleConvBp{C1<:AbstractConvBp,C2<:AbstractConvBp} <: AbstractConvBp
+    struct DoubleConvBp{C1<:AbstractConvBp,C2<:Union{Nothing,AbstractConvBp}} <: AbstractConvBp
         #@volume #enlever
         conv1::C1         #firstconv
         conv2::C2 = conv1 #secondconv
@@ -42,7 +42,12 @@ function make(bp::DoubleConvBp, channels::NTuple{3})
 end
 
 function make(bp::DoubleConvBp, ksize, channels::Int)
-    make(bp, ksize, channels => channels)
+    flatten_layers(
+        [
+            make(bp.conv1, ksize, channels),
+            make(bp.conv2, ksize, channels)
+        ]
+    )
 end
 
 # Peut-etre inutile
