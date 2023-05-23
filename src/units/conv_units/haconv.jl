@@ -17,7 +17,7 @@ HybridAtrouConvBp(; dilation_rates=(1, 2, 3),
     ConvBp(; normalization=normalization, kwargs...)
 )
 
-function make(bp::HybridAtrouConvBp, ksize, channels)
+function make(bp::HybridAtrouConvBp, ksize, channels::Pair)
     check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")
     layers = []
     in_chs, out_chs = channels
@@ -28,6 +28,8 @@ function make(bp::HybridAtrouConvBp, ksize, channels)
     end
     flatten_layers(layers)
 end
+
+make(bp::HybridAtrouConvBp, ksize, channels::Int) = make(bp, ksize, channels => channels)
 
 # https://arxiv.org/pdf/1702.08502.pdf
 # DOI 10.1109/WACV.2018.00163
