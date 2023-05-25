@@ -52,7 +52,11 @@ chsoftmax(x) = softmax(x; dims=ndims(x) - 1)
 
 chmeanpool(x) = mean(x; dims=ndims(x) - 1)
 
+ChainRules.@non_differentiable chmeanpool(x)
+
 chmaxpool(x) = maximum(x; dims=ndims(x) - 1)
+
+ChainRules.@non_differentiable chmaxpool(x)
 
 function flatten_layers(layers...)
     result = []

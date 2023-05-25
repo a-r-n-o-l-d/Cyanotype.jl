@@ -24,6 +24,7 @@ module Cyanotype
 using Reexport
 @reexport using Flux
 using Flux: zeros32, ones32, glorot_uniform, flatten
+using ChainRules
 using Statistics
 
 export make, spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
