@@ -66,11 +66,14 @@ end
 @cyanotype begin
     """
     """
-    struct ConvTransposeUpsamplerBp <: AbstractBpUpsampler
+    struct ConvTransposeUpsamplerBp{F<:Function} <: AbstractBpUpsampler
         @volume
         scale::Int = 2
+        bias::Bool = true
+        init::F = Flux.glorot_uniform
     end
 end
+# ajout kwargs (init, bias)
 
 function make(bp::ConvTransposeUpsamplerBp, channels::Pair)
     k = genk(bp.scale, bp.volume)

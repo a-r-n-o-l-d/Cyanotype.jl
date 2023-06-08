@@ -9,7 +9,7 @@ const CyPad = Union{SamePad,Int}
             flargs = (:stride, :pad,      :dilation, :groups, :init),
             ftypes = (Int,     :P,        Int,       Int,     :I),
             defval = (1,       SamePad(), 1,         1,       glorot_uniform)
-        )
+    )
 
     """
     ConvBp(; kwargs...)

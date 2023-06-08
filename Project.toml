@@ -10,8 +10,9 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
-Flux = "0.13.6"
+Flux = "0.13"
 Reexport = "1.2"
+ChainRules = "1.50"
 julia = "1.8"
 
 [extras]
