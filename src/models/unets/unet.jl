@@ -1,5 +1,7 @@
 include("uchain.jl")
 
+# error with expansion > 2: bridge channels are wrong
+
 @cyanotype begin
     """
 
