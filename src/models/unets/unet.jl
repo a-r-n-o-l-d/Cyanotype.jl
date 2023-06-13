@@ -72,9 +72,10 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
         decoder::UDecoderBp
         bridge::UBridgeBp
         stem::S = nothing # si nothing => encoder
-        path::P = nothing #  => connection path CBAM, convpath
+        path::P = nothing #  connection_path (path CBAM, convpath)
         head::H = nothing # si nothing => decoder
         top::T = nothing
+        #connector = chcat
     end
 end
 
