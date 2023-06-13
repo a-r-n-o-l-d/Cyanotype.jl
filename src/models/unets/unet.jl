@@ -122,6 +122,26 @@ function _level_channels(bp, level)
         else
             in_enc = bp.basewidth
         end
+        mid_enc = out_enc = bp.basewidth
+        in_dec = 2 * out_enc # channel concatenation
+        mid_dec = out_dec = bp.basewidth
+    else
+        encp, decp = _level_channels(bp, level - 1)
+        _, _, in_enc = encp
+        mid_enc = out_enc = bp.expansion * in_enc
+        in_dec = 2 * out_enc
+        mid_dec = in_dec ÷ bp.expansion
+        out_dec = bp.decoder.upsampler isa ConvTransposeUpsamplerBp ? mid_dec : mid_dec ÷ 2
+    end
+    (in_enc, mid_enc, out_enc), (in_dec, mid_dec, out_dec)
+#=
+    # encoder channels: input, middle, ouptput = (in_enc, mid_enc, out_enc)
+    if level == 1
+        if isnothing(bp.stem)
+            in_enc = bp.inchannels
+        else
+            in_enc = bp.basewidth
+        end
     else
         in_enc = bp.expansion^(level - 2) * bp.basewidth
     end
@@ -135,12 +155,22 @@ function _level_channels(bp, level)
         out_dec = (level == 1) ? mid_dec : mid_dec ÷ 2
     end
     (in_enc, mid_enc, out_enc), (in_dec, mid_dec, out_dec)
+=#
 end
 
 function _bridge_channels(bp)
+    #=
     enc, dec = _level_channels(bp, bp.nlevels + 1)
     in_chs, mid_chs, _ = enc
     _, _, out_chs = dec
+    in_chs, mid_chs, out_chs
+    =#
+    enc, _ = _level_channels(bp, bp.nlevels + 1)
+    _, dec = _level_channels(bp, bp.nlevels)
+    in_chs, mid_chs, _ = enc
+    out_chs, _, _ = dec
+    #println(dec)
+    out_chs = bp.decoder.upsampler isa ConvTransposeUpsamplerBp ? out_chs : out_chs ÷ 2
     in_chs, mid_chs, out_chs
 end
 
