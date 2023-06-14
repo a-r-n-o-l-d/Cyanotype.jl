@@ -29,7 +29,7 @@ function make(bp::SqueezeExcitationBp, channels)
     #if bp.reduction == 1
     #    identity
     #else
-        mid_chs = channels ÷ bp.reduction
+        mid_chs = max(1, channels ÷ bp.reduction)
         layers = flatten_layers(
             [
                 GlobalMeanPool(), #AdaptiveMeanPool(genk(1, bp.volume)), #
