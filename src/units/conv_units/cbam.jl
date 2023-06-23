@@ -91,3 +91,23 @@ make(bp::CBAMBp, ksize, channels) = flatten_layers(
         make(bp.spatial_gate, ksize)
     ]
 )
+
+@cyanotype constructor=false begin
+    """
+
+    """
+    struct ResCBAMBp <: Cyanotype.AbstractConvBp
+        cbam::CBAMBp
+    end
+end
+
+ResCBAMBp(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = ResCBAMBp(
+    CBAMBp(;
+        reduction=reduction,
+        activation=activation,
+        gate_activation=gate_activation,
+        kwargs...
+    )
+)
+
+make(bp::ResCBAMBp, ksize, channels) = SkipConnection(Chain(make(bp.cbam, ksize, channels)...), +)
