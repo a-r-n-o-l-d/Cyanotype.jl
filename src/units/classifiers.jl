@@ -4,14 +4,12 @@ abstract type AbstractBpClassifier end #<: AbstractConvBp
     """
     """
     struct PixelClassifierBp <: AbstractConvBp
-        #@volume
         nclasses::Int
         convolution::PointwiseConvBp
     end
 end
 
 function PixelClassifierBp(; nclasses, activation=nclasses > 2 ? identity : sigmoid, kwargs...)
-    #act = nclasses > 2 ? identity : sigmoid
     conv = PointwiseConvBp(; activation=activation, kwargs...)
     PixelClassifierBp(nclasses, conv)
 end
