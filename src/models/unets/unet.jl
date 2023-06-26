@@ -179,6 +179,12 @@ function _level_encodec(bp, ksize, level) #
     # number of channels (input, middle, output)
     enc_chs, dec_chs = _level_channels(bp, level)
     if level == 1
+        c = spread(bp.encoder.convolution; stride=1)
+        enc = [
+                make(bp.stem, ksize, bp.inchannels => first(enc_chs)),
+                make(c, ksize, enc_chs)
+              ]
+        #=
         if !isnothing(bp.stem)
             enc = [
                     make(bp.stem, ksize, bp.inchannels => last(enc_chs)),
@@ -191,6 +197,7 @@ function _level_encodec(bp, ksize, level) #
         else
             enc = make(bp.encoder.convolution, ksize, enc_chs)
         end
+        =#
         dec = [
                 make(bp.decoder.convolution, ksize, dec_chs),
                 make(bp.head, ksize, last(dec_chs)),
