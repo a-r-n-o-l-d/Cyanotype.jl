@@ -6,4 +6,7 @@
     end
 end
 
-make(bp::ResidualConvBp, ksize, channels) = SkipConnection(make(bp.convolution, ksize, channels), bp.connector)
+make(bp::ResidualConvBp, ksize, channels) = SkipConnection(
+    Chain(make(bp.convolution, ksize, channels)...),
+    bp.connector
+)
