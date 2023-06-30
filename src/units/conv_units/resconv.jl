@@ -1,6 +1,6 @@
 #ResidualBp
 @cyanotype begin
-    struct ResidualConvBp{C<:AbstractConvBp,F<:Function}
+    struct ResidualConvBp{C<:AbstractConvBp,F<:Function} <: AbstractConvBp
         convolution::C
         connector::F = +
     end
