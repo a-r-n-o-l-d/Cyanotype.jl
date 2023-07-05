@@ -62,7 +62,7 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
     struct UNetBp{S<:Union{Nothing,AbstractConvBp},
                   P<:Union{Nothing,AbstractConvBp},
                   H<:Union{Nothing,AbstractConvBp},
-                  T<:Union{Nothing,AbstractConvBp}}
+                  T<:Union{Nothing,AbstractConvBp}} <: AbstractConvBp
         inchannels::Int = 3
         nlevels::Int = 4
         basewidth::Int = 64
