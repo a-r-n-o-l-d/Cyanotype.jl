@@ -39,6 +39,8 @@ function make(bp::ChannelAttentionBp, channels::Int)
     )
 end
 
+make(bp::ChannelAttentionBp, channels::Pair) = make(bp, first(channels))
+
 #make(bp::ChannelAttentionBp, channels::Int) = make(bp,  channels => channels)
 
 @cyanotype constructor=false begin
