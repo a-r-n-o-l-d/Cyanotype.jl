@@ -40,8 +40,8 @@ make(bp::UDecoderBp, ksize, channels) = flatten_layers(
     """
 
     """
-    struct UBridgeBp{D<:Union{Nothing,AbstractBpDownsampler},U<:AbstractBpUpsampler} #,P<:BpPixelClassifierBp
-        convolution::DoubleConvBp
+    struct UBridgeBp{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler},U<:AbstractBpUpsampler} #,P<:BpPixelClassifierBp
+        convolution::C
         downsampler::D #nothing si stride=2
         upsampler::U
     end

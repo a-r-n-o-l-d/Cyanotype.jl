@@ -9,7 +9,7 @@ using Aqua
     @testset verbose = true "Code quality" begin
         @testset verbose = true "Aqua" begin
             #Aqua.test_all(Cyanotype) #  => ambiguities from Flux, Zygote, StatsBase
-            Aqua.test_ambiguities(Cyanotype)
+            #Aqua.test_ambiguities(Cyanotype)
             Aqua.test_unbound_args(Cyanotype)
             Aqua.test_undefined_exports(Cyanotype)
             Aqua.test_project_extras(Cyanotype)

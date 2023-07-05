@@ -42,12 +42,13 @@ function make(bp::DoubleConvBp, channels::NTuple{3})
 end
 
 function make(bp::DoubleConvBp, ksize, channels::Int)
-    flatten_layers(
+    make(bp, ksize, (channels, channels, channels))
+    #=flatten_layers(
         [
             make(bp.conv1, ksize, channels),
             make(bp.conv2, ksize, channels)
         ]
-    )
+    )=#
 end
 
 # Peut-etre inutile
@@ -55,18 +56,32 @@ end
     """
     Template describing a module with N `NConvBp` repeated.
     """
-    struct NConvBp{C<:AbstractConvBp} <: AbstractConvBp
-        convolution::C
-        nrepeat::Int
+    struct NConvBp{N,C<:NTuple{N,AbstractConvBp}} <: AbstractConvBp
+        convolutions::C
+        #nrepeat::Int
     end
 end
 
-function make(bp::NConvBp, ksize, channels)
+function make(bp::NConvBp, ksize, channels::NTuple{3})
     layers = []
-    in_chs, out_chs = channels
-    for _ in 1:bp.nrepeat
-        push!(layers, make(bp.convolution, ksize, in_chs=>out_chs))
-        in_chs = out_chs
+    in_chs, mid_chs, out_chs = channels
+    for (i, c) in enumerate(bp.convolutions) #_ in 1:bp.nrepeat
+        #push!(layers, make(bp.convolution, ksize, in_chs=>out_chs))
+        #in_chs = out_chs
+        if i == 1
+            push!(layers, make(c, ksize, in_chs=>mid_chs))
+        elseif i == length(bp.convolutions)
+            push!(layers, make(c, ksize, mid_chs=>out_chs))
+        else
+            push!(layers, make(c, ksize, mid_chs=>mid_chs))
+        end
     end
     flatten_layers(layers)
 end
+
+function make(bp::NConvBp, ksize, channels::Pair)
+    in_chs, out_chs = channels
+    make(bp, ksize, (in_chs, out_chs, out_chs))
+end
+
+make(bp::NConvBp, ksize, channels::Int) = make(bp, ksize, (channels, channels, channels))
