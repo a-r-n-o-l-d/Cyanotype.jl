@@ -96,8 +96,8 @@ function make(bp::UNetBp)
     uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
 end
 
-function make(bp::UNetBp, channels)
-    tmp = spread(bp, inchannels=channels)
+function make(bp::UNetBp, ksize, channels)
+    tmp = spread(bp, ksize=ksize, inchannels=channels)
     make(tmp)
 end
 
