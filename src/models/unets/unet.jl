@@ -92,7 +92,7 @@ function make(bp::UNetBp)
             push!(pth, bp.path)
         end
     end
-    bdg = make(bp.bridge, 3, _bridge_channels(bp))
+    bdg = make(bp.bridge, bp.ksize, _bridge_channels(bp))
     uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
 end
 
