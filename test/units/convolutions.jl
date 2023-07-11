@@ -94,3 +94,7 @@ model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 bp = FusedMbConvBp(stride=1, ch_expansion=6, init=Flux.glorot_normal)
 model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 4, 16)
+
+bp = AxialDWConvBp(activation=gelu)
+model = Chain(make(bp, 7, 4 => 16) |> flatten_layers)
+@test Flux.outputsize(model, (32, 32, 4, 4)) == (32, 32, 16, 4)
