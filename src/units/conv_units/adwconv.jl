@@ -2,7 +2,10 @@
     """
     https://arxiv.org/pdf/2306.16103v2.pdf
     """
-    struct AxialDWConvBp{A<:Function,N<:Union{Nothing,AbstractNormBp},P<:Union{SamePad,Int},I<:Function} <: AbstractConvBp
+    struct AxialDWConvBp{A<:Function,
+                         N<:Union{Nothing,AbstractNormBp},
+                         P<:Union{SamePad,Int},
+                         I<:Function} <: AbstractConvBp
         @volume
         @activation(identity)
         stride::Int = 1
@@ -41,7 +44,7 @@ function make(bp::AxialDWConvBp, ksize, channels::Pair)
     pwc = PointwiseConvBp(activation=bp.activation, pad=bp.pad, init=bp.init)
     flatten_layers(
         [
-            Parallel(+, layers...),
+            SkipConnection(Parallel(+, layers...), +),
             norm,
             make(pwc, in_chs => out_chs)
         ]
