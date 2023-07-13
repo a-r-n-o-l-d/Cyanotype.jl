@@ -76,28 +76,50 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
         head::H = nothing # si nothing => decoder
         top::T = nothing
         #connector = chcat
+        residual::Bool = false
     end
 end
 
 function make(bp::UNetBp)
     # Build encoders and decoders for each level
-    enc, dec, pth = [], [], []
-    for l ∈ 1:bp.nlevels
-        enclvl, declvl = _level_encodec(bp, bp.ksize, l)
-        push!.((enc, dec), (enclvl, declvl))
-        if !isnothing(bp.path)
-            enc_chs, _ = _level_channels(bp, l)
-            push!(pth, make(bp.path, bp.ksize, last(enc_chs)))
-        else
-            push!(pth, bp.path)
+    if bp.residual
+        enc, dec, pth = [], [], []
+        for l ∈ 1:bp.nlevels
+            enclvl, declvl = _level_encodec2(bp, bp.ksize, l)
+            push!.((enc, dec), (enclvl, declvl))
+            if !isnothing(bp.path)
+                enc_chs, _ = _level_channels(bp, l)
+                push!(pth, make(bp.path, bp.ksize, last(enc_chs)))
+            else
+                push!(pth, bp.path)
+            end
         end
+        bdg = make(bp.bridge, bp.ksize, _bridge_channels(bp))
+        unet = uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
+        enc_chs, dec_chs = _level_channels(bp, 1)
+        stem = make(bp.stem, ksize, bp.inchannels => first(enc_chs))
+        head = make(bp.head, ksize, last(dec_chs))
+        top = make(bp.top, last(dec_chs))
+        Chain(flatten_layers(stem)..., SkipConnection(unet, +), flatten_layers(head)..., flatten_layers(top)...)
+    else
+        enc, dec, pth = [], [], []
+        for l ∈ 1:bp.nlevels
+            enclvl, declvl = _level_encodec(bp, bp.ksize, l)
+            push!.((enc, dec), (enclvl, declvl))
+            if !isnothing(bp.path)
+                enc_chs, _ = _level_channels(bp, l)
+                push!(pth, make(bp.path, bp.ksize, last(enc_chs)))
+            else
+                push!(pth, bp.path)
+            end
+        end
+        bdg = make(bp.bridge, bp.ksize, _bridge_channels(bp))
+        uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
     end
-    bdg = make(bp.bridge, bp.ksize, _bridge_channels(bp))
-    uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
 end
 
-function make(bp::UNetBp, ksize, channels)
-    tmp = spread(bp, ksize=ksize, inchannels=channels)
+function make(bp::UNetBp, ::Any, channels)
+    tmp = spread(bp, inchannels=channels) #ksize=ksize,
     make(tmp)
 end
 
@@ -208,6 +230,20 @@ function _level_encodec(bp, ksize, level) #
                 make(bp.head, ksize, last(dec_chs)),
                 make(bp.top, last(dec_chs))
               ]
+    else
+        enc = make(bp.encoder, ksize, enc_chs)
+        dec = make(bp.decoder, ksize, dec_chs)
+    end
+    flatten_layers(enc), flatten_layers(dec)
+end
+
+function _level_encodec2(bp, ksize, level)
+    # number of channels (input, middle, output)
+    enc_chs, dec_chs = _level_channels(bp, level)
+    if level == 1
+        c = spread(bp.encoder.convolution; stride=1)
+        enc = make(c, ksize, enc_chs)
+        dec = make(bp.decoder.convolution, ksize, dec_chs)
     else
         enc = make(bp.encoder, ksize, enc_chs)
         dec = make(bp.decoder, ksize, dec_chs)
