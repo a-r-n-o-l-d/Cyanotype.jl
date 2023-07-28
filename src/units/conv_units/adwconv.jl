@@ -13,6 +13,7 @@
         dilation::Int = 1
         init::I = glorot_uniform
         normalization::N = BatchNormBp()
+        skip::Bool = true
     end
 end
 #=
@@ -42,9 +43,10 @@ function make(bp::AxialDWConvBp, ksize, channels::Pair)
     end
     norm = bp.normalization isa Nothing ? identity : BatchNorm(in_chs)
     pwc = PointwiseConvBp(activation=bp.activation, pad=bp.pad, init=bp.init)
+    axial = bp.skip ? SkipConnection(Parallel(+, layers...), +) : Parallel(+, layers...)
     flatten_layers(
         [
-            SkipConnection(Parallel(+, layers...), +),
+            axial, #SkipConnection(Parallel(+, layers...), +),
             norm,
             make(pwc, in_chs => out_chs)
         ]
