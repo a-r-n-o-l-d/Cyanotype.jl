@@ -18,6 +18,7 @@ To do :
     - spread => broadcast(?)
     x activation identity by default
     x BpDConv => DoubleConvBp
+    - check if we can use @cyanotype outside the package
 =#
 module Cyanotype
 
