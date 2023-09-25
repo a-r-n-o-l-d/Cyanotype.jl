@@ -36,10 +36,10 @@ end
     # !!!! `track_stats=true` will be removed from GroupNorm in Flux 0.14.
     KwargsMapping(
             flfunc = :GroupNorm,
-            fnames = (:initshift, :initscale, :affine, :trackstats,  :epsilon, :momentum),
-            flargs = (:initβ,     :initγ,     :affine, :track_stats, :eps,       :momentum),
-            ftypes = (:I1,        :I2,         Bool,    Bool,        :F,       :F),
-            defval  = (zeros32,   ones32,      true,    false,       1f-5,     0.1f0)
+            fnames = (:initshift, :initscale, :affine, :epsilon, :momentum),
+            flargs = (:initβ,     :initγ,     :affine, :eps,     :momentum),
+            ftypes = (:I1,        :I2,         Bool,   :F,       :F),
+            defval  = (zeros32,   ones32,      true,   1f-5,     0.1f0)
         )
 
     """
