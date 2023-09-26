@@ -34,7 +34,7 @@ export make, spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, Batch
        MbConvBp, PixelClassifierBp, ChannelAttentionBp, SpatialAttentionBp, CBAMBp,
        FusedMbConvBp, LabelClassifierBp, MaxDownsamplerBp, MeanDownsamplerBp,
        NearestUpsamplerBp, LinearUpsamplerBp, ConvTransposeUpsamplerBp,
-       PixelShuffleUpsamplerBp, uchain, UEncoderBp, UDecoderBp, UBridgeBp, UNetBp,
+       PixelShuffleUpsamplerBp, uchain, UEncoderBp, UDecoderBp, UBridgeBp, UNetBp, UNetBp2,
        EfficientNetStageBp, EfficientNetBp, PixelMapBp, EfficientUNetBp, ResCBAMBp,
        ResidualConvBp, AxialDWConvBp
 
@@ -68,6 +68,7 @@ include("units/pixmap.jl")
 include("units/samplers.jl")
 
 include("models/unets/unet.jl")
+include("models/unets/unet2.jl")
 
 include("models/efficientnets/efficientnet.jl")
 
