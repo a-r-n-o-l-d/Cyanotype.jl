@@ -125,7 +125,7 @@ function _cyanotype(mod, doc, kmexp, head, body, cons=true)
         head = Expr(:<:, head, Cyanotype.AbstractBlueprint)
     end
 
-    kmap = eval(kmexp)
+    kmap = Core.eval(@__MODULE__, kmexp) #eval(kmexp)
 
     # Flux name
     flname = kmap.flfunc
