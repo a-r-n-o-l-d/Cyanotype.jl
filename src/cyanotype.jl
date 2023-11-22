@@ -90,7 +90,7 @@ end
 
 function _parse_expr(mod, expr)
     doc = ""
-    kmexp = :(KwargsMapping())
+    kmexp = :() #KwargsMapping()
     head = :()
     body = :()
     for arg in expr.args
