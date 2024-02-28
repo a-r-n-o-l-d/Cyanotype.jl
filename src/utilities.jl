@@ -121,8 +121,7 @@ function _blueprint_gen(stack)
     # Evaluates stack from bottom to top
     for (bp, kw, n) in reverse(stack)
         for k in keys(kw)
-            # Modify kw if k is in blueprints dictionnary and is actually an
-            # AbstractBlueprint
+            # Modify kw if k is in blueprints dictionnary and is actually an AbstractBlueprint
             if haskey(blueprints, k) && kw[k] isa AbstractBlueprint
                 # Consume this blueprint
                 kw[k] = blueprints[k]
