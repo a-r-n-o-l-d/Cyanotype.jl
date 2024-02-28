@@ -89,6 +89,10 @@ macro activation(func)
     end)
 end
 
+########################################################################################################################
+#                                           INTERNAL FUNCTIONS                                                         #
+########################################################################################################################
+
 # Shortcut that do nothing if not an AbstractBlueprint
 _parse_blueprint!(::Any, ::Any, ::Any; kwargs...) = nothing
 
