@@ -31,7 +31,7 @@ end
 """
     chcat(x...)
 
-Concatenate the image data along the dimension corresponding to the channels. Image data
+Concatenates the image data along the dimension corresponding to the channels. Image data
 should be stored in WHCN order (width, height, channels, batch) or WHDCN (width, height,
 depth, channels, batch) in 3D context. Channels are assumed to be the penultimate dimension.
 
@@ -48,6 +48,8 @@ julia> chcat(x1, x2) |> size
 chcat(x...) = cat(x...; dims = ndims(x[1]) - 1)
 
 chsoftmax(x) = softmax(x; dims = ndims(x) - 1)
+
+ChainRules.@non_differentiable chsoftmax(x)
 
 chmeanpool(x) = mean(x; dims = ndims(x) - 1)
 
