@@ -23,14 +23,11 @@ struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},
     defval::T3
 end
 
-function KwargsMapping(;
-        flfunc = :notflux, fnames = (), flargs = (), ftypes = (), defval = ()
-    )
+function KwargsMapping(; flfunc = :notflux, fnames = (), flargs = (), ftypes = (), defval = ())
     KwargsMapping(flfunc, fnames, flargs, ftypes, defval)
 end
 
 @inline eachkwargs(km::KwargsMapping) = zip(km.fnames, km.flargs, km.ftypes, km.defval)
-
 
 """
     @cyanotype(expr)
@@ -119,11 +116,11 @@ function _parse_expr(mod, expr)
     doc, kmexp, head, body
 end
 
-function _cyanotype(mod, doc, kmexp, head, body, cons=true)
+function _cyanotype(mod, doc, kmexp, head, body, cons = true)
     # Forces the struct to inherit from AbstractCyano
     if head isa Symbol || head.head === :curly
-        # It is not type stable to do that, since the head type is changed, but at this
-        # stage performance is not a big deal.
+        # It is not type stable to do that, since the head type is changed, but at this stage performance is not a big
+        # deal.
         head = Expr(:<:, head, Cyanotype.AbstractBlueprint)
     end
 

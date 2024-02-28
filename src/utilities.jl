@@ -1,7 +1,7 @@
 """
     spread(bp; kwargs...)
 
-Return a new blueprint with `kwargs` spreaded over all fields of `bp`. This function allows
+Returns a new blueprint with `kwargs` spreaded over all fields of `bp`. This function allows
 to modify all nested cyanotypes at once.
 
 ```julia
