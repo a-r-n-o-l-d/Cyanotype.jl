@@ -31,10 +31,9 @@ end
 """
     chcat(x...)
 
-Concatenate the image data along the dimension corresponding to the channels.
-Image data should be stored in WHCN order (width, height, channels, batch) or
-WHDCN (width, height, depth, channels, batch) in 3D context. Channels are
-assumed to be the penultimate dimension.
+Concatenate the image data along the dimension corresponding to the channels. Image data
+should be stored in WHCN order (width, height, channels, batch) or WHDCN (width, height,
+depth, channels, batch) in 3D context. Channels are assumed to be the penultimate dimension.
 
 # Example
 ```julia
@@ -46,15 +45,15 @@ julia> chcat(x1, x2) |> size
 (32, 32, 8, 6)
 ```
 """
-chcat(x...) = cat(x...; dims=ndims(x[1]) - 1) #  (x[1] |> size |> length) - 1
+chcat(x...) = cat(x...; dims = ndims(x[1]) - 1)
 
-chsoftmax(x) = softmax(x; dims=ndims(x) - 1)
+chsoftmax(x) = softmax(x; dims = ndims(x) - 1)
 
-chmeanpool(x) = mean(x; dims=ndims(x) - 1)
+chmeanpool(x) = mean(x; dims = ndims(x) - 1)
 
 ChainRules.@non_differentiable chmeanpool(x)
 
-chmaxpool(x) = maximum(x; dims=ndims(x) - 1)
+chmaxpool(x) = maximum(x; dims = ndims(x) - 1)
 
 ChainRules.@non_differentiable chmaxpool(x)
 
@@ -91,7 +90,7 @@ end
 # Shortcut that do nothing if not an AbstractBlueprint
 _parse_blueprint!(::Any, ::Any, ::Any; kwargs...) = nothing
 
-# Parses a AbstractBlueprint blueprint and returns a stack
+# Parses a AbstractBlueprint bp and returns a stack
 function _parse_blueprint!(stack, name, bp::AbstractBlueprint; kwargs...)
     fields = Dict(pairs(getfields(bp)))
     # stack records the AbstractBlueprint object, its fields and name
@@ -111,9 +110,9 @@ end
 
 # Generate a new blueprint from a stack
 function _blueprint_gen(stack)
-    # Store blueprints generated from the stack
+    # Stores blueprints generated from the stack
     blueprints = Dict()
-    # Evaluate stack from bottom to top
+    # Evaluates stack from bottom to top
     for (bp, kw, n) in reverse(stack)
         for k in keys(kw)
             # Modify kw if k is in blueprints dictionnary and is actually an
@@ -124,7 +123,7 @@ function _blueprint_gen(stack)
                 delete!(blueprints, k)
             end
         end
-        # Generate a new blueprint from kw and store it for the further iterations
+        # Generates a new blueprint from kw and store it for the further iterations
         blueprints[n] = cyanotype(bp; kw...)
     end
     blueprints[:top]
@@ -144,23 +143,3 @@ function _flatten_layers!(buffer, layers)
         push!(buffer, layers)
     end
 end
-
-#activation_doc(func = relu) = "`activation`: activation function, by default [`$func`](@ref Flux.$func)"
-
-#const ACTIVATION_DOC_RELU = activation_doc()
-
-#=
-function autogen_build_doc(T, with_kernel_size, with_channels)
-    doc = "build("
-    if with_kernel_size
-        doc = doc * "kernel_size, "
-    end
-    if with_channels
-        doc = doc * "channels, "
-    end
-    doc = doc * "cya::$T)"
-    "$doc See [`$T`](@ref)"
-end
-=#
-
-#const VOLUMETRIC_FIELD = :(volumetric::Bool = false) # pas encore test
