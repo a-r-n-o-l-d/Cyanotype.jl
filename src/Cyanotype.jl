@@ -37,7 +37,7 @@ export make, spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, Batch
        NearestUpsamplerBp, LinearUpsamplerBp, ConvTransposeUpsamplerBp,
        PixelShuffleUpsamplerBp, uchain, UEncoderBp, UDecoderBp, UBridgeBp, UNetBp, UNet2Bp,
        EfficientNetStageBp, EfficientNetBp, PixelMapBp, EfficientUNetBp, ResCBAMBp,
-       ResidualConvBp, AxialDWConvBp
+       ResidualConvBp, AxialDWConvBp, MeanMaxDownsamplerBp
 
 const CyFloat = Union{Float16, Float32, Float64}
 
