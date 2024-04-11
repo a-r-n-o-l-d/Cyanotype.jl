@@ -4,6 +4,27 @@ abstract type AbstractBpDownsampler end
 
 abstract type AbstractBpUpsampler end
 
+@cyanotype constructor=false begin
+    """
+    """
+    struct MeanMaxDownsamplerBp <: AbstractBpDownsampler
+        pw
+        wsize::Int = 2
+    end
+end
+
+MeanMaxDownsamplerBp(; wsize=2, kwargs...) = MeanMaxDownsamplerBp(PointwiseConvBp(; kwargs...), wsize)
+
+function make(bp::MeanMaxDownsamplerBp, channels)
+    ws = genk(bp.wsize, bp.pw.volume)
+    flatten_layers(
+        [
+            Parallel(chcat, MeanPool(ws), MaxPool(ws)),
+            make(bp.pw, 2 * channels => channels)
+        ]
+    )
+end
+
 @cyanotype begin
     """
     """

@@ -14,7 +14,7 @@ end
 
 make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     [
-        make(bp.downsampler),
+        _make(bp.downsampler, channels), #_make(bp.downsampler, channels),
         make(bp.convolution, ksize, channels)
     ]
 )
@@ -40,7 +40,7 @@ make(bp::UDecoderBp, ksize, channels) = flatten_layers(
     """
 
     """
-    struct UBridgeBp{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler},U<:AbstractBpUpsampler} #,P<:BpPixelClassifierBp
+    struct UBridgeBp{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler},U<:Union{Nothing,AbstractBpUpsampler}} #,P<:BpPixelClassifierBp
         convolution::C
         downsampler::D #nothing si stride=2
         upsampler::U
@@ -49,7 +49,7 @@ end
 
 make(bp::UBridgeBp, ksize, channels) = flatten_layers(
     [
-        make(bp.downsampler),
+        _make(bp.downsampler, channels),
         make(bp.convolution, ksize, channels),
         _make(bp.upsampler, channels)
     ]
@@ -136,6 +136,10 @@ _make(bp::PixelShuffleUpsamplerBp, channels) = make(bp, last(channels))
 _make(bp::ConvTransposeUpsamplerBp, channels) = make(bp, last(channels) => last(channels) ÷ 2)
 
 _make(bp, channels) = make(bp)
+
+_make(bp::AbstractBpDownsampler, ::Any) = make(bp)
+
+_make(bp::MeanMaxDownsamplerBp, ::Any) = make(bp, channels)
 
 # Compute encoder/decoder number of channels at a given level (lvl)
 # return two tuples one for encoder and one for decoder

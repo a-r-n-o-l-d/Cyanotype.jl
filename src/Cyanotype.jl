@@ -2,6 +2,7 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
+    - downsampler : avg et maxpool concat pw
     - tool to check if AbstractConvBp (and fields) is volumetric
     - spread avec type de blueprint sur lesquel on change une options : spread(bp, ConvBp; activation=swish)
     - docs, docs, docs, docs
