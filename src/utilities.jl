@@ -147,8 +147,8 @@ function _blueprint_gen(stack)
             # Modify kw if k is in blueprints dictionnary and is actually an AbstractBlueprint
             if haskey(blueprints, k) && kw[k] isa AbstractBlueprint
                 # Consume this blueprint
-                kw[k] = blueprints[k]
                 delete!(blueprints, k)
+                kw[k] = blueprints[k]
             end
         end
         # Generates a new blueprint from kw and store it for the further iterations
