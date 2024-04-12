@@ -2,8 +2,8 @@
     """
 
     """
-    struct PointwiseConvBp <: AbstractConvBp
-        conv::ConvBp
+    struct PointwiseConvBp{C<:AbstractConvBp} <: AbstractConvBp
+        conv::C
     end
 end
 
