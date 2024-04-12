@@ -2,12 +2,13 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
-    - downsampler : avg et maxpool concat pw
+    - fonction replace(bp, :fieldname, old => new)
+    x downsampler : avg et maxpool concat pw
     - tool to check if AbstractConvBp (and fields) is volumetric
-    - spread avec type de blueprint sur lesquel on change une options : spread(bp, ConvBp; activation=swish)
+    x spread avec type de blueprint sur lesquel on change une options : spread(bp, ConvBp; activation=swish)
     - docs, docs, docs, docs
     x renommage : mettre Bp en fin de nom
-    - showing blueprints is ugly => GarishPrint or custom dump ? cyanotype _show_func
+    x showing blueprints is ugly => GarishPrint or custom dump ? cyanotype _show_func
     - BpMBConv => BpMbConv
     - UDecoderBp => dispatch on make not on _make
     - DoubleConvBp with kwargs
@@ -19,7 +20,7 @@ To do :
     - spread => broadcast(?)
     x activation identity by default
     x BpDConv => DoubleConvBp
-    - check if we can use @cyanotype outside the package
+    x check if we can use @cyanotype outside the package
 =#
 module Cyanotype
 

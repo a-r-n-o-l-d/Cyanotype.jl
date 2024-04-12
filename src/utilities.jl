@@ -28,6 +28,12 @@ function spread(bp; kwargs...)
     _blueprint_gen(stack)
 end
 
+function replace(bp, fieldname, old_new)
+    old, new = old_new
+    stack = _parse_blueprint!([], :top, bp, fieldname, old, new)
+    _blueprint_gen(stack)
+end
+
 """
     chcat(x...)
 
@@ -95,6 +101,7 @@ end
 
 # Shortcut that do nothing if not an AbstractBlueprint
 _parse_blueprint!(::Any, ::Any, ::Any; kwargs...) = nothing
+_parse_blueprint!(::Any, ::Any, ::Any, ::Any, ::Any, ::Any) = nothing
 
 # Parses a AbstractBlueprint bp and returns a stack
 function _parse_blueprint!(stack, name, bp::AbstractBlueprint; kwargs...)
@@ -110,6 +117,22 @@ function _parse_blueprint!(stack, name, bp::AbstractBlueprint; kwargs...)
     # Reccursive parsing of each field
     for (n, f) in fields
         _parse_blueprint!(stack, n, f; kwargs...)
+    end
+    stack
+end
+
+# Parses a AbstractBlueprint bp and returns a stack
+function _parse_blueprint!(stack, name, bp::AbstractBlueprint, fieldname, old, new)
+    fields = Dict(pairs(getfields(bp)))
+    # stack records the AbstractBlueprint object, its fields and name
+    push!(stack, (bp, fields, name))
+    # Replace field according to old => new
+    if haskey(fields, fieldname) && fields[fieldname] == old
+        fields[fieldname] = new
+    end
+    # Reccursive parsing of each field
+    for (n, f) in fields
+        _parse_blueprint!(stack, n, f, fieldname, old, new)
     end
     stack
 end
