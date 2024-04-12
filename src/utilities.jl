@@ -148,7 +148,8 @@ function _blueprint_gen(stack)
             if haskey(blueprints, k) && kw[k] isa AbstractBlueprint
                 # Consume this blueprint
                 delete!(blueprints, k)
-                kw[k] = blueprints[k]
+                #kw[k] = blueprints[k]
+                push!(kw, k => blueprints[k])
             end
         end
         # Generates a new blueprint from kw and store it for the further iterations
