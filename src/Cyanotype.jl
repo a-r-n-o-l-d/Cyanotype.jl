@@ -30,7 +30,7 @@ using Flux: zeros32, ones32, glorot_uniform, flatten
 using ChainRules
 using Statistics
 
-export make, spread, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
+export make, spread, replace, flatten_layers, cyanotype, KwargsMapping, @cyanotype, BatchNormBp,
        GroupNormBp, InstanceNormBp, ConvBp, DoubleConvBp, NConvBp, PointwiseConvBp,
        ChannelExpansionConvBp, DepthwiseConvBp, HybridAtrouConvBp, SqueezeExcitationBp,
        MbConvBp, PixelClassifierBp, ChannelAttentionBp, SpatialAttentionBp, CBAMBp,
