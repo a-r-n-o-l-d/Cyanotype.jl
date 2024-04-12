@@ -61,7 +61,12 @@ function make(bp::UNet2Bp)
             end
         end
         bdg = make(bp.bridge, bp.ksize(bp.nlevels + 1), _bridge_channels(bp))
-        uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
+        unet = uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
+        enc_chs, dec_chs = _level_channels(bp, 1)
+        stem = make(bp.stem, bp.ksize(1), bp.inchannels => first(enc_chs))
+        head = make(bp.head, bp.ksize(1), last(dec_chs))
+        top = make(bp.top, last(dec_chs))
+        Chain(flatten_layers(stem)..., unet..., flatten_layers(head)..., flatten_layers(top)...)
     end
 end
 
