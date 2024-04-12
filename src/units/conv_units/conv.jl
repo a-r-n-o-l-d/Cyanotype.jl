@@ -17,7 +17,7 @@ const CyPad = Union{SamePad,Int}
     A cyanotype blueprint describing a convolutionnal module or layer depending om the value
     of `normalization` argument.
     """
-    struct ConvBp{N<:Union{Nothing,AbstractNormBp},A,I<:Function,P<:Union{SamePad,Int}} <: AbstractConvBp
+    struct ConvBp{N<:Union{Nothing,AbstractNormBp},A<:Function,I<:Function,P<:Union{SamePad,Int}} <: AbstractConvBp
         @volume
         @activation(identity)
         """
