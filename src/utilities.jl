@@ -28,7 +28,7 @@ function spread(bp; kwargs...)
     _blueprint_gen(stack)
 end
 
-function replace(bp, fieldname, old_new)
+function Base.replace(bp, fieldname, old_new)
     old, new = old_new
     stack = _parse_blueprint!([], :top, bp, fieldname, old, new)
     _blueprint_gen(stack)
