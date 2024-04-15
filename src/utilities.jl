@@ -148,11 +148,11 @@ function _blueprint_gen(stack)
             if haskey(blueprints, k) && kw[k] isa AbstractBlueprint
                 # Consume this blueprint
                 #delete!(kw, k)
-                println(kw[k])
+                #println(kw[k])
                 kw[k] = blueprints[k]
-                println("pouet 2")
+                #println("pouet 2")
                 delete!(blueprints, k)
-                println("pouet 3")
+                #println("pouet 3")
             end
         end
         # Generates a new blueprint from kw and store it for the further iterations

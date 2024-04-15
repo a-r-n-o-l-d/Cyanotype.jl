@@ -2,6 +2,7 @@
 wrappers: Flux to Cyanotype
 modules: high level modules
 To do :
+    - supprimer le surtypage ça fout le bordel
     - fonction replace(bp, :fieldname, old => new)
     x downsampler : avg et maxpool concat pw
     - tool to check if AbstractConvBp (and fields) is volumetric

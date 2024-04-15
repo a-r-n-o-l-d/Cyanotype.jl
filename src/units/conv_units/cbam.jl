@@ -4,10 +4,10 @@
     """
 
     """
-    struct ChannelAttentionBp{GA<:Function} <: AbstractConvBp
-        reduction::Int
-        shared_mlp::DoubleConvBp{PointwiseConvBp,PointwiseConvBp}
-        gate_activation::GA
+    struct ChannelAttentionBp <: AbstractConvBp #{GA<:Function}
+        reduction#::Int
+        shared_mlp#::DoubleConvBp{PointwiseConvBp,PointwiseConvBp}
+        gate_activation#::GA
     end
 end
 

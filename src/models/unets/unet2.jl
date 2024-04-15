@@ -67,6 +67,7 @@ function make(bp::UNet2Bp)
         head = make(bp.head, bp.ksize(1), last(dec_chs))
         top = make(bp.top, last(dec_chs))
         Chain(flatten_layers(stem)..., unet..., flatten_layers(head)..., flatten_layers(top)...)
+        unet
     end
 end
 
