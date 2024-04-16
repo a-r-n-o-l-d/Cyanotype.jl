@@ -30,7 +30,7 @@ function make(bp::ChannelAttentionBp, channels::Int)
         Chain(
             Parallel(
                 +,
-                Chain(GlobalMeanPool(), shared_mlp), #AdaptiveMeanPool(genk(1, bp.volume)),
+                Chain(GlobalMeanPool(), shared_mlp),
                 Chain(GlobalMaxPool(), shared_mlp)
             ),
             bp.gate_activation
@@ -48,7 +48,7 @@ make(bp::ChannelAttentionBp, channels::Pair) = make(bp, first(channels))
 
     """
     struct SpatialAttentionBp <: AbstractConvBp
-        convolution::ConvBp
+        convolution#::ConvBp
     end
 end
 

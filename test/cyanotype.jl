@@ -64,7 +64,7 @@ end
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
     incididunt.
     """
-    struct BatchNormTest{N <: CyFloat}
+    struct BatchNormTest
         """activation function for BatchNorm layer"""
         activation
     end

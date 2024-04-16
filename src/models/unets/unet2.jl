@@ -5,25 +5,25 @@
     """
 
     """
-    struct UNet2Bp{K<:Function,
+    struct UNet2Bp#={K<:Function,
                    S<:Union{Nothing,AbstractConvBp},
                    P<:Function,
                    H<:Union{Nothing,AbstractConvBp},
-                   T<:Union{Nothing,AbstractConvBp}} <: AbstractConvBp
-        inchannels::Int = 3
-        nlevels::Int = 4
-        basewidth::Int = 64
-        expansion::Int = 2
-        ksize::K = l -> 3
-        encoder::UEncoderBp
-        decoder::UDecoderBp
-        bridge::UBridgeBp
-        stem::S = nothing # si nothing => encoder
-        path::P = l -> nothing #  connection_path (path CBAM, convpath)
-        head::H = nothing # si nothing => decoder
-        top::T = nothing
+                   T<:Union{Nothing,AbstractConvBp}}=# <: AbstractConvBp
+        inchannels#=::Int=# = 3
+        nlevels#=::Int=# = 4
+        basewidth#=::Int=# = 64
+        expansion#=::Int=# = 2
+        ksize#=::K=# = l -> 3
+        encoder#::UEncoderBp
+        decoder#::UDecoderBp
+        bridge#::UBridgeBp
+        stem#=::S=# = nothing # si nothing => encoder
+        path#=::P=# = l -> nothing #  connection_path (path CBAM, convpath)
+        head#=::H=# = nothing # si nothing => decoder
+        top#=::T=# = nothing
         #connector = chcat
-        residual::Bool = false
+        residual#=::Bool=# = false
     end
 end
 
@@ -62,11 +62,6 @@ function make(bp::UNet2Bp)
         end
         bdg = make(bp.bridge, bp.ksize(bp.nlevels + 1), _bridge_channels(bp))
         unet = uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
-        enc_chs, dec_chs = _level_channels(bp, 1)
-        stem = make(bp.stem, bp.ksize(1), bp.inchannels => first(enc_chs))
-        head = make(bp.head, bp.ksize(1), last(dec_chs))
-        top = make(bp.top, last(dec_chs))
-        Chain(flatten_layers(stem)..., unet..., flatten_layers(head)..., flatten_layers(top)...)
         unet
     end
 end

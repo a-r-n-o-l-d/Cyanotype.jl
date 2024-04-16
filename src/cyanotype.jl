@@ -166,7 +166,7 @@ function _cyanotype(mod, doc, kmexp, head, body, cons = true)
     # Adds fields defined by kmap
     for (fname, flarg, T, def) in eachkwargs(kmap)
         fdoc = "`$fname`: see [`$flarg`](@ref ) (default `$def`)" #Flux.$flname
-        _push_field!(fields, kwargs, fnames, fdocs, fname, T, def, fdoc)
+        _push_field!(fields, kwargs, fnames, fdocs, fname, #=T=#Any, def, fdoc)
     end
 
     # Generates the struct and its associated functions

@@ -3,8 +3,8 @@
 
     """
     struct PixelMapBp <: AbstractConvBp
-        nmaps::Int
-        projection::PointwiseConvBp
+        nmaps#::Int
+        projection#::PointwiseConvBp
     end
 end
 

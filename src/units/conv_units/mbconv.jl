@@ -3,12 +3,12 @@
 
     """
     struct MbConvBp <: AbstractConvBp
-        skip::Bool
+        skip#::Bool
         #dropout
-        expansion::ChannelExpansionConvBp
-        depthwise::DepthwiseConvBp
-        excitation::SqueezeExcitationBp
-        projection::PointwiseConvBp
+        expansion#::ChannelExpansionConvBp
+        depthwise#::DepthwiseConvBp
+        excitation#::SqueezeExcitationBp
+        projection#::PointwiseConvBp
     end
 end
 

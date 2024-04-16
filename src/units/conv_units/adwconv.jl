@@ -2,18 +2,18 @@
     """
     https://arxiv.org/pdf/2306.16103v2.pdf
     """
-    struct AxialDWConvBp{A<:Function,
+    struct AxialDWConvBp#={A<:Function,
                          N<:Union{Nothing,AbstractNormBp},
                          P<:Union{SamePad,Int},
-                         I<:Function} <: AbstractConvBp
-        @volume
-        @activation(identity)
-        stride::Int = 1
-        pad::P = SamePad()
-        dilation::Int = 1
-        init::I = glorot_uniform
-        normalization::N = BatchNormBp()
-        skip::Bool = true
+                         I<:Function}=# <: AbstractConvBp
+        @volume2
+        @activation2(identity)
+        stride#=::Int=# = 1
+        pad#=::P=# = SamePad()
+        dilation#=::Int=# = 1
+        init#=::I=# = glorot_uniform
+        normalization#=::N=# = BatchNormBp()
+        skip#=::Bool=# = true
     end
 end
 #=

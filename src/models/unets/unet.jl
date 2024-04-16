@@ -6,9 +6,9 @@ include("uchain.jl")
     """
 
     """
-    struct UEncoderBp{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler}}
-        convolution::C #DoubleConvBp
-        downsampler::D #nothing si stride=2
+    struct UEncoderBp#={C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler}}=#
+        convolution#::C #DoubleConvBp
+        downsampler#::D #nothing si stride=2
     end
 end
 
@@ -23,9 +23,9 @@ make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     """
 
     """
-    struct UDecoderBp{C<:AbstractConvBp,U<:AbstractBpUpsampler}
-        convolution::C
-        upsampler::U
+    struct UDecoderBp#={C<:AbstractConvBp,U<:AbstractBpUpsampler}=#
+        convolution#::C
+        upsampler#::U
     end
 end
 
@@ -40,10 +40,10 @@ make(bp::UDecoderBp, ksize, channels) = flatten_layers(
     """
 
     """
-    struct UBridgeBp{C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler},U<:Union{Nothing,AbstractBpUpsampler}} #,P<:BpPixelClassifierBp
-        convolution::C
-        downsampler::D #nothing si stride=2
-        upsampler::U
+    struct UBridgeBp#={C<:AbstractConvBp,D<:Union{Nothing,AbstractBpDownsampler},U<:Union{Nothing,AbstractBpUpsampler}}=# #,P<:BpPixelClassifierBp
+        convolution#::C
+        downsampler#::D #nothing si stride=2
+        upsampler#::U
     end
 end
 
@@ -59,24 +59,24 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
     """
 
     """
-    struct UNetBp{S<:Union{Nothing,AbstractConvBp},
+    struct UNetBp#={S<:Union{Nothing,AbstractConvBp},
                   P<:Union{Nothing,AbstractConvBp},
                   H<:Union{Nothing,AbstractConvBp},
-                  T<:Union{Nothing,AbstractConvBp}} <: AbstractConvBp
-        inchannels::Int = 3
-        nlevels::Int = 4
-        basewidth::Int = 64
-        expansion::Int = 2
-        ksize::Int = 3
-        encoder::UEncoderBp
-        decoder::UDecoderBp
-        bridge::UBridgeBp
-        stem::S = nothing # si nothing => encoder
-        path::P = nothing #  connection_path (path CBAM, convpath)
-        head::H = nothing # si nothing => decoder
-        top::T = nothing
+                  T<:Union{Nothing,AbstractConvBp}}=# <: AbstractConvBp
+        inchannels#=::Int=# = 3
+        nlevels#=::Int=# = 4
+        basewidth#=::Int=# = 64
+        expansion#=::Int=# = 2
+        ksize#=::Int=# = 3
+        encoder#::UEncoderBp
+        decoder#::UDecoderBp
+        bridge#::UBridgeBp
+        stem#=::S=# = nothing # si nothing => encoder
+        path#=::P=# = nothing #  connection_path (path CBAM, convpath)
+        head#=::H=# = nothing # si nothing => decoder
+        top#=::T=# = nothing
         #connector = chcat
-        residual::Bool = false
+        residual#=::Bool=# = false
     end
 end
 

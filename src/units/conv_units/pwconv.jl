@@ -2,8 +2,8 @@
     """
 
     """
-    struct PointwiseConvBp{C<:AbstractConvBp} <: AbstractConvBp
-        conv::C
+    struct PointwiseConvBp#={C<:AbstractConvBp}=# <: AbstractConvBp
+        conv#::C
     end
 end
 

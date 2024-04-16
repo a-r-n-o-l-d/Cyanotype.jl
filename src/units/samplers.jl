@@ -9,7 +9,7 @@ abstract type AbstractBpUpsampler end
     """
     struct MeanMaxDownsamplerBp <: AbstractBpDownsampler
         pw
-        wsize::Int = 2
+        wsize#=::Int=# = 2
     end
 end
 
@@ -30,7 +30,7 @@ end
     """
     struct MaxDownsamplerBp <: AbstractBpDownsampler
         @volume
-        wsize::Int = 2
+        wsize#=::Int=# = 2
     end
 end
 
@@ -43,8 +43,8 @@ end
     """
     """
     struct MeanDownsamplerBp <: AbstractBpDownsampler
-        @volume
-        wsize::Int = 2
+        @volume2
+        wsize#=::Int=# = 2
     end
 end
 
@@ -57,8 +57,8 @@ end
     """
     """
     struct NearestUpsamplerBp <: AbstractBpUpsampler
-        @volume
-        scale::Int = 2
+        @volume2
+        scale#=:Int=# = 2
     end
 end
 
@@ -71,8 +71,8 @@ end
     """
     """
     struct LinearUpsamplerBp <: AbstractBpUpsampler
-        @volume
-        scale::Int = 2
+        @volume2
+        scale#=::Int=# = 2
     end
 end
 
@@ -87,11 +87,11 @@ end
 @cyanotype begin
     """
     """
-    struct ConvTransposeUpsamplerBp{F<:Function} <: AbstractBpUpsampler
-        @volume
-        scale::Int = 2
-        bias::Bool = true
-        init::F = Flux.glorot_uniform
+    struct ConvTransposeUpsamplerBp#={F<:Function}=# <: AbstractBpUpsampler
+        @volume2
+        scale#=::Int=# = 2
+        bias#=::Bool=# = true
+        init#=::F=# = Flux.glorot_uniform
     end
 end
 # ajout kwargs (init, bias)
@@ -107,8 +107,8 @@ make(bp::ConvTransposeUpsamplerBp, channels::Int) = make(bp, channels => channel
     """
     """
     struct PixelShuffleUpsamplerBp <: AbstractBpUpsampler
-        expansion::ChannelExpansionConvBp
-        scale::Int
+        expansion#::ChannelExpansionConvBp
+        scale#::Int
     end
 end
 

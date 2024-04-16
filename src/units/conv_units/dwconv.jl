@@ -3,7 +3,7 @@
 
     """
     struct DepthwiseConvBp <: AbstractConvBp
-        conv::ConvBp
+        conv#::ConvBp
     end
 end
 

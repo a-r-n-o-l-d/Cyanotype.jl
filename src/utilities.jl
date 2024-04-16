@@ -95,6 +95,28 @@ macro activation(func)
     end)
 end
 
+macro activation2(func)
+    ref = "[`$func`](@ref $func)"
+    doc = "`activation`: activation function (default [`$func`](@ref Flux.$func))"
+    esc(
+    quote
+        """
+        $($(doc))
+        """
+        activation = $func
+    end)
+end
+
+macro volume2()
+    esc(
+    quote
+        """
+        `volume`: indicates a building process for three-dimensionnal data (default `false`)
+        """
+        volume = false
+    end)
+end
+
 ########################################################################################################################
 #                                               INTERNAL FUNCTIONS                                                     #
 ########################################################################################################################

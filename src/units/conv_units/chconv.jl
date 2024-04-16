@@ -3,8 +3,8 @@
 
     """
     struct ChannelExpansionConvBp <: AbstractConvBp
-        expansion::Int
-        conv::PointwiseConvBp
+        expansion#::Int
+        conv#::PointwiseConvBp
     end
 end
 
@@ -12,7 +12,7 @@ function ChannelExpansionConvBp(; kwargs...)
     kw = Dict(kwargs...)
     expansion = kw[:expansion]
     delete!(kw, :expansion)
-    conv =  PointwiseConvBp(; kw...)
+    conv = PointwiseConvBp(; kw...)
     ChannelExpansionConvBp(expansion, conv)
 end
 

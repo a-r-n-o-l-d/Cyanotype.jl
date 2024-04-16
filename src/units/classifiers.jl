@@ -4,8 +4,8 @@ abstract type AbstractBpClassifier end #<: AbstractConvBp
     """
     """
     struct PixelClassifierBp <: AbstractConvBp
-        nclasses::Int
-        convolution::PointwiseConvBp
+        nclasses#::Int
+        convolution#::PointwiseConvBp
     end
 end
 
@@ -35,8 +35,8 @@ end
     """
     """
     struct LabelClassifierBp
-        nclasses::Int
-        dropout::Real = 0.0
+        nclasses#::Int
+        dropout#=::Real=# = 0.0
     end
 end
 

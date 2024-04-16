@@ -7,7 +7,7 @@ const CyPad = Union{SamePad,Int}
             flfunc = :Conv,
             fnames = (:stride, :pad,      :dilation, :groups, :init), #stride, bias
             flargs = (:stride, :pad,      :dilation, :groups, :init),
-            ftypes = (Int,     :P,        Int,       Int,     :I),
+            ftypes = (Int,     Union{SamePad,Int},        Int,       Int,     Any),
             defval = (1,       SamePad(), 1,         1,       glorot_uniform)
     )
 
@@ -17,9 +17,9 @@ const CyPad = Union{SamePad,Int}
     A cyanotype blueprint describing a convolutionnal module or layer depending om the value
     of `normalization` argument.
     """
-    struct ConvBp{N<:Union{Nothing,AbstractNormBp},A,I<:Function,P<:Union{SamePad,Int}} <: AbstractConvBp #<:Function
-        @volume
-        @activation(identity)
+    struct ConvBp{N<:Union{Nothing,AbstractNormBp}#=,A,I<:Function,P<:Union{SamePad,Int}=#} <: AbstractConvBp #<:Function
+        volume = false
+        activation = identity
         """
         `normalization`:
         """
@@ -27,19 +27,19 @@ const CyPad = Union{SamePad,Int}
         """
         `depthwise`:
         """
-        depthwise::Bool = false
+        depthwise#=::Bool=# = false
         """
         `revnorm`:
         """
-        revnorm::Bool = false
+        revnorm#=::Bool=# = false
         """
         `preactivation`:
         """
-        preactivation::Bool = false
+        preactivation#=::Bool=# = false
         """
         `bias`:
         """
-        bias::Bool = normalization isa Nothing
+        bias#=::Bool=# = normalization isa Nothing
     end
 end
 
