@@ -1,7 +1,7 @@
 name = "Cyanotype"
 uuid = "6fe0f2d7-ba93-4b02-94b8-1591d52b152a"
 authors = ["Arnold"]
-version = "0.1.2"
+version = "0.1.3"
 
 [deps]
 ChainRules = "082447d4-558c-5d27-93f4-14fc19e9eca2"
