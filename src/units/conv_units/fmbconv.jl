@@ -11,12 +11,12 @@
     end
 end
 
-FusedMbConvBp(; stride, ch_expansion, skip=(stride == 1), activation=relu,
-norm=BatchNormBp(activation=activation),
+FusedMbConvBp(; stride, ch_expansion, skip=(stride == 1), act=relu,
+norm=BatchNormBp(act=act),
                          kwargs...) = FusedMbConvBp(
     skip,
     ch_expansion,
-    ConvBp(; stride=stride, activation=activation, norm=norm, kwargs...),
+    ConvBp(; stride=stride, act=act, norm=norm, kwargs...),
     ch_expansion <= 1 ? nothing : PointwiseConvBp(; norm=norm, kwargs...)
 )
 

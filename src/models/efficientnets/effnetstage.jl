@@ -20,7 +20,7 @@ EfficientNetStageBp(::Type{FusedMbConvBp}, ksize, out_chs, expansion, stride,
     convolution=FusedMbConvBp(
         stride=stride,
         ch_expansion=expansion,
-        activation=swish
+        act=swish
     )
 )
 
@@ -35,7 +35,7 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expansion, stride, nrepeat
         stride=stride,
         ch_expansion=expansion,
         se_reduction=reduction,
-        activation=swish
+        act=swish
     )
 )
 

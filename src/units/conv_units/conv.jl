@@ -47,7 +47,7 @@ function make(bp::ConvBp{<:Nothing}, ksize, channels::Pair)
     if bp.depthwise
         kw[:groups] = first(channels)
     end
-    Conv(k, channels, bp.activation; kw...) #|> flatten_layers
+    Conv(k, channels, bp.act; kw...) #|> flatten_layers
 end
 
 # Convolutionnal unit: convolutionnal layer & norm layer
@@ -55,7 +55,7 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
     k = genk(ksize, bp.vol)
     layers = []
     in_chs, out_chs = channels
-    activation = bp.activation
+    act = bp.act
     kw = kwargs(bp)
     if bp.depthwise
         kw[:groups] = in_chs
@@ -64,13 +64,13 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
     if bp.revnorm
         # Activation before convolution ?
         if bp.preactivation
-            act_n = activation
+            act_n = act
             act_c = identity
         else
             act_n = identity
-            act_c = activation
+            act_c = act
         end
-        norm = cyanotype(bp.norm; activation = act_n)
+        norm = cyanotype(bp.norm; act = act_n)
         conv = Conv(k, channels, act_c; bias = bp.bias, kw...)
         push!(layers, make(norm, in_chs), conv)
     # Convolution first
@@ -78,11 +78,11 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
         # Activation before convolution ?
         if bp.preactivation
             act_n = identity
-            push!(layers, activation)
+            push!(layers, act)
         else
-            act_n = activation
+            act_n = act
         end
-        norm = cyanotype(bp.norm; activation = act_n)
+        norm = cyanotype(bp.norm; act = act_n)
         conv = Conv(k, channels; bias = bp.bias, kw...)
         push!(layers, conv, make(norm, out_chs))
     end

@@ -30,7 +30,7 @@ function make(bp::AxialDWConvBp, ksize, channels::Pair)
         push!(layers, conv((1, ksize)))
     end
     norm = bp.norm isa Nothing ? identity : BatchNorm(in_chs)
-    pwc = PointwiseConvBp(activation=bp.activation, pad=bp.pad, init=bp.init)
+    pwc = PointwiseConvBp(act=bp.act, pad=bp.pad, init=bp.init)
     axial = bp.skip ? SkipConnection(Parallel(+, layers...), +) : Parallel(+, layers...)
     flatten_layers(
         [

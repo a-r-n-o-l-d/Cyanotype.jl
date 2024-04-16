@@ -44,19 +44,19 @@ test_mapping(bnmap1, :bnmap1)
 # Checks the documentation generation
 @cyano struct EmptyTest <: AbstractCyanotype
     """Activation function."""
-    activation
+    act
 end
 @test !isempty(eval(macroexpand(@__MODULE__, :(@doc $EmptyTest))))
 
 # Checks the correctness of parametric type declaration
 @cyano struct EmptyTest2{F <: Function}
-    activation::F = relu
+    act::F = relu
 end
-@test EmptyTest2().activation isa Function
+@test EmptyTest2().act isa Function
 
 # Checks the default inheritance from AbstractCyanotype
 @cyano struct EmptyTest3
-    activation = relu
+    act = relu
 end
 @test EmptyTest3() isa AbstractCyanotype
 
@@ -67,7 +67,7 @@ end
 # A more complete use case: wraps Flux.BatchNorm
 @cyano bnmap1 struct BatchNormTest{N <: Union{Float16, Float32, Float64}} <: AbstractCyanotype
     """activation function for BatchNorm layer"""
-    activation = relu
+    act = relu
 end
 
 # Checks the correctness of fields declaration

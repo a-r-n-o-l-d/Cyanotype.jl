@@ -20,7 +20,7 @@ conv2 = DoubleConvBp(; convolution1 = hac, convolution2 = ConvBp());
 pprint(conv2)
 
 # Now let change all activation functions from relu to leakyrelu
-spread(conv2; activation = leakyrelu) |> pprint
+spread(conv2; act = leakyrelu) |> pprint
 ```
 """
 function spread(bp; kwargs...)
@@ -75,13 +75,13 @@ end
 
 macro activation(func)
     ref = "[`$func`](@ref $func)"
-    doc = "`activation`: activation function (default [`$func`](@ref Flux.$func))"
+    doc = "`act`: activation function (default [`$func`](@ref Flux.$func))"
     esc(
         quote
             """
             $($(doc))
             """
-            activation = $func
+            act = $func
         end
     )
 end

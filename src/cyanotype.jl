@@ -58,8 +58,8 @@ using Cyanotype
     A FooBlueprint as example.
     \"""
     struct FooBlueprint{A<:Function}
-        \"""`activation`: activation function\"""
-        activation::A = relu
+        \"""`act`: activation function\"""
+        act::A = relu
     end
 end
 ```

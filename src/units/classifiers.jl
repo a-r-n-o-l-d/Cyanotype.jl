@@ -9,8 +9,8 @@ abstract type AbstractBpClassifier end #<: AbstractConvBp
     end
 end
 
-function PixelClassifierBp(; nclasses, activation=nclasses > 2 ? identity : sigmoid, kwargs...)
-    conv = PointwiseConvBp(; activation=activation, kwargs...)
+function PixelClassifierBp(; nclasses, act=nclasses > 2 ? identity : sigmoid, kwargs...)
+    conv = PointwiseConvBp(; act=act, kwargs...)
     PixelClassifierBp(nclasses, conv)
 end
 

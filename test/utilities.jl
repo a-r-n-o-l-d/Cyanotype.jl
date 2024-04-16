@@ -1,3 +1,3 @@
 hac = HybridAtrouConvBp()
-hac2 = spread(hac; activation=leakyrelu)
-@test hac2.conv.norm.activation == leakyrelu
+hac2 = spread(hac; act=leakyrelu)
+@test hac2.conv.norm.act == leakyrelu

@@ -24,7 +24,7 @@ f = Foo(; a=42, b=84, c=666, d=1.618, vol=false)
     """
     struct Foo1
         """Activation function."""
-        activation
+        act
     end
 end
 @test !isempty(eval(macroexpand(@__MODULE__, :(@doc $Foo1))))
@@ -35,10 +35,10 @@ end
     Bla-bla
     """
     struct Foo2{F <: Function}
-        activation::F = relu
+        act::F = relu
     end
 end
-@test Foo2().activation isa Function
+@test Foo2().act isa Function
 
 # Check the default inheritance from AbstractBlueprint
 @cyanotype begin
@@ -65,7 +65,7 @@ end
     """
     struct BatchNormTest
         """activation function for BatchNorm layer"""
-        activation
+        act
     end
 end
 
@@ -75,14 +75,14 @@ for f in (:init_bias, :init_scale, :affine, :track_stats, :epsilon, :momentum)
 end
 
 # Check cyanotype function
-bn = BatchNormTest(; activation = relu)
+bn = BatchNormTest(; act = relu)
 bn = cyanotype(bn; affine = false, epsilon = 0f0)
 @test bn.affine == false
 @test bn.epsilon == 0f0
 
 # Check kwargs function
-bn = BatchNormTest(; activation = relu)
+bn = BatchNormTest(; act = relu)
 @test haskey(Cyanotype.kwargs(bn), :initβ)
 @test haskey(Cyanotype.kwargs(bn), :initγ)
 @test haskey(Cyanotype.kwargs(bn), :ϵ)
-@test !haskey(Cyanotype.kwargs(bn), :activation)
+@test !haskey(Cyanotype.kwargs(bn), :act)

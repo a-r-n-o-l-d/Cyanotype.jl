@@ -17,7 +17,7 @@ abstract type AbstractNormBp <: AbstractBlueprint end
 end
 
 function make(bp::BatchNormBp, channels)
-    [BatchNorm(channels, bp.activation; kwargs(bp)...)]
+    [BatchNorm(channels, bp.act; kwargs(bp)...)]
 end
 
 @cyanotype begin
@@ -46,7 +46,7 @@ end
 end
 
 function make(bp::GroupNormBp, channels)
-    [GroupNorm(channels, bp.groups, bp.activation; kwargs(bp)...)]
+    [GroupNorm(channels, bp.groups, bp.act; kwargs(bp)...)]
 end
 
 @cyanotype begin
@@ -69,5 +69,5 @@ end
 end
 
 function make(bp::InstanceNormBp, channels)
-    [InstanceNorm(channels, bp.activation; kwargs(bp)...)]
+    [InstanceNorm(channels, bp.act; kwargs(bp)...)]
 end

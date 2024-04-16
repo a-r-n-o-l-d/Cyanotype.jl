@@ -12,25 +12,23 @@
     end
 end
 
-# MbConvBp(expkwargs, depkwargs, exckwargs, projkwargs; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
-# norm=BatchNormBp(activation=activation))
-function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
-                  norm=BatchNormBp(activation=activation), kwargs...)
+function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, act=relu,
+                  norm=BatchNormBp(act=act), kwargs...)
 
     stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `MbConvBp`")
 
-    expansion = ChannelExpansionConvBp(; activation=activation,
+    expansion = ChannelExpansionConvBp(; act=act,
                                          expansion=ch_expansion,
                                          norm=norm,
                                          kwargs...)
 
-    depthwise = DepthwiseConvBp(; activation=activation,
+    depthwise = DepthwiseConvBp(; act=act,
                                   stride=stride,
                                   norm=norm,
                                   kwargs...)
 
-    excitation = SqueezeExcitationBp(; activation=activation,
-                                       gate_activation=hardσ,
+    excitation = SqueezeExcitationBp(; act=act,
+                                       gate_act=hardσ,
                                        reduction=se_reduction * ch_expansion,
                                        kwargs...)
 

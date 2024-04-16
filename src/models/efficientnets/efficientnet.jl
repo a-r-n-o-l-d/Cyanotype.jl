@@ -32,13 +32,13 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
     end
 
     stem = if include_stem
-        ConvBp(; activation=swish, norm=BatchNormBp(), stride=2)
+        ConvBp(; act=swish, norm=BatchNormBp(), stride=2)
     else
         nothing
     end
 
     head = if include_head
-        ConvBp(; activation=swish, norm=BatchNormBp())
+        ConvBp(; act=swish, norm=BatchNormBp())
     else
         nothing
     end

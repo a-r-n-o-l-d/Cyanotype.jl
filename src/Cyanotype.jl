@@ -6,7 +6,7 @@ To do :
     - fonction replace(bp, :fieldname, old => new)
     x downsampler : avg et maxpool concat pw
     - tool to check if AbstractConvBp (and fields) is volumetric
-    x spread avec type de blueprint sur lesquel on change une options : spread(bp, ConvBp; activation=swish)
+    x spread avec type de blueprint sur lesquel on change une options : spread(bp, ConvBp; act=swish)
     - docs, docs, docs, docs
     x renommage : mettre Bp en fin de nom
     x showing blueprints is ugly => GarishPrint or custom dump ? cyanotype _show_func

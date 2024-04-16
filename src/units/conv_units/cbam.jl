@@ -7,19 +7,19 @@
     struct ChannelAttentionBp <: AbstractConvBp
         reduction
         shared_mlp
-        gate_activation
+        gate_act
     end
 end
 
-function ChannelAttentionBp(; reduction, activation=relu, gate_activation=sigmoid, 
+function ChannelAttentionBp(; reduction, act=relu, gate_act=sigmoid, 
                             kwargs...)
     ChannelAttentionBp(
         reduction,
         DoubleConvBp(
-            conv1=PointwiseConvBp(; activation=activation, kwargs...),
-            conv2=PointwiseConvBp(; activation=identity, kwargs...)
+            conv1=PointwiseConvBp(; act=act, kwargs...),
+            conv2=PointwiseConvBp(; act=identity, kwargs...)
         ),
-        gate_activation
+        gate_act
     )
 end
 
@@ -33,7 +33,7 @@ function make(bp::ChannelAttentionBp, channels::Int)
                 Chain(GlobalMeanPool(), shared_mlp),
                 Chain(GlobalMaxPool(), shared_mlp)
             ),
-            bp.gate_activation
+            bp.gate_act
         ),
         .*
     )
@@ -50,8 +50,8 @@ make(bp::ChannelAttentionBp, channels::Pair) = make(bp, first(channels))
     end
 end
 
-SpatialAttentionBp(; gate_activation=sigmoid, kwargs...) = SpatialAttentionBp(
-    ConvBp(; activation=gate_activation, kwargs...)
+SpatialAttentionBp(; gate_act=sigmoid, kwargs...) = SpatialAttentionBp(
+    ConvBp(; act=gate_act, kwargs...)
 )
 
 make(bp::SpatialAttentionBp, ksize) = SkipConnection(
@@ -72,15 +72,15 @@ make(bp::SpatialAttentionBp, ksize) = SkipConnection(
     end
 end
 
-CBAMBp(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = CBAMBp(
+CBAMBp(; reduction, act=relu, gate_act=sigmoid, kwargs...) = CBAMBp(
     ChannelAttentionBp(;
         reduction=reduction,
-        activation=activation,
-        gate_activation=gate_activation,
+        act=act,
+        gate_act=gate_act,
         kwargs...
     ),
     SpatialAttentionBp(;
-        gate_activation=gate_activation,
+        gate_act=gate_act,
         kwargs...
     )
 )
@@ -101,11 +101,11 @@ make(bp::CBAMBp, ksize, channels) = flatten_layers(
     end
 end
 
-ResCBAMBp(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = ResCBAMBp(
+ResCBAMBp(; reduction, act=relu, gate_act=sigmoid, kwargs...) = ResCBAMBp(
     CBAMBp(;
         reduction=reduction,
-        activation=activation,
-        gate_activation=gate_activation,
+        act=act,
+        gate_act=gate_act,
         kwargs...
     )
 )

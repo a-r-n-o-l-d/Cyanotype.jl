@@ -10,17 +10,17 @@
     end
 end
 
-function SqueezeExcitationBp(; vol=false, activation=relu, gate_activation=sigmoid, reduction, kwargs...)
+function SqueezeExcitationBp(; vol=false, act=relu, gate_act=sigmoid, reduction, kwargs...)
     # Verifier que kwargs ne contient pas activation
-    haskey(kwargs, :activation) && error(
+    haskey(kwargs, :act) && error(
         """
         pouet pouet
         """)
     SqueezeExcitationBp(
         vol,
         reduction,
-        PointwiseConvBp(; activation=activation, kwargs...),
-        PointwiseConvBp(; activation=gate_activation, kwargs...)
+        PointwiseConvBp(; act=act, kwargs...),
+        PointwiseConvBp(; act=gate_act, kwargs...)
     )
 end
 
