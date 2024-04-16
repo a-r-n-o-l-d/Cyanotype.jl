@@ -56,7 +56,6 @@ end
         flfunc = :BatchNorm,
         fnames = (:init_bias, :init_scale, :affine, :track_stats, :epsilon, :momentum),
         flargs = (:initβ,     :initγ,      :affine, :track_stats, :ϵ,       :momentum),
-        ftypes = (Any,        Any,         Bool,     Bool,        :N,       :N),
         defval = (Flux.zeros32, Flux.ones32, true, true, 1f-5, 0.1f0)
     )
 

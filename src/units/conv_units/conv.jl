@@ -5,9 +5,8 @@ const CyPad = Union{SamePad,Int}
 @cyanotype begin
     KwargsMapping(
             flfunc = :Conv,
-            fnames = (:stride, :pad,      :dilation, :groups, :init), #stride, bias
+            fnames = (:stride, :pad,      :dilation, :groups, :init),
             flargs = (:stride, :pad,      :dilation, :groups, :init),
-            ftypes = (Int,     Union{SamePad,Int},        Int,       Int,     Any),
             defval = (1,       SamePad(), 1,         1,       glorot_uniform)
     )
 
@@ -17,7 +16,7 @@ const CyPad = Union{SamePad,Int}
     A cyanotype blueprint describing a convolutionnal module or layer depending om the value
     of `normalization` argument.
     """
-    struct ConvBp{N<:Union{Nothing,AbstractNormBp}} <: AbstractConvBp #<:Function
+    struct ConvBp{N<:Union{Nothing,AbstractNormBp}} <: AbstractConvBp
         volume = false
         activation = identity
         """

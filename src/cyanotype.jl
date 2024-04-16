@@ -14,20 +14,18 @@ cyanotype
 Defines a mapping of keyword arguments to interface a blueprint with a `Flux` function or
 constructor.
 """
-struct KwargsMapping{N,T1<:NTuple{N,Symbol},T2<:NTuple{N,Union{Type,Symbol}},
-                     T3<:NTuple{N,Any}}
-    flfunc::Symbol
-    fnames::T1
-    flargs::T1
-    ftypes::T2
-    defval::T3
+struct KwargsMapping
+    flfunc
+    fnames
+    flargs
+    defval
 end
 
-function KwargsMapping(; flfunc = :notflux, fnames = (), flargs = (), ftypes = (), defval = ())
-    KwargsMapping(flfunc, fnames, flargs, ftypes, defval)
+function KwargsMapping(; flfunc=:notflux, fnames=(), flargs=(), defval=())
+    KwargsMapping(flfunc, fnames, flargs, defval)
 end
 
-@inline eachkwargs(km::KwargsMapping) = zip(km.fnames, km.flargs, km.ftypes, km.defval)
+@inline eachkwargs(km::KwargsMapping) = zip(km.fnames, km.flargs, km.defval)
 
 """
     @cyanotype(expr)
@@ -164,9 +162,9 @@ function _cyanotype(mod, doc, kmexp, head, body, cons = true)
     end
 
     # Adds fields defined by kmap
-    for (fname, flarg, T, def) in eachkwargs(kmap)
-        fdoc = "`$fname`: see [`$flarg`](@ref ) (default `$def`)" #Flux.$flname
-        _push_field!(fields, kwargs, fnames, fdocs, fname, #=T=#Any, def, fdoc)
+    for (fname, flarg, def) in eachkwargs(kmap) #, T
+        fdoc = "`$fname`: see [`$flarg`](@ref ) (default `$def`)"
+        _push_field!(fields, kwargs, fnames, fdocs, fname, Any, def, fdoc)
     end
 
     # Generates the struct and its associated functions
