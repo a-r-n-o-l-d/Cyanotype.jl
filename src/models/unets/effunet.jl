@@ -2,10 +2,10 @@
     """
 
     """
-    struct EfficientUNetBp#={H<:Union{Nothing,AbstractConvBp}}=#
-        backbone#::EfficientNetBp
-        decoder#::UDecoderBp
-        head#=::H=# = nothing
+    struct EfficientUNetBp
+        backbone
+        decoder
+        head = nothing
     end
 end
 

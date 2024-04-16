@@ -5,10 +5,9 @@
 
     Describes a convolutionnal module formed by two successive convolutionnal modules.
     """
-    struct DoubleConvBp#={C2<:Union{Nothing,AbstractConvBp},C1<:AbstractConvBp}=# <: AbstractConvBp
-        #@volume #enlever
-        conv1#::C1         #firstconv
-        conv2#=::C2=# = conv1 #secondconv
+    struct DoubleConvBp <: AbstractConvBp
+        conv1         #firstconv
+        conv2 = conv1 #secondconv
     end
 end
 
@@ -67,18 +66,15 @@ end
     """
     Template describing a module with N `NConvBp` repeated.
     """
-    struct NConvBp#={N,C<:NTuple{N,AbstractConvBp}}=# <: AbstractConvBp
-        convolutions#::C
-        #nrepeat::Int
+    struct NConvBp <: AbstractConvBp
+        convolutions
     end
 end
 
 function make(bp::NConvBp, ksize, channels::NTuple{3})
     layers = []
     in_chs, mid_chs, out_chs = channels
-    for (i, c) in enumerate(bp.convolutions) #_ in 1:bp.nrepeat
-        #push!(layers, make(bp.convolution, ksize, in_chs=>out_chs))
-        #in_chs = out_chs
+    for (i, c) in enumerate(bp.convolutions)
         if i == 1
             push!(layers, make(c, ksize, in_chs=>mid_chs))
         elseif i == length(bp.convolutions)

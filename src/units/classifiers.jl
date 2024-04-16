@@ -4,8 +4,8 @@ abstract type AbstractBpClassifier end #<: AbstractConvBp
     """
     """
     struct PixelClassifierBp <: AbstractConvBp
-        nclasses#::Int
-        convolution#::PointwiseConvBp
+        nclasses
+        convolution
     end
 end
 

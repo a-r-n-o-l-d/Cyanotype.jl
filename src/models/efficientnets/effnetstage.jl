@@ -2,15 +2,13 @@
     """
 
     """
-    struct EfficientNetStageBp#={C<:AbstractConvBp,
-                               R1<:Union{Nothing,Real},
-                               R2<:Union{Nothing,Real}}=# <: AbstractConvBp
-        ksize#::Int
-        outchannels#::Int
-        nrepeat#::Int
-        convolution#::C
-        widthscaling#=::R1=# = nothing
-        depthscaling#=::R2=# = nothing
+    struct EfficientNetStageBp <: AbstractConvBp
+        ksize
+        outchannels
+        nrepeat
+        convolution
+        widthscaling = nothing
+        depthscaling = nothing
     end
 end
 

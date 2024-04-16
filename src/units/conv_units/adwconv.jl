@@ -1,31 +1,19 @@
-@cyanotype begin #constructor=false
+@cyanotype begin
     """
     https://arxiv.org/pdf/2306.16103v2.pdf
     """
-    struct AxialDWConvBp#={A<:Function,
-                         N<:Union{Nothing,AbstractNormBp},
-                         P<:Union{SamePad,Int},
-                         I<:Function}=# <: AbstractConvBp
+    struct AxialDWConvBp <: AbstractConvBp
         @volume2
         @activation2(identity)
-        stride#=::Int=# = 1
-        pad#=::P=# = SamePad()
-        dilation#=::Int=# = 1
-        init#=::I=# = glorot_uniform
-        normalization#=::N=# = BatchNormBp()
-        skip#=::Bool=# = true
+        stride        = 1
+        pad           = SamePad()
+        dilation      = 1
+        init          = glorot_uniform
+        normalization = BatchNormBp()
+        skip          = true
     end
 end
-#=
-AxialDWConvBp(; volume=false, activation=identity, stride=1, pad=SamePad(), dilation=1, init=glorot_uniform) = AxialDWConvBp(
-    volume,
-    activation,
-    stride,
-    pad,
-    dilation,
-    init
-)
-=#
+
 make(bp::AxialDWConvBp, ksize, channels::Int) = make(bp, ksize, channels => channels)
 
 function make(bp::AxialDWConvBp, ksize, channels::Pair)
@@ -46,7 +34,7 @@ function make(bp::AxialDWConvBp, ksize, channels::Pair)
     axial = bp.skip ? SkipConnection(Parallel(+, layers...), +) : Parallel(+, layers...)
     flatten_layers(
         [
-            axial, #SkipConnection(Parallel(+, layers...), +),
+            axial,
             norm,
             make(pwc, in_chs => out_chs)
         ]

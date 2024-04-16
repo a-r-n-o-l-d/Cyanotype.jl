@@ -8,18 +8,14 @@ const EFFNETV2 = [:small, :medium, :large, :xlarge]
     """
 
     """
-    struct EfficientNetBp#={N,
-                          S<:Union{Nothing,AbstractConvBp},
-                          B<:NTuple{N,EfficientNetStageBp},
-                          H<:Union{Nothing,AbstractConvBp},
-                          T<:Union{Nothing,LabelClassifierBp}}=#
-        inchannels#::Int
-        stemchannels#::Int
-        headchannels#::Int
-        stem#::S
-        backbone#::B
-        head#::H
-        top#::T
+    struct EfficientNetBp
+        inchannels
+        stemchannels
+        headchannels
+        stem
+        backbone
+        head
+        top
     end
 end
 

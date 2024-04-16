@@ -5,25 +5,21 @@
     """
 
     """
-    struct UNet2Bp#={K<:Function,
-                   S<:Union{Nothing,AbstractConvBp},
-                   P<:Function,
-                   H<:Union{Nothing,AbstractConvBp},
-                   T<:Union{Nothing,AbstractConvBp}}=# <: AbstractConvBp
-        inchannels#=::Int=# = 3
-        nlevels#=::Int=# = 4
-        basewidth#=::Int=# = 64
-        expansion#=::Int=# = 2
-        ksize#=::K=# = l -> 3
-        encoder#::UEncoderBp
-        decoder#::UDecoderBp
-        bridge#::UBridgeBp
-        stem#=::S=# = nothing # si nothing => encoder
-        path#=::P=# = l -> nothing #  connection_path (path CBAM, convpath)
-        head#=::H=# = nothing # si nothing => decoder
-        top#=::T=# = nothing
+    struct UNet2Bp <: AbstractConvBp
+        inchannels = 3
+        nlevels = 4
+        basewidth = 64
+        expansion = 2
+        ksize = l -> 3
+        encoder
+        decoder
+        bridge
+        stem = nothing # si nothing => encoder
+        path = l -> nothing #  connection_path (path CBAM, convpath)
+        head = nothing # si nothing => decoder
+        top = nothing
         #connector = chcat
-        residual#=::Bool=# = false
+        residual = false
     end
 end
 

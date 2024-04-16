@@ -1,14 +1,4 @@
 abstract type AbstractNormBp <: AbstractBlueprint end
-#=
-@cyanotype begin
-    """
-    NoNormalization()
-    """
-    struct BpNoNorm{A} <: AbstractBpNorm
-        @activation(Flux.relu)
-    end
-end
-=#
 
 @cyanotype begin
     KwargsMapping(
@@ -22,8 +12,7 @@ end
     """
     Wraps a Flux.Batchnorm
     """
-    struct BatchNormBp{#=F<:CyFloat,A<:Function,I1<:Function,
-                              I2<:Function=#} <: AbstractNormBp
+    struct BatchNormBp <: AbstractNormBp
         @activation2(identity)
     end
 end
@@ -48,13 +37,13 @@ end
     Describes a building process for a [`Groupnorm`](@ref Flux.Groupnorm) layer.
     make(channels, bp::CyGroupNorm)
     """
-    struct GroupNormBp#={F<:CyFloat,A<:Function,I1<:Function,I2<:Function}=# <: AbstractNormBp
+    struct GroupNormBp <: AbstractNormBp
         @activation2(identity)
         """
         `groups`: the number of groups passed to [`GroupNorm`](@ref Flux.GroupNorm)
         constructor
         """
-        groups::Int
+        groups
     end
 end
 
@@ -77,7 +66,7 @@ end
     Describes a building process for a [`InstanceNorm`](@ref) layer.
     make(channels, bp::CyInstanceNorm)
     """
-    struct InstanceNormBp#={F<:CyFloat,A<:Function,I1<:Function,I2<:Function}=# <: AbstractNormBp
+    struct InstanceNormBp <: AbstractNormBp
         @activation2(identity)
     end
 end

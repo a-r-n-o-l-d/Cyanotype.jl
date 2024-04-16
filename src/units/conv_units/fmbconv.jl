@@ -2,12 +2,12 @@
     """
 
     """
-    struct FusedMbConvBp#={P<:Union{Nothing,PointwiseConvBp}}=# <: AbstractConvBp
-        skip#::Bool
-        ch_expansion#::Int
-        convolution#::ConvBp
+    struct FusedMbConvBp <: AbstractConvBp
+        skip
+        ch_expansion
+        convolution
         #dropout
-        projection#::P # nothing if ch_expansion == 1
+        projection
     end
 end
 

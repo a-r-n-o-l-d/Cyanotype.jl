@@ -3,8 +3,8 @@
 
     """
     struct ChannelExpansionConvBp <: AbstractConvBp
-        expansion#::Int
-        conv#::PointwiseConvBp
+        expansion
+        conv
     end
 end
 

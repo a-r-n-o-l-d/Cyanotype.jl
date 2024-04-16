@@ -87,11 +87,11 @@ end
 @cyanotype begin
     """
     """
-    struct ConvTransposeUpsamplerBp#={F<:Function}=# <: AbstractBpUpsampler
+    struct ConvTransposeUpsamplerBp <: AbstractBpUpsampler
         @volume2
-        scale#=::Int=# = 2
-        bias#=::Bool=# = true
-        init#=::F=# = Flux.glorot_uniform
+        scale = 2
+        bias = true
+        init = Flux.glorot_uniform
     end
 end
 # ajout kwargs (init, bias)
@@ -107,8 +107,8 @@ make(bp::ConvTransposeUpsamplerBp, channels::Int) = make(bp, channels => channel
     """
     """
     struct PixelShuffleUpsamplerBp <: AbstractBpUpsampler
-        expansion#::ChannelExpansionConvBp
-        scale#::Int
+        expansion
+        scale
     end
 end
 

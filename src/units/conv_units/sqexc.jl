@@ -4,10 +4,9 @@
     """
     struct SqueezeExcitationBp
         @volume
-        reduction#::Int
-        #convolution::DoubleConvBp{PointwiseConvBp,PointwiseConvBp}
-        conv1#::PointwiseConvBp
-        conv2#::PointwiseConvBp
+        reduction
+        conv1
+        conv2
     end
 end
 

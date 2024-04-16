@@ -4,10 +4,10 @@
     """
 
     """
-    struct ChannelAttentionBp <: AbstractConvBp #{GA<:Function}
-        reduction#::Int
-        shared_mlp#::DoubleConvBp{PointwiseConvBp,PointwiseConvBp}
-        gate_activation#::GA
+    struct ChannelAttentionBp <: AbstractConvBp
+        reduction
+        shared_mlp
+        gate_activation
     end
 end
 
@@ -41,14 +41,12 @@ end
 
 make(bp::ChannelAttentionBp, channels::Pair) = make(bp, first(channels))
 
-#make(bp::ChannelAttentionBp, channels::Int) = make(bp,  channels => channels)
-
 @cyanotype constructor=false begin
     """
 
     """
     struct SpatialAttentionBp <: AbstractConvBp
-        convolution#::ConvBp
+        convolution
     end
 end
 
@@ -69,8 +67,8 @@ make(bp::SpatialAttentionBp, ksize) = SkipConnection(
 
     """
     struct CBAMBp <: AbstractConvBp
-        channel_gate::ChannelAttentionBp
-        spatial_gate::SpatialAttentionBp
+        channel_gate
+        spatial_gate
     end
 end
 
@@ -99,7 +97,7 @@ make(bp::CBAMBp, ksize, channels) = flatten_layers(
 
     """
     struct ResCBAMBp <: Cyanotype.AbstractConvBp
-        cbam::CBAMBp
+        cbam
     end
 end
 
