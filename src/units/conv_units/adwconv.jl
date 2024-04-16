@@ -3,8 +3,8 @@
     https://arxiv.org/pdf/2306.16103v2.pdf
     """
     struct AxialDWConvBp <: AbstractConvBp
-        @volume2
-        @activation2(identity)
+        @volume
+        @activation(identity)
         stride        = 1
         pad           = SamePad()
         dilation      = 1

@@ -43,8 +43,8 @@ end
     """
     """
     struct MeanDownsamplerBp <: AbstractBpDownsampler
-        @volume2
-        wsize#=::Int=# = 2
+        @volume
+        wsize = 2
     end
 end
 
@@ -57,7 +57,7 @@ end
     """
     """
     struct NearestUpsamplerBp <: AbstractBpUpsampler
-        @volume2
+        @volume
         scale#=:Int=# = 2
     end
 end
@@ -71,7 +71,7 @@ end
     """
     """
     struct LinearUpsamplerBp <: AbstractBpUpsampler
-        @volume2
+        @volume
         scale#=::Int=# = 2
     end
 end
@@ -88,7 +88,7 @@ end
     """
     """
     struct ConvTransposeUpsamplerBp <: AbstractBpUpsampler
-        @volume2
+        @volume
         scale = 2
         bias = true
         init = Flux.glorot_uniform

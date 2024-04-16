@@ -1,7 +1,3 @@
-
-
-const CyPad = Union{SamePad,Int}
-
 @cyanotype begin
     KwargsMapping(
             flfunc = :Conv,

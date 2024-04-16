@@ -73,48 +73,28 @@ end
 
 @inline genk(k, vol) = vol ? (k, k, k) : (k, k)
 
-macro volume()
-    esc(
-    quote
-        """
-        `volume`: indicates a building process for three-dimensionnal data (default `false`)
-        """
-        volume::Bool = false
-    end)
-end
-
 macro activation(func)
     ref = "[`$func`](@ref $func)"
     doc = "`activation`: activation function (default [`$func`](@ref Flux.$func))"
     esc(
-    quote
-        """
-        $($(doc))
-        """
-        activation::A = $func
-    end)
+        quote
+            """
+            $($(doc))
+            """
+            activation = $func
+        end
+    )
 end
 
-macro activation2(func)
-    ref = "[`$func`](@ref $func)"
-    doc = "`activation`: activation function (default [`$func`](@ref Flux.$func))"
+macro volume()
     esc(
-    quote
-        """
-        $($(doc))
-        """
-        activation = $func
-    end)
-end
-
-macro volume2()
-    esc(
-    quote
-        """
-        `volume`: indicates a building process for three-dimensionnal data (default `false`)
-        """
-        volume = false
-    end)
+        quote
+            """
+            `volume`: indicates a building process for three-dimensionnal data (default `false`)
+            """
+            volume = false
+        end
+    )
 end
 
 ########################################################################################################################
@@ -169,12 +149,8 @@ function _blueprint_gen(stack)
             # Modify kw if k is in blueprints dictionnary and is actually an AbstractBlueprint
             if haskey(blueprints, k) && kw[k] isa AbstractBlueprint
                 # Consume this blueprint
-                #delete!(kw, k)
-                #println(kw[k])
                 kw[k] = blueprints[k]
-                #println("pouet 2")
                 delete!(blueprints, k)
-                #println("pouet 3")
             end
         end
         # Generates a new blueprint from kw and store it for the further iterations

@@ -5,14 +5,14 @@ abstract type AbstractNormBp <: AbstractBlueprint end
             flfunc = :BatchNorm,
             fnames = (:initshift, :initscale, :affine, :trackstats,  :epsilon, :momentum),
             flargs = (:initβ,     :initγ,     :affine, :track_stats, :eps,     :momentum),
-            defval  = (zeros32,   ones32,     true,    true,         1f-5,     0.1f0)
+            defval = (zeros32,    ones32,     true,    true,         1f-5,     0.1f0)
         )
 
     """
     Wraps a Flux.Batchnorm
     """
     struct BatchNormBp <: AbstractNormBp
-        @activation2(identity)
+        @activation(identity)
     end
 end
 
@@ -26,7 +26,7 @@ end
             flfunc = :GroupNorm,
             fnames = (:initshift, :initscale, :affine, :epsilon, :momentum),
             flargs = (:initβ,     :initγ,     :affine, :eps,     :momentum),
-            defval  = (zeros32,   ones32,      true,   1f-5,     0.1f0)
+            defval = (zeros32,    ones32,      true,   1f-5,     0.1f0)
         )
 
     """
@@ -36,7 +36,7 @@ end
     make(channels, bp::CyGroupNorm)
     """
     struct GroupNormBp <: AbstractNormBp
-        @activation2(identity)
+        @activation(identity)
         """
         `groups`: the number of groups passed to [`GroupNorm`](@ref Flux.GroupNorm)
         constructor
@@ -54,7 +54,7 @@ end
             flfunc = :InstanceNorm,
             fnames = (:initshift, :initscale, :affine, :trackstats,  :epsilon, :momentum),
             flargs = (:initβ,     :initγ,     :affine, :track_stats, :eps,     :momentum),
-            defval  = (zeros32,    ones32,    false,   false,        1f-5,     0.1f0)
+            defval = (zeros32,    ones32,     false,   false,        1f-5,     0.1f0)
         )
 
     """
@@ -64,7 +64,7 @@ end
     make(channels, bp::CyInstanceNorm)
     """
     struct InstanceNormBp <: AbstractNormBp
-        @activation2(identity)
+        @activation(identity)
     end
 end
 

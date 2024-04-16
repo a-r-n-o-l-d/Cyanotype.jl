@@ -11,8 +11,8 @@
     end
 end
 
-function ChannelAttentionBp(; reduction, activation=relu, gate_activation=sigmoid,
-                              kwargs...)
+function ChannelAttentionBp(; reduction, activation=relu, gate_activation=sigmoid, 
+                            kwargs...)
     ChannelAttentionBp(
         reduction,
         DoubleConvBp(
@@ -110,4 +110,6 @@ ResCBAMBp(; reduction, activation=relu, gate_activation=sigmoid, kwargs...) = Re
     )
 )
 
-make(bp::ResCBAMBp, ksize, channels) = SkipConnection(Chain(make(bp.cbam, ksize, channels)...), +)
+make(bp::ResCBAMBp, ksize, channels) = SkipConnection(
+    Chain(make(bp.cbam, ksize, channels)...), +
+)
