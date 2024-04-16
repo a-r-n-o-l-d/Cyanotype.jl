@@ -11,10 +11,10 @@
     end
 end
 
-HybridAtrouConvBp(; dilation_rates=(1, 2, 3),
-                    normalization=BatchNormBp(), kwargs...) = HybridAtrouConvBp(
+HybridAtrouConvBp(; dilation_rates=(1, 2, 3), norm=BatchNormBp(), 
+                  kwargs...) = HybridAtrouConvBp(
     dilation_rates,
-    ConvBp(; normalization=normalization, kwargs...)
+    ConvBp(; norm=norm, kwargs...)
 )
 
 function make(bp::HybridAtrouConvBp, ksize, channels::Pair)

@@ -10,15 +10,15 @@
     ConvBp(; kwargs...)
 
     A cyanotype blueprint describing a convolutionnal module or layer depending om the value
-    of `normalization` argument.
+    of `norm` argument.
     """
     struct ConvBp{N<:Union{Nothing,AbstractNormBp}} <: AbstractConvBp
-        volume = false
-        activation = identity
+        @volume
+        @activation(identity)
         """
-        `normalization`:
+        `norm`:
         """
-        normalization::N = nothing
+        norm::N = nothing
         """
         `depthwise`:
         """
@@ -34,7 +34,7 @@
         """
         `bias`:
         """
-        bias = normalization isa Nothing
+        bias = norm isa Nothing
     end
 end
 
@@ -42,7 +42,7 @@ make(bp::ConvBp, ksize, channels::Int) = make(bp, ksize, channels => channels)
 
 # Regular convolutionnal layer
 function make(bp::ConvBp{<:Nothing}, ksize, channels::Pair)
-    k = genk(ksize, bp.volume)
+    k = genk(ksize, bp.vol)
     kw = kwargs(bp)
     if bp.depthwise
         kw[:groups] = first(channels)
@@ -50,9 +50,9 @@ function make(bp::ConvBp{<:Nothing}, ksize, channels::Pair)
     Conv(k, channels, bp.activation; kw...) #|> flatten_layers
 end
 
-# Convolutionnal unit: convolutionnal layer & normalization layer
+# Convolutionnal unit: convolutionnal layer & norm layer
 function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
-    k = genk(ksize, bp.volume)
+    k = genk(ksize, bp.vol)
     layers = []
     in_chs, out_chs = channels
     activation = bp.activation
@@ -70,7 +70,7 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
             act_n = identity
             act_c = activation
         end
-        norm = cyanotype(bp.normalization; activation = act_n)
+        norm = cyanotype(bp.norm; activation = act_n)
         conv = Conv(k, channels, act_c; bias = bp.bias, kw...)
         push!(layers, make(norm, in_chs), conv)
     # Convolution first
@@ -82,7 +82,7 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
         else
             act_n = activation
         end
-        norm = cyanotype(bp.normalization; activation = act_n)
+        norm = cyanotype(bp.norm; activation = act_n)
         conv = Conv(k, channels; bias = bp.bias, kw...)
         push!(layers, conv, make(norm, out_chs))
     end

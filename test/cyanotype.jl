@@ -14,7 +14,7 @@
 end
 
 # Check the correctness of kwargs constructor
-f = Foo(; a=42, b=84, c=666, d=1.618, volume=false)
+f = Foo(; a=42, b=84, c=666, d=1.618, vol=false)
 @test f.a == 42
 
 # Check the documentation generation

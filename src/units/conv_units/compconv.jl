@@ -15,8 +15,8 @@ end
 # channels::NTuple{3} in_chs=>mid_chs mid_chs=>out_chs
 function make(bp::DoubleConvBp, ksize, channels::NTuple{3})
     # convolution1.vol == convolution2.vol || error("")
-    #c1 = spread(bp.conv1; vol = bp.volume) #cyanotype(bp.convolution1; vol = bp.volume)
-    #c2 = spread(bp.conv2; vol = bp.volume) #cyanotype(bp.convolution2; vol = bp.volume)
+    #c1 = spread(bp.conv1; vol = bp.vol) #cyanotype(bp.convolution1; vol = bp.vol)
+    #c2 = spread(bp.conv2; vol = bp.vol) #cyanotype(bp.convolution2; vol = bp.vol)
     in_chs, mid_chs, out_chs = channels
     if isnothing(bp.conv2)
         flatten_layers(make(bp.conv1, ksize, in_chs=>out_chs))

@@ -15,7 +15,7 @@ function PixelClassifierBp(; nclasses, activation=nclasses > 2 ? identity : sigm
 end
 
 function make(bp::PixelClassifierBp, channels)
-    k = genk(1, bp.convolution.conv.volume)
+    k = genk(1, bp.convolution.conv.vol)
     layers = []
     if bp.nclasses > 2
         push!(layers, make(bp.convolution, channels => bp.nclasses))

@@ -16,7 +16,7 @@ end
 MeanMaxDownsamplerBp(; wsize=2, kwargs...) = MeanMaxDownsamplerBp(PointwiseConvBp(; kwargs...), wsize)
 
 function make(bp::MeanMaxDownsamplerBp, channels)
-    ws = genk(bp.wsize, bp.pw.volume)
+    ws = genk(bp.wsize, bp.pw.vol)
     flatten_layers(
         [
             Parallel(chcat, MeanPool(ws), MaxPool(ws)),
@@ -35,7 +35,7 @@ end
 end
 
 function make(bp::MaxDownsamplerBp)
-    ws = genk(bp.wsize, bp.volume)
+    ws = genk(bp.wsize, bp.vol)
     MaxPool(ws)
 end
 
@@ -49,7 +49,7 @@ end
 end
 
 function make(bp::MeanDownsamplerBp)
-    ws = genk(bp.wsize, bp.volume)
+    ws = genk(bp.wsize, bp.vol)
     MeanPool(ws)
 end
 
@@ -58,12 +58,12 @@ end
     """
     struct NearestUpsamplerBp <: AbstractBpUpsampler
         @volume
-        scale#=:Int=# = 2
+        scale = 2
     end
 end
 
 function make(bp::NearestUpsamplerBp)
-    sc = genk(bp.scale, bp.volume)
+    sc = genk(bp.scale, bp.vol)
     Upsample(:nearest; scale = sc)
 end
 
@@ -77,7 +77,7 @@ end
 end
 
 function make(bp::LinearUpsamplerBp)
-    if bp.volume
+    if bp.vol
         Upsample(:trilinear; scale = (bp.scale, bp.scale, bp.scale))
     else
         Upsample(:bilinear; scale = (bp.scale, bp.scale))
@@ -97,7 +97,7 @@ end
 # ajout kwargs (init, bias)
 
 function make(bp::ConvTransposeUpsamplerBp, channels::Pair)
-    k = genk(bp.scale, bp.volume)
+    k = genk(bp.scale, bp.vol)
     ConvTranspose(k, channels, stride=bp.scale)
 end
 
@@ -112,9 +112,9 @@ make(bp::ConvTransposeUpsamplerBp, channels::Int) = make(bp, channels => channel
     end
 end
 
-function PixelShuffleUpsamplerBp(; scale=2, volume=false, normalization=BatchNormBp(), kwargs...)
-    e = volume ? scale^3 : scale^2
-    expansion = ChannelExpansionConvBp(; expansion=e, volume=volume, normalization=normalization, kwargs...)
+function PixelShuffleUpsamplerBp(; scale=2, vol=false, norm=BatchNormBp(), kwargs...)
+    e = vol ? scale^3 : scale^2
+    expansion = ChannelExpansionConvBp(; expansion=e, vol=vol, norm=norm, kwargs...)
     PixelShuffleUpsamplerBp(expansion, scale)
 end
 

@@ -12,12 +12,12 @@
 end
 
 FusedMbConvBp(; stride, ch_expansion, skip=(stride == 1), activation=relu,
-                         normalization=BatchNormBp(activation=activation),
+norm=BatchNormBp(activation=activation),
                          kwargs...) = FusedMbConvBp(
     skip,
     ch_expansion,
-    ConvBp(; stride=stride, activation=activation, normalization=normalization, kwargs...),
-    ch_expansion <= 1 ? nothing : PointwiseConvBp(; normalization=normalization, kwargs...)
+    ConvBp(; stride=stride, activation=activation, norm=norm, kwargs...),
+    ch_expansion <= 1 ? nothing : PointwiseConvBp(; norm=norm, kwargs...)
 )
 
 function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
@@ -40,7 +40,7 @@ function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
         if iszero(dropout)
             SkipConnection(Chain(layers...), +)
         else
-            d = bp.projection.conv.volume ? 5 : 4
+            d = bp.projection.conv.vol ? 5 : 4
             Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
         end
     else

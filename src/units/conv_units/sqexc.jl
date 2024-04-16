@@ -10,14 +10,14 @@
     end
 end
 
-function SqueezeExcitationBp(; volume =false, activation=relu, gate_activation=sigmoid, reduction, kwargs...)
+function SqueezeExcitationBp(; vol=false, activation=relu, gate_activation=sigmoid, reduction, kwargs...)
     # Verifier que kwargs ne contient pas activation
     haskey(kwargs, :activation) && error(
         """
         pouet pouet
         """)
     SqueezeExcitationBp(
-        volume,
+        vol,
         reduction,
         PointwiseConvBp(; activation=activation, kwargs...),
         PointwiseConvBp(; activation=gate_activation, kwargs...)
@@ -31,7 +31,7 @@ function make(bp::SqueezeExcitationBp, channels)
         mid_chs = max(1, channels ÷ bp.reduction)
         layers = flatten_layers(
             [
-                GlobalMeanPool(), #AdaptiveMeanPool(genk(1, bp.volume)), #
+                GlobalMeanPool(), #AdaptiveMeanPool(genk(1, bp.vol)), #
                 make(bp.conv1, channels => mid_chs),
                 make(bp.conv2, mid_chs => channels)
             ]

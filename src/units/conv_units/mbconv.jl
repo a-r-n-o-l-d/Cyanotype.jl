@@ -13,20 +13,20 @@
 end
 
 # MbConvBp(expkwargs, depkwargs, exckwargs, projkwargs; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
-# normalization=BatchNormBp(activation=activation))
+# norm=BatchNormBp(activation=activation))
 function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, activation=relu,
-                  normalization=BatchNormBp(activation=activation), kwargs...)
+                  norm=BatchNormBp(activation=activation), kwargs...)
 
     stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `MbConvBp`")
 
     expansion = ChannelExpansionConvBp(; activation=activation,
                                          expansion=ch_expansion,
-                                         normalization=normalization,
+                                         norm=norm,
                                          kwargs...)
 
     depthwise = DepthwiseConvBp(; activation=activation,
                                   stride=stride,
-                                  normalization=normalization,
+                                  norm=norm,
                                   kwargs...)
 
     excitation = SqueezeExcitationBp(; activation=activation,
@@ -34,7 +34,7 @@ function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, activa
                                        reduction=se_reduction * ch_expansion,
                                        kwargs...)
 
-    projection = PointwiseConvBp(; normalization=normalization, kwargs...)
+    projection = PointwiseConvBp(; norm=norm, kwargs...)
 
     MbConvBp(skip, expansion, depthwise, excitation, projection)
 end
@@ -61,7 +61,7 @@ function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stocha
         if iszero(dropout)
             SkipConnection(Chain(layers...), +)
         else
-            d = bp.projection.conv.volume ? 5 : 4
+            d = bp.projection.conv.vol ? 5 : 4
             Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
         end
     else

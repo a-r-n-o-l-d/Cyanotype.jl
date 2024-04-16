@@ -90,9 +90,9 @@ macro volume()
     esc(
         quote
             """
-            `volume`: indicates a building process for three-dimensionnal data (default `false`)
+            `vol`: indicates a building process for three-dimensionnal data (default `false`)
             """
-            volume = false
+            vol = false
         end
     )
 end
