@@ -11,9 +11,8 @@
     end
 end
 
-FusedMbConvBp(; stride, expn_ch, skip=(stride == 1), act=relu,
-norm=BatchNormBp(act=act),
-                         kwargs...) = FusedMbConvBp(
+FusedMbConvBp(; stride, expn_ch, skip=(stride == 1), act=relu, norm=BatchNormBp(act=act),
+              kwargs...) = FusedMbConvBp(
     skip,
     expn_ch,
     ConvBp(; stride=stride, act=act, norm=norm, kwargs...),
@@ -23,19 +22,12 @@ norm=BatchNormBp(act=act),
 function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expn_ch
-    #=if bp.skip && in_chs !== out_chs
-        error("""
-        If a 'FusedMbConvBp' have a skip connection defined, the number fo input channels and
-        output channels must be the same.
-        """)
-    end=#
     layers = flatten_layers(
         [
             make(bp.conv, ksize, in_chs => mid_chs),
             make(bp.proj, mid_chs => out_chs)
         ]
     )
-    #bp.skip && in_chs == out_chs ? SkipConnection(Chain(layers...), +) : layers
     if bp.skip && in_chs == out_chs
         if iszero(dropout)
             SkipConnection(Chain(layers...), +)
