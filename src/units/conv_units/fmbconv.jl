@@ -4,23 +4,23 @@
     """
     struct FusedMbConvBp <: AbstractConvBp
         skip
-        expn_ch
+        exch
         conv
         proj
     end
 end
 
-FusedMbConvBp(; stride, expn_ch, skip=(stride == 1), act=relu, norm=BatchNormBp(act=act),
+FusedMbConvBp(; stride, exch, skip=(stride == 1), act=relu, norm=BatchNormBp(act=act),
               kwargs...) = FusedMbConvBp(
     skip,
-    expn_ch,
+    exch,
     ConvBp(; stride=stride, act=act, norm=norm, kwargs...),
-    expn_ch <= 1 ? nothing : PointwiseConvBp(; norm=norm, kwargs...)
+    exch <= 1 ? nothing : PointwiseConvBp(; norm=norm, kwargs...)
 )
 
 function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
     in_chs, out_chs = channels
-    mid_chs = in_chs * bp.expn_ch
+    mid_chs = in_chs * bp.exch
     layers = flatten_layers(
         [
             make(bp.conv, ksize, in_chs => mid_chs),
