@@ -6,7 +6,6 @@
         skip
         expn_ch
         conv
-        #dropout
         proj
     end
 end
