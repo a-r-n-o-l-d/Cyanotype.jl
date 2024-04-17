@@ -20,17 +20,17 @@
         """
         norm::N = nothing
         """
-        `depthwise`:
+        `dw`:
         """
-        depthwise = false
+        dw = false
         """
         `revnorm`:
         """
         revnorm = false
         """
-        `preactivation`:
+        `preact`:
         """
-        preactivation = false
+        preact = false
         """
         `bias`:
         """
@@ -44,7 +44,7 @@ make(bp::ConvBp, ksize, channels::Int) = make(bp, ksize, channels => channels)
 function make(bp::ConvBp{<:Nothing}, ksize, channels::Pair)
     k = genk(ksize, bp.vol)
     kw = kwargs(bp)
-    if bp.depthwise
+    if bp.dw
         kw[:groups] = first(channels)
     end
     Conv(k, channels, bp.act; kw...) #|> flatten_layers
@@ -57,13 +57,13 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
     in_chs, out_chs = channels
     act = bp.act
     kw = kwargs(bp)
-    if bp.depthwise
+    if bp.dw
         kw[:groups] = in_chs
     end
     # Normalization first
     if bp.revnorm
         # Activation before convolution ?
-        if bp.preactivation
+        if bp.preact
             act_n = act
             act_c = identity
         else
@@ -76,7 +76,7 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
     # Convolution first
     else
         # Activation before convolution ?
-        if bp.preactivation
+        if bp.preact
             act_n = identity
             push!(layers, act)
         else

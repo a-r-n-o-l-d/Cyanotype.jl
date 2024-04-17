@@ -9,10 +9,10 @@ end
 
 function DepthwiseConvBp(; kwargs...)
     kw = Dict(kwargs...)
-    #if haskey(kw, :depthwise)
-        #kw[:depthwise] = true
+    #if haskey(kw, :dw)
+        #kw[:dw] = true
     #end
-    DepthwiseConvBp(ConvBp(; depthwise=true, kw...))
+    DepthwiseConvBp(ConvBp(; dw=true, kw...))
 end
 
 make(bp::DepthwiseConvBp, ksize, channels) = make(bp.conv, ksize, channels)
