@@ -4,7 +4,7 @@
     """
     struct EfficientNetStageBp <: AbstractConvBp
         ksize
-        outchannels
+        out_chs
         nrepeat
         conv
         widthscaling = nothing
@@ -15,7 +15,7 @@ end
 EfficientNetStageBp(::Type{FusedMbConvBp}, ksize, out_chs, expn, stride,
                     nrepeat) = EfficientNetStageBp(
     ksize=ksize,
-    outchannels=out_chs,
+    out_chs=out_chs,
     nrepeat=_nrepeats(nrepeat),
     conv=FusedMbConvBp(
         stride=stride,
@@ -27,7 +27,7 @@ EfficientNetStageBp(::Type{FusedMbConvBp}, ksize, out_chs, expn, stride,
 EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expn, stride, nrepeat,
                     reduction, wscaling=nothing, dscaling=nothing) = EfficientNetStageBp(
     ksize=ksize,
-    outchannels=_out_channels(wscaling, out_chs),
+    out_chs=_out_channels(wscaling, out_chs),
     nrepeat=_nrepeats(dscaling, nrepeat),
     widthscaling=wscaling,
     depthscaling=dscaling,
@@ -42,10 +42,10 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expn, stride, nrepeat,
 function make(bp::EfficientNetStageBp, channels::Int, dropouts=zeros(bp.nrepeat + 1))
     in_chs = _round_channels(channels)
     layers = []
-    push!(layers, make(bp.conv, bp.ksize, in_chs => bp.outchannels, dropouts[1]))
+    push!(layers, make(bp.conv, bp.ksize, in_chs => bp.out_chs, dropouts[1]))
     for d in dropouts[2:end] #_ in 1:bp.nrepeat
         conv = spread(bp.conv; stride = 1, skip=true)
-        push!(layers, make(conv, bp.ksize, bp.outchannels => bp.outchannels, d))
+        push!(layers, make(conv, bp.ksize, bp.out_chs => bp.out_chs, d))
     end
     flatten_layers(layers)
 end

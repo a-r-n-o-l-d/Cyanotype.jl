@@ -12,7 +12,7 @@ end
 function make(bp::EfficientUNetBp)
     effnet = bp.backbone
 
-    bdg_chs = effnet.backbone[end].outchannels
+    bdg_chs = effnet.backbone[end].out_chs
     get_stride(conv::MbConvBp) = conv.dwise.conv.stride
     get_stride(conv::FusedMbConvBp) = conv.conv.stride
     nlevel = 1
@@ -42,7 +42,7 @@ function make(bp::EfficientUNetBp)
             push!(decoders, dec)
             level = level + 1
         end
-        out_chs = s.outchannels
+        out_chs = s.out_chs
     end
     bridge = [pop!(encoders), make(PixelShuffleUpsamplerBp(), out_chs)]
     uchain(

@@ -55,7 +55,7 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
         wsc, _ = _effnetv1_scaling(config)
         _round_channels(stemchannels * wsc)
     elseif config ∈ EFFNETV2
-        first(bb).outchannels
+        first(bb).out_chs
     end
 
     EfficientNetBp(inchannels, stem_chs, headchannels, stem, bb, head, top)
@@ -76,7 +76,7 @@ function make(bp::EfficientNetBp) #dropout
     for s in bp.backbone
         dps = dropouts[block_idx:block_idx + s.nrepeat]
         push!(layers, Chain(make(s, out_chs, dps))...)
-        out_chs = s.outchannels
+        out_chs = s.out_chs
         block_idx = block_idx + s.nrepeat + 1
     end
     backbone = Chain(flatten_layers(layers)...)
