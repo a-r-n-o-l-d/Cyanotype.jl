@@ -7,7 +7,7 @@ norms = [
         ]
 #dwise, revs = pres = [true false]
 for n in norms, r in [true false], p in [true false], d in [true false]
-    c = cyanotype(conv; norm=n, preact=p, revnorm=r, dwise=d)
+    c = cyanotype(conv; norm=n, preact=p, rvnorm=r, dwise=d)
     layers = flatten_layers(make(c, 3, 8 => 16))
     m = Chain(layers...)
     @test Flux.outputsize(m, (32, 32, 8, 16)) == (32, 32, 16, 16)
@@ -47,13 +47,13 @@ bp = PointwiseConvBp(act=swish, init=Flux.glorot_normal)
 model = Chain(make(bp, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
-bp = ChannelExpansionConvBp(expansion=2)
+bp = ChannelExpansionConvBp(expn=2)
 model = Chain(make(bp, 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 8, 16)
-bp = ChannelExpansionConvBp(expansion=2, norm=BatchNormBp())
+bp = ChannelExpansionConvBp(expn=2, norm=BatchNormBp())
 model = Chain(make(bp, 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 8, 16)
-bp = ChannelExpansionConvBp(expansion=1, norm=BatchNormBp())
+bp = ChannelExpansionConvBp(expn=1, norm=BatchNormBp())
 @test make(bp, 4) == identity
 
 bp = DepthwiseConvBp()
@@ -66,11 +66,11 @@ bp = DepthwiseConvBp(norm=BatchNormBp(), dwise=false, init=Flux.glorot_normal)
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 
-bp = MbConvBp(stride=2, ch_expansion=6, se_reduction=4)
+bp = MbConvBp(stride=2, ch_expn=6, se_reduction=4)
 model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (16, 16, 4, 16)
 
-bp = MbConvBp(stride=1, ch_expansion=6, se_reduction=4, init=Flux.glorot_normal)
+bp = MbConvBp(stride=1, ch_expn=6, se_reduction=4, init=Flux.glorot_normal)
 model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 4, 16)
 

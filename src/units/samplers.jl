@@ -107,17 +107,17 @@ make(bp::ConvTransposeUpsamplerBp, channels::Int) = make(bp, channels => channel
     """
     """
     struct PixelShuffleUpsamplerBp <: AbstractBpUpsampler
-        expansion
+        expn
         scale
     end
 end
 
 function PixelShuffleUpsamplerBp(; scale=2, vol=false, norm=BatchNormBp(), kwargs...)
     e = vol ? scale^3 : scale^2
-    expansion = ChannelExpansionConvBp(; expansion=e, vol=vol, norm=norm, kwargs...)
-    PixelShuffleUpsamplerBp(expansion, scale)
+    expn = ChannelExpansionConvBp(; expn=e, vol=vol, norm=norm, kwargs...)
+    PixelShuffleUpsamplerBp(expn, scale)
 end
 
 function make(bp::PixelShuffleUpsamplerBp, channels)
-    [make(bp.expansion, channels), PixelShuffle(bp.scale)] |> flatten_layers
+    [make(bp.expn, channels), PixelShuffle(bp.scale)] |> flatten_layers
 end

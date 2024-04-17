@@ -24,9 +24,9 @@
         """
         dwise = false
         """
-        `revnorm`:
+        `rvnorm`:
         """
-        revnorm = false
+        rvnorm = false
         """
         `preact`:
         """
@@ -61,7 +61,7 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
         kw[:groups] = in_chs
     end
     # Normalization first
-    if bp.revnorm
+    if bp.rvnorm
         # Activation before convolution ?
         if bp.preact
             act_n = act

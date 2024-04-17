@@ -5,20 +5,20 @@
     struct MbConvBp <: AbstractConvBp
         skip
         #dropout
-        expansion
+        expn
         dwise
         excitation
         projection
     end
 end
 
-function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, act=relu,
+function MbConvBp(; stride, ch_expn, se_reduction, skip=stride == 1, act=relu,
                   norm=BatchNormBp(act=act), kwargs...)
 
     stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `MbConvBp`")
 
-    expansion = ChannelExpansionConvBp(; act=act,
-                                         expansion=ch_expansion,
+    expn = ChannelExpansionConvBp(; act=act,
+    expn=ch_expn,
                                          norm=norm,
                                          kwargs...)
 
@@ -29,18 +29,18 @@ function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, act=re
 
     excitation = SqueezeExcitationBp(; act=act,
                                        gate_act=hardσ,
-                                       reduction=se_reduction * ch_expansion,
+                                       reduction=se_reduction * ch_expn,
                                        kwargs...)
 
     projection = PointwiseConvBp(; norm=norm, kwargs...)
 
-    MbConvBp(skip, expansion, dwise, excitation, projection)
+    MbConvBp(skip, expn, dwise, excitation, projection)
 end
 
 #function make(bp::MbConvBp, ksize, channels, dropout=0.0)
 function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stochastic depth
     in_chs, out_chs = channels
-    mid_chs = in_chs * bp.expansion.expansion
+    mid_chs = in_chs * bp.expn.expn
     #=if bp.skip && in_chs !== out_chs
         error("""
         If a 'MbConvBp' have a skip connection defined, the number fo input channels and
@@ -49,7 +49,7 @@ function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stocha
     end=#
     layers = flatten_layers(
         [
-            make(bp.expansion, in_chs),
+            make(bp.expn, in_chs),
             make(bp.dwise, ksize, mid_chs),
             make(bp.excitation, mid_chs),
             make(bp.projection, mid_chs => out_chs)
@@ -74,10 +74,10 @@ end
 
 function _mblayers(bp::MbConvBp, ksize, channels)
     in_chs, out_chs = channels
-    mid_chs = in_chs * bp.expansion.expansion
+    mid_chs = in_chs * bp.expn.expn
     flatten_layers(
         [
-            make(bp.expansion, in_chs),
+            make(bp.expn, in_chs),
             make(bp.dwise, ksize, mid_chs),
             make(bp.excitation, mid_chs),
             make(bp.projection, mid_chs => out_chs)

@@ -3,23 +3,23 @@
 
     """
     struct ChannelExpansionConvBp <: AbstractConvBp
-        expansion
+        expn
         conv
     end
 end
 
 function ChannelExpansionConvBp(; kwargs...)
     kw = Dict(kwargs...)
-    expansion = kw[:expansion]
-    delete!(kw, :expansion)
+    expn = kw[:expn]
+    delete!(kw, :expn)
     conv = PointwiseConvBp(; kw...)
-    ChannelExpansionConvBp(expansion, conv)
+    ChannelExpansionConvBp(expn, conv)
 end
 
 function make(bp::ChannelExpansionConvBp, channels)
-    if bp.expansion <= 1
+    if bp.expn <= 1
         identity
     else
-        make(bp.conv, channels => channels * bp.expansion)
+        make(bp.conv, channels => channels * bp.expn)
     end
 end

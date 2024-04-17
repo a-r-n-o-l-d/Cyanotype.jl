@@ -1,6 +1,6 @@
 include("uchain.jl")
 
-# error with expansion > 2: bridge channels are wrong
+# error with expn > 2: bridge channels are wrong
 
 @cyanotype begin
     """
@@ -63,7 +63,7 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
         inchannels = 3
         nlevels = 4
         basewidth = 64
-        expansion = 2
+        expn = 2
         ksize = 3
         encoder
         decoder
@@ -141,8 +141,8 @@ _make(bp::MeanMaxDownsamplerBp, ::Any) = make(bp, channels)
 # Compute encoder/decoder number of channels at a given level (lvl)
 # return two tuples one for encoder and one for decoder
 # formula :
-#  ice = expansion^(lvl - 2) * basewidth
-#  mce = expansion^(lvl - 1) * basewidth
+#  ice = expn^(lvl - 2) * basewidth
+#  mce = expn^(lvl - 1) * basewidth
 function _level_channels(bp, level)
     # encoder channels: input, middle, ouptput = (in_enc, mid_enc, out_enc)
     if level == 1
@@ -157,9 +157,9 @@ function _level_channels(bp, level)
     else
         encp, decp = _level_channels(bp, level - 1)
         _, _, in_enc = encp
-        mid_enc = out_enc = bp.expansion * in_enc
+        mid_enc = out_enc = bp.expn * in_enc
         in_dec = 2 * out_enc
-        mid_dec = in_dec ÷ bp.expansion
+        mid_dec = in_dec ÷ bp.expn
         out_dec = bp.decoder.upsampler isa ConvTransposeUpsamplerBp ? mid_dec : mid_dec ÷ 2
     end
     (in_enc, mid_enc, out_enc), (in_dec, mid_dec, out_dec)
@@ -172,10 +172,10 @@ function _level_channels(bp, level)
             in_enc = bp.basewidth
         end
     else
-        in_enc = bp.expansion^(level - 2) * bp.basewidth
+        in_enc = bp.expn^(level - 2) * bp.basewidth
     end
-    #in_enc = (level == 1) ? bp.inchannels : bp.expansion^(level - 2) * bp.basewidth
-    mid_enc = out_enc = bp.expansion^(level - 1) * bp.basewidth
+    #in_enc = (level == 1) ? bp.inchannels : bp.expn^(level - 2) * bp.basewidth
+    mid_enc = out_enc = bp.expn^(level - 1) * bp.basewidth
     # decoder channels: input, middle, ouptput = (icd, mcd, ocd)
     in_dec, mid_dec = 2 * out_enc, out_enc
     if bp.decoder.upsampler isa ConvTransposeUpsamplerBp

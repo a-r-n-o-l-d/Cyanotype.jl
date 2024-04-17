@@ -9,7 +9,7 @@
         inchannels = 3
         nlevels = 4
         basewidth = 64
-        expansion = 2
+        expn = 2
         ksize = l -> 3
         encoder
         decoder
