@@ -4,10 +4,10 @@
     """
     struct PixelMapBp <: AbstractConvBp
         nmaps
-        projection
+        proj
     end
 end
 
 PixelMapBp(; nmaps, kwargs...) = PixelMapBp(nmaps, PointwiseConvBp(; kwargs...))
 
-make(bp::PixelMapBp, channels) = make(bp.projection, channels => bp.nmaps)
+make(bp::PixelMapBp, channels) = make(bp.proj, channels => bp.nmaps)

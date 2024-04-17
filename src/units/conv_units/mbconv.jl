@@ -7,8 +7,8 @@
         #dropout
         expn
         dwise
-        excitation
-        projection
+        excn
+        proj
     end
 end
 
@@ -27,14 +27,14 @@ function MbConvBp(; stride, ch_expn, se_reduction, skip=stride == 1, act=relu,
                                   norm=norm,
                                   kwargs...)
 
-    excitation = SqueezeExcitationBp(; act=act,
+    excn = SqueezeExcitationBp(; act=act,
                                        gate_act=hardσ,
                                        reduction=se_reduction * ch_expn,
                                        kwargs...)
 
-    projection = PointwiseConvBp(; norm=norm, kwargs...)
+    proj = PointwiseConvBp(; norm=norm, kwargs...)
 
-    MbConvBp(skip, expn, dwise, excitation, projection)
+    MbConvBp(skip, expn, dwise, excn, proj)
 end
 
 #function make(bp::MbConvBp, ksize, channels, dropout=0.0)
@@ -51,15 +51,15 @@ function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stocha
         [
             make(bp.expn, in_chs),
             make(bp.dwise, ksize, mid_chs),
-            make(bp.excitation, mid_chs),
-            make(bp.projection, mid_chs => out_chs)
+            make(bp.excn, mid_chs),
+            make(bp.proj, mid_chs => out_chs)
         ]
     )
     if bp.skip && in_chs == out_chs
         if iszero(dropout)
             SkipConnection(Chain(layers...), +)
         else
-            d = bp.projection.conv.vol ? 5 : 4
+            d = bp.proj.conv.vol ? 5 : 4
             Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
         end
     else
@@ -79,8 +79,8 @@ function _mblayers(bp::MbConvBp, ksize, channels)
         [
             make(bp.expn, in_chs),
             make(bp.dwise, ksize, mid_chs),
-            make(bp.excitation, mid_chs),
-            make(bp.projection, mid_chs => out_chs)
+            make(bp.excn, mid_chs),
+            make(bp.proj, mid_chs => out_chs)
         ]
     )
 end

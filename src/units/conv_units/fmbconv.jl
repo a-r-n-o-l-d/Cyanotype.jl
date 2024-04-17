@@ -4,25 +4,25 @@
     """
     struct FusedMbConvBp <: AbstractConvBp
         skip
-        ch_expansion
+        expn_ch
         conv
         #dropout
-        projection
+        proj
     end
 end
 
-FusedMbConvBp(; stride, ch_expansion, skip=(stride == 1), act=relu,
+FusedMbConvBp(; stride, expn_ch, skip=(stride == 1), act=relu,
 norm=BatchNormBp(act=act),
                          kwargs...) = FusedMbConvBp(
     skip,
-    ch_expansion,
+    expn_ch,
     ConvBp(; stride=stride, act=act, norm=norm, kwargs...),
-    ch_expansion <= 1 ? nothing : PointwiseConvBp(; norm=norm, kwargs...)
+    expn_ch <= 1 ? nothing : PointwiseConvBp(; norm=norm, kwargs...)
 )
 
 function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
     in_chs, out_chs = channels
-    mid_chs = in_chs * bp.ch_expansion
+    mid_chs = in_chs * bp.expn_ch
     #=if bp.skip && in_chs !== out_chs
         error("""
         If a 'FusedMbConvBp' have a skip connection defined, the number fo input channels and
@@ -32,7 +32,7 @@ function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
     layers = flatten_layers(
         [
             make(bp.conv, ksize, in_chs => mid_chs),
-            make(bp.projection, mid_chs => out_chs)
+            make(bp.proj, mid_chs => out_chs)
         ]
     )
     #bp.skip && in_chs == out_chs ? SkipConnection(Chain(layers...), +) : layers
@@ -40,7 +40,7 @@ function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
         if iszero(dropout)
             SkipConnection(Chain(layers...), +)
         else
-            d = bp.projection.conv.vol ? 5 : 4
+            d = bp.proj.conv.vol ? 5 : 4
             Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
         end
     else
