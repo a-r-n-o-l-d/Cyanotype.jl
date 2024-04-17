@@ -41,17 +41,17 @@ end
 make(bp::ConvBp, ksize, channels::Int) = make(bp, ksize, channels => channels)
 
 # Regular convolutionnal layer
-function make(bp::ConvBp{<:Nothing}, ksize, channels::Pair)
+function make(bp::ConvBp{N}, ksize, channels::Pair) where N<:Nothing
     k = genk(ksize, bp.vol)
     kw = kwargs(bp)
     if bp.dwise
         kw[:groups] = first(channels)
     end
-    Conv(k, channels, bp.act; kw...) #|> flatten_layers
+    Conv(k, channels, bp.act; kw...)
 end
 
 # Convolutionnal unit: convolutionnal layer & norm layer
-function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
+function make(bp::ConvBp{N}, ksize, channels::Pair) where N<:AbstractNormBp
     k = genk(ksize, bp.vol)
     layers = []
     in_chs, out_chs = channels

@@ -1,26 +1,33 @@
 """
     spread(bp; kwargs...)
 
-Returns a new blueprint with `kwargs` spreaded over all fields of `bp`. This function allows
-to modify all nested cyanotypes at once.
+Create a new blueprint with `kwargs` spreaded over all fields of `bp`. This function allows
+to modify all nested blueprint at once.
 
+# Example
 ```julia
-# Nice printing of large objects
-using GarishPrint
+julia> # Create a blueprint for a Hybrid A-trou Convolution unit. By default activation functions
+       # are `identity`.
 
-# Create a blueprint for a Hybrid A-trou Convolution module
-hac = HybridAtrouConvBp();
-# By default activation functions are relu
-pprint(hac)
+julia> hac = HybridAtrouConvBp();
 
-# Create a blueprint for a double convolution module with the second convolution as a usual
-# convolutionnal layer
-conv2 = DoubleConvBp(; convolution1 = hac, convolution2 = ConvBp());
-# By default activation functions are relu
-pprint(conv2)
+julia> hac.conv.act |> println
+identity
 
-# Now let change all activation functions from relu to leakyrelu
-spread(conv2; act = leakyrelu) |> pprint
+julia> # Create a blueprint for a double convolution unit a the second convolution as a usual
+       # convolutionnal layer. By default activation function is `identity`.
+
+julia> conv = DoubleConvBp(; conv1 = hac, conv2 = ConvBp());
+
+julia> # Now let change all activation functions from relu to leakyrelu
+
+julia> bp = spread(conv; act = leakyrelu);
+
+julia> bp.conv1.conv.act |> println
+leakyrelu
+
+julia> bp.conv2.act |> println
+leakyrelu
 ```
 """
 function spread(bp; kwargs...)
@@ -28,7 +35,39 @@ function spread(bp; kwargs...)
     _blueprint_gen(stack)
 end
 
-function Base.replace(bp, fieldname, old_new)
+"""
+    spread(bp, fieldname, old => new)
+
+Create a new blueprint from `bp` for the given `fieldname`, and replace each occurence of
+`old` with `new`. This function allows to modify all nested blueprints at once.
+
+# Example
+```julia
+julia> # Create a blueprint for a Hybrid A-trou Convolution unit. By default activation functions
+       # are identity.
+
+julia> hac = HybridAtrouConvBp();
+
+julia> hac.conv.act |> println
+identity
+
+julia> # Create a blueprint for a double convolution unit with a second convolution as a usual
+       # convolutionnal layer with `relu` as activation.
+
+julia> conv = DoubleConvBp(; conv1 = hac, conv2 = ConvBp(act = relu));
+
+julia> # Now let change all activation functions from relu to leakyrelu
+
+julia> bp = spread(conv, :act, identity => leakyrelu);
+
+julia> bp.conv1.conv.act |> println
+leakyrelu
+
+julia> bp.conv2.act |> println
+relu
+```
+"""
+function spread(bp, fieldname, old_new)
     old, new = old_new
     stack = _parse_blueprint!([], :top, bp, fieldname, old, new)
     _blueprint_gen(stack)
@@ -37,9 +76,10 @@ end
 """
     chcat(x...)
 
-Concatenates the image data along the dimension corresponding to the channels. Image data
+Concatenate the image data along the dimension corresponding to the channels. Image data
 should be stored in WHCN order (width, height, channels, batch) or WHDCN (width, height,
-depth, channels, batch) in 3D context. Channels are assumed to be the penultimate dimension.
+depth, channels, batch) in a three-dimentional context. Channels are assumed to be the
+penultimate dimension.
 
 # Example
 ```julia
@@ -53,18 +93,85 @@ julia> chcat(x1, x2) |> size
 """
 chcat(x...) = cat(x...; dims = ndims(x[1]) - 1)
 
+"""
+    chsoftmax(x)
+
+Apply a softmax function along channel dimension. This function is useful for pixel
+classification (semantic segmentation).
+
+# Example
+```julia
+julia> x = rand(2, 2, 3, 1);
+
+julia> sum(chsoftmax(x), dims=3)
+2×2×1×1 Array{Float64, 4}:
+[:, :, 1, 1] =
+ 1.0  1.0
+ 1.0  1.0
+```
+See also [`PixelClassifierBp`](@ref).
+"""
 chsoftmax(x) = softmax(x; dims = ndims(x) - 1)
 
 ChainRules.@non_differentiable chsoftmax(x)
 
+"""
+    chmeanpool(x)
+
+Pools all channels with the mean function.
+
+# Example
+```julia
+julia> x = rand(2, 2, 3, 1);
+
+julia> chmeanpool(x)
+2×2×1×1 Array{Float64, 4}:
+[:, :, 1, 1] =
+ 0.64925   0.242134
+ 0.153542  0.312039
+ ```
+"""
 chmeanpool(x) = mean(x; dims = ndims(x) - 1)
 
 ChainRules.@non_differentiable chmeanpool(x)
 
+"""
+    chmaxpool(x)
+
+Pools all channels with the maximum function.
+
+# Example
+```julia
+julia> x = rand(2, 2, 3, 1);
+
+julia> Cyanotype.chmaxpool(x)
+2×2×1×1 Array{Float64, 4}:
+[:, :, 1, 1] =
+ 0.930081  0.648555
+ 0.759567  0.803717
+```
+"""
 chmaxpool(x) = maximum(x; dims = ndims(x) - 1)
 
 ChainRules.@non_differentiable chmaxpool(x)
 
+"""
+    flatten_layers(layers...)
+
+Flatten nested Vector/Tuple/Chain into a single Vector. If any layers contains identity
+function it is skipped.
+
+# Example
+```julia
+julia> flatten_layers(["a",("b","c",["d","e",identity])])
+5-element Vector{Any}:
+ "a"
+ "b"
+ "c"
+ "d"
+ "e"
+```
+"""
 function flatten_layers(layers...)
     result = []
     _flatten_layers!(result, layers)
@@ -74,8 +181,7 @@ end
 @inline genk(k, vol) = vol ? (k, k, k) : (k, k)
 
 macro activation(func)
-    ref = "[`$func`](@ref $func)"
-    doc = "`act`: activation function (default [`$func`](@ref Flux.$func))"
+    doc = "`act`: activation function (default [`$func`](@ref))"
     esc(
         quote
             """
@@ -90,7 +196,8 @@ macro volume()
     esc(
         quote
             """
-            `vol`: indicates a building process for three-dimensionnal data (default `false`)
+            `vol`: indicates a building process for three-dimensionnal data (default
+             `false`)
             """
             vol = false
         end
