@@ -4,14 +4,13 @@
     """
     struct EfficientUNetBp
         bbone
-        decoder
+        dec
         head = nothing
     end
 end
 
 function make(bp::EfficientUNetBp)
     effnet = bp.bbone
-
     bdg_chs = effnet.bbone[end].out_chs
     get_stride(conv::MbConvBp) = conv.dwise.conv.stride
     get_stride(conv::FusedMbConvBp) = conv.conv.stride
@@ -35,7 +34,7 @@ function make(bp::EfficientUNetBp)
             push!(last(encoders), stage)
         else
             push!(encoders, Any[stage])
-            dec = make(bp.decoder, 3, dec_in_chs(level) => dec_out_chs(level))
+            dec = make(bp.dec, 3, dec_in_chs(level) => dec_out_chs(level))
             if level == 1
                 push!(dec, make(bp.head, dec_out_chs(level)))
             end
