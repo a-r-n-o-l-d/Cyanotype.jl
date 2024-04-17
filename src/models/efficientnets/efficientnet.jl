@@ -19,11 +19,11 @@ const EFFNETV2 = [:small, :medium, :large, :xlarge]
     end
 end
 
-function EfficientNetBp(config; in_chs=3, st_chs=32, hd_chs=1280, nclasses=1000,
-                        include_stem=true, include_top=true, include_head=include_top) #activation
+function EfficientNetBp(config; in_chs=3, st_chs=32, hd_chs=1280, ncls=1000, stem=true, 
+                        top=true, head=top)
     # Sanity check
-     _check_effnet_config(config)
-    if include_top && !include_head
+    _check_effnet_config(config)
+    if top && !head
         error(
             """
             You must set 'include_head' to true if you want to include top layers.
@@ -31,20 +31,20 @@ function EfficientNetBp(config; in_chs=3, st_chs=32, hd_chs=1280, nclasses=1000,
         )
     end
 
-    stem = if include_stem
+    st = if stem
         ConvBp(; act=swish, norm=BatchNormBp(), stride=2)
     else
         nothing
     end
 
-    head = if include_head
+    hd = if head
         ConvBp(; act=swish, norm=BatchNormBp())
     else
         nothing
     end
 
-    top = if include_top
-        LabelClassifierBp(nclasses=nclasses)
+    tp = if top
+        LabelClassifierBp(nclasses=ncls)
     else
         nothing
     end
@@ -58,11 +58,10 @@ function EfficientNetBp(config; in_chs=3, st_chs=32, hd_chs=1280, nclasses=1000,
         first(bb).out_chs
     end
 
-    EfficientNetBp(in_chs, stem_chs, hd_chs, stem, bb, head, top)
+    EfficientNetBp(in_chs, stem_chs, hd_chs, st, bb, hd, tp)
 end
 
 function make(bp::EfficientNetBp) #dropout
-    #
     drop_prob = 0.2
     block_repeats = 0
     for s in bp.bbone
