@@ -14,7 +14,7 @@ end
 
 make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     [
-        _make(bp.down, channels), #_make(bp.down, channels),
+        _make(bp.down, channels),
         make(bp.conv, ksize, channels)
     ]
 )
@@ -61,16 +61,16 @@ make(bp::UBridgeBp, ksize, channels) = flatten_layers(
     """
     struct UNetBp <: AbstractConvBp
         in_chs = 3
-        nlevels = 4
-        basewidth = 64
+        nlvl = 4
+        bwidth = 64
         expn = 2
         ksize = 3
-        encoder
-        decoder
-        bridge
-        stem = nothing # si nothing => encoder
-        path = nothing #  connection_path (path CBAM, convpath)
-        head = nothing # si nothing => decoder
+        enc
+        dec
+        bdg
+        stem = nothing
+        path = nothing
+        head = nothing
         top = nothing
         #connector = chcat
         residual = false
@@ -81,7 +81,7 @@ function make(bp::UNetBp)
     # Build encoders and decoders for each level
     if bp.residual
         enc, dec, pth = [], [], []
-        for l ∈ 1:bp.nlevels
+        for l ∈ 1:bp.nlvl
             enclvl, declvl = _level_encodec2(bp, bp.ksize, l)
             push!.((enc, dec), (enclvl, declvl))
             if !isnothing(bp.path)
@@ -91,8 +91,8 @@ function make(bp::UNetBp)
                 push!(pth, bp.path)
             end
         end
-        bdg = make(bp.bridge, bp.ksize, _bridge_channels(bp))
-        unet = uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
+        bdg = make(bp.bdg, bp.ksize, _bridge_channels(bp))
+        unet = uchain(encoders=enc, decoders=dec, bdg=bdg, paths=pth)
         enc_chs, dec_chs = _level_channels(bp, 1)
         stem = make(bp.stem, bp.ksize, bp.in_chs => first(enc_chs))
         head = make(bp.head, bp.ksize, last(dec_chs))
@@ -100,7 +100,7 @@ function make(bp::UNetBp)
         Chain(flatten_layers(stem)..., SkipConnection(unet, +), flatten_layers(head)..., flatten_layers(top)...)
     else
         enc, dec, pth = [], [], []
-        for l ∈ 1:bp.nlevels
+        for l ∈ 1:bp.nlvl
             enclvl, declvl = _level_encodec(bp, bp.ksize, l)
             push!.((enc, dec), (enclvl, declvl))
             if !isnothing(bp.path)
@@ -110,7 +110,7 @@ function make(bp::UNetBp)
                 push!(pth, bp.path)
             end
         end
-        bdg = make(bp.bridge, bp.ksize, _bridge_channels(bp))
+        bdg = make(bp.bdg, bp.ksize, _bridge_channels(bp))
         uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
     end
 end
@@ -141,26 +141,26 @@ _make(bp::MeanMaxDownsamplerBp, ::Any) = make(bp, channels)
 # Compute encoder/decoder number of channels at a given level (lvl)
 # return two tuples one for encoder and one for decoder
 # formula :
-#  ice = expn^(lvl - 2) * basewidth
-#  mce = expn^(lvl - 1) * basewidth
+#  ice = expn^(lvl - 2) * bwidth
+#  mce = expn^(lvl - 1) * bwidth
 function _level_channels(bp, level)
     # encoder channels: input, middle, ouptput = (in_enc, mid_enc, out_enc)
     if level == 1
         if isnothing(bp.stem)
             in_enc = bp.in_chs
         else
-            in_enc = bp.basewidth
+            in_enc = bp.bwidth
         end
-        mid_enc = out_enc = bp.basewidth
+        mid_enc = out_enc = bp.bwidth
         in_dec = 2 * out_enc # channel concatenation
-        mid_dec = out_dec = bp.basewidth
+        mid_dec = out_dec = bp.bwidth
     else
         encp, decp = _level_channels(bp, level - 1)
         _, _, in_enc = encp
         mid_enc = out_enc = bp.expn * in_enc
         in_dec = 2 * out_enc
         mid_dec = in_dec ÷ bp.expn
-        out_dec = bp.decoder.up isa ConvTransposeUpsamplerBp ? mid_dec : mid_dec ÷ 2
+        out_dec = bp.dec.up isa ConvTransposeUpsamplerBp ? mid_dec : mid_dec ÷ 2
     end
     (in_enc, mid_enc, out_enc), (in_dec, mid_dec, out_dec)
 #=
@@ -169,16 +169,16 @@ function _level_channels(bp, level)
         if isnothing(bp.stem)
             in_enc = bp.in_chs
         else
-            in_enc = bp.basewidth
+            in_enc = bp.bwidth
         end
     else
-        in_enc = bp.expn^(level - 2) * bp.basewidth
+        in_enc = bp.expn^(level - 2) * bp.bwidth
     end
-    #in_enc = (level == 1) ? bp.in_chs : bp.expn^(level - 2) * bp.basewidth
-    mid_enc = out_enc = bp.expn^(level - 1) * bp.basewidth
+    #in_enc = (level == 1) ? bp.in_chs : bp.expn^(level - 2) * bp.bwidth
+    mid_enc = out_enc = bp.expn^(level - 1) * bp.bwidth
     # decoder channels: input, middle, ouptput = (icd, mcd, ocd)
     in_dec, mid_dec = 2 * out_enc, out_enc
-    if bp.decoder.up isa ConvTransposeUpsamplerBp
+    if bp.dec.up isa ConvTransposeUpsamplerBp
         out_dec = mid_dec
     else
         out_dec = (level == 1) ? mid_dec : mid_dec ÷ 2
@@ -189,17 +189,17 @@ end
 
 function _bridge_channels(bp)
     #=
-    enc, dec = _level_channels(bp, bp.nlevels + 1)
+    enc, dec = _level_channels(bp, bp.nlvl + 1)
     in_chs, mid_chs, _ = enc
     _, _, out_chs = dec
     in_chs, mid_chs, out_chs
     =#
-    enc, _ = _level_channels(bp, bp.nlevels + 1)
-    _, dec = _level_channels(bp, bp.nlevels)
+    enc, _ = _level_channels(bp, bp.nlvl + 1)
+    _, dec = _level_channels(bp, bp.nlvl)
     in_chs, mid_chs, _ = enc
     out_chs, _, _ = dec
     #println(dec)
-    out_chs = bp.decoder.up isa ConvTransposeUpsamplerBp ? out_chs : out_chs ÷ 2
+    out_chs = bp.dec.up isa ConvTransposeUpsamplerBp ? out_chs : out_chs ÷ 2
     in_chs, mid_chs, out_chs
 end
 
@@ -207,7 +207,7 @@ function _level_encodec(bp, ksize, level) #
     # number of channels (input, middle, output)
     enc_chs, dec_chs = _level_channels(bp, level)
     if level == 1
-        c = spread(bp.encoder.conv; stride=1)
+        c = spread(bp.enc.conv; stride=1)
         enc = [
                 make(bp.stem, ksize, bp.in_chs => first(enc_chs)),
                 make(c, ksize, enc_chs)
@@ -227,13 +227,13 @@ function _level_encodec(bp, ksize, level) #
         end
         =#
         dec = [
-                make(bp.decoder.conv, ksize, dec_chs),
+                make(bp.dec.conv, ksize, dec_chs),
                 make(bp.head, ksize, last(dec_chs)),
                 make(bp.top, last(dec_chs))
               ]
     else
-        enc = make(bp.encoder, ksize, enc_chs)
-        dec = make(bp.decoder, ksize, dec_chs)
+        enc = make(bp.enc, ksize, enc_chs)
+        dec = make(bp.dec, ksize, dec_chs)
     end
     flatten_layers(enc), flatten_layers(dec)
 end
@@ -242,12 +242,12 @@ function _level_encodec2(bp, ksize, level)
     # number of channels (input, middle, output)
     enc_chs, dec_chs = _level_channels(bp, level)
     if level == 1
-        c = spread(bp.encoder.conv; stride=1)
+        c = spread(bp.enc.conv; stride=1)
         enc = make(c, ksize, enc_chs)
-        dec = make(bp.decoder.conv, ksize, dec_chs)
+        dec = make(bp.dec.conv, ksize, dec_chs)
     else
-        enc = make(bp.encoder, ksize, enc_chs)
-        dec = make(bp.decoder, ksize, dec_chs)
+        enc = make(bp.enc, ksize, enc_chs)
+        dec = make(bp.dec, ksize, dec_chs)
     end
     flatten_layers(enc), flatten_layers(dec)
 end

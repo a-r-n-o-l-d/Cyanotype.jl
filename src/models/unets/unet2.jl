@@ -7,16 +7,16 @@
     """
     struct UNet2Bp <: AbstractConvBp
         in_chs = 3
-        nlevels = 4
-        basewidth = 64
+        nlvl = 4
+        bwidth = 64
         expn = 2
         ksize = l -> 3
-        encoder
-        decoder
-        bridge
-        stem = nothing # si nothing => encoder
-        path = l -> nothing #  connection_path (path CBAM, convpath)
-        head = nothing # si nothing => decoder
+        enc
+        dec
+        bdg
+        stem = nothing
+        path = l -> nothing
+        head = nothing
         top = nothing
         #connector = chcat
         residual = false
@@ -27,7 +27,7 @@ function make(bp::UNet2Bp)
     # Build encoders and decoders for each level
     if bp.residual
         enc, dec, pth = [], [], []
-        for l ∈ 1:bp.nlevels
+        for l ∈ 1:bp.nlvl
             enclvl, declvl = _level_encodec2(bp, bp.ksize(l), l)
             push!.((enc, dec), (enclvl, declvl))
             if !isnothing(bp.path(l))
@@ -37,7 +37,7 @@ function make(bp::UNet2Bp)
                 push!(pth, bp.path(l))
             end
         end
-        bdg = make(bp.bridge, bp.ksize(bp.nlevels + 1), _bridge_channels(bp))
+        bdg = make(bp.bdg, bp.ksize(bp.nlvl + 1), _bridge_channels(bp))
         unet = uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
         enc_chs, dec_chs = _level_channels(bp, 1)
         stem = make(bp.stem, bp.ksize(1), bp.in_chs => first(enc_chs))
@@ -46,7 +46,7 @@ function make(bp::UNet2Bp)
         Chain(flatten_layers(stem)..., SkipConnection(unet, +), flatten_layers(head)..., flatten_layers(top)...)
     else
         enc, dec, pth = [], [], []
-        for l ∈ 1:bp.nlevels
+        for l ∈ 1:bp.nlvl
             enclvl, declvl = _level_encodec(bp, bp.ksize(l), l)
             push!.((enc, dec), (enclvl, declvl))
             if !isnothing(bp.path(l))
@@ -56,7 +56,7 @@ function make(bp::UNet2Bp)
                 push!(pth, bp.path(l))
             end
         end
-        bdg = make(bp.bridge, bp.ksize(bp.nlevels + 1), _bridge_channels(bp))
+        bdg = make(bp.bdg, bp.ksize(bp.nlvl + 1), _bridge_channels(bp))
         unet = uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
         unet
     end
