@@ -9,7 +9,7 @@
         pad           = SamePad()
         dilation      = 1
         init          = glorot_uniform
-        norm = BatchNormBp()
+        norm          = BatchNormBp()
         skip          = true
     end
 end
@@ -18,8 +18,8 @@ make(bp::AxialDWConvBp, ksize, channels::Int) = make(bp, ksize, channels => chan
 
 function make(bp::AxialDWConvBp, ksize, channels::Pair)
     in_chs, out_chs = channels
-    conv(k) = DepthwiseConv(k, in_chs => in_chs, stride=bp.stride, pad=bp.pad, dilation=bp.dilation, init=bp.init,
-                            bias=bp.norm isa Nothing)
+    conv(k) = DepthwiseConv(k, in_chs => in_chs, stride=bp.stride, pad=bp.pad, 
+                            dilation=bp.dilation, init=bp.init, bias=bp.norm isa Nothing)
     layers = []
     if bp.vol
         push!(layers, conv((ksize, 1, 1)))
