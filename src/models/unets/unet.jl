@@ -8,13 +8,13 @@ include("uchain.jl")
     """
     struct UEncoderBp
         conv
-        downsampler
+        down
     end
 end
 
 make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     [
-        _make(bp.downsampler, channels), #_make(bp.downsampler, channels),
+        _make(bp.down, channels), #_make(bp.down, channels),
         make(bp.conv, ksize, channels)
     ]
 )
@@ -25,14 +25,14 @@ make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     """
     struct UDecoderBp
         conv
-        upsampler
+        up
     end
 end
 
 make(bp::UDecoderBp, ksize, channels) = flatten_layers(
     [
         make(bp.conv, ksize, channels),
-        _make(bp.upsampler, channels)
+        _make(bp.up, channels)
     ]
 )
 
@@ -42,16 +42,16 @@ make(bp::UDecoderBp, ksize, channels) = flatten_layers(
     """
     struct UBridgeBp
         conv
-        downsampler
-        upsampler
+        down
+        up
     end
 end
 
 make(bp::UBridgeBp, ksize, channels) = flatten_layers(
     [
-        _make(bp.downsampler, channels),
+        _make(bp.down, channels),
         make(bp.conv, ksize, channels),
-        _make(bp.upsampler, channels)
+        _make(bp.up, channels)
     ]
 )
 
@@ -160,7 +160,7 @@ function _level_channels(bp, level)
         mid_enc = out_enc = bp.expn * in_enc
         in_dec = 2 * out_enc
         mid_dec = in_dec ÷ bp.expn
-        out_dec = bp.decoder.upsampler isa ConvTransposeUpsamplerBp ? mid_dec : mid_dec ÷ 2
+        out_dec = bp.decoder.up isa ConvTransposeUpsamplerBp ? mid_dec : mid_dec ÷ 2
     end
     (in_enc, mid_enc, out_enc), (in_dec, mid_dec, out_dec)
 #=
@@ -178,7 +178,7 @@ function _level_channels(bp, level)
     mid_enc = out_enc = bp.expn^(level - 1) * bp.basewidth
     # decoder channels: input, middle, ouptput = (icd, mcd, ocd)
     in_dec, mid_dec = 2 * out_enc, out_enc
-    if bp.decoder.upsampler isa ConvTransposeUpsamplerBp
+    if bp.decoder.up isa ConvTransposeUpsamplerBp
         out_dec = mid_dec
     else
         out_dec = (level == 1) ? mid_dec : mid_dec ÷ 2
@@ -199,7 +199,7 @@ function _bridge_channels(bp)
     in_chs, mid_chs, _ = enc
     out_chs, _, _ = dec
     #println(dec)
-    out_chs = bp.decoder.upsampler isa ConvTransposeUpsamplerBp ? out_chs : out_chs ÷ 2
+    out_chs = bp.decoder.up isa ConvTransposeUpsamplerBp ? out_chs : out_chs ÷ 2
     in_chs, mid_chs, out_chs
 end
 
@@ -218,7 +218,7 @@ function _level_encodec(bp, ksize, level) #
                     make(bp.stem, ksize, bp.in_chs => last(enc_chs)),
                     make(bp.encoder.conv, ksize, enc_chs)
                   ]
-        elseif isnothing(bp.encoder.downsampler) && isnothing(bp.stem)
+        elseif isnothing(bp.encoder.down) && isnothing(bp.stem)
             # if downsampling is done with a strided convolution
             e = spread(bp.encoder; stride=1)
             enc = make(e, ksize, enc_chs)

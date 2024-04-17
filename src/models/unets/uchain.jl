@@ -38,9 +38,11 @@ level decoder.
 See also [`chcat`](@ref).
 """
 function uchain(; encoders, decoders, bridge, paths=fill(nothing, length(encoders)))
-    length(encoders) == length(decoders) || error("""
-    The number of encoders should be equal to the number of decoders.
-    """)
+    length(encoders) == length(decoders) || error(
+        """
+        The number of encoders should be equal to the number of decoders.
+        """
+    )
     # build from bottom to top
     lvl = _ubridge(bridge, paths[end])
     ite = zip(reverse(encoders[2:end]), reverse(decoders[2:end]), reverse(paths[1:end - 1]))
