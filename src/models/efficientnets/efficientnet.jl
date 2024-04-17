@@ -30,35 +30,17 @@ function EfficientNetBp(config; in_chs=3, st_chs=32, hd_chs=1280, ncls=1000, ste
             """
         )
     end
-
-    st = if stem
-        ConvBp(; act=swish, norm=BatchNormBp(), stride=2)
-    else
-        nothing
-    end
-
-    hd = if head
-        ConvBp(; act=swish, norm=BatchNormBp())
-    else
-        nothing
-    end
-
-    tp = if top
-        LabelClassifierBp(nclasses=ncls)
-    else
-        nothing
-    end
-
+    st = stem ? ConvBp(; act=swish, norm=BatchNormBp(), stride=2) : nothing
+    hd = head ? ConvBp(; act=swish, norm=BatchNormBp()) : nothing
+    tp = top ? LabelClassifierBp(nclasses=ncls) : nothing
     bb = _effnet_backbone(config)
-
-    stem_chs = if config ∈ EFFNETV1
+    st_chs = if config ∈ EFFNETV1
         wsc, _ = _effnetv1_scaling(config)
         _round_channels(st_chs * wsc)
     elseif config ∈ EFFNETV2
         first(bb).out_chs
     end
-
-    EfficientNetBp(in_chs, stem_chs, hd_chs, st, bb, hd, tp)
+    EfficientNetBp(in_chs, st_chs, hd_chs, st, bb, hd, tp)
 end
 
 function make(bp::EfficientNetBp) #dropout
