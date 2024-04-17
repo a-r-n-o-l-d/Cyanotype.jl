@@ -5,9 +5,9 @@ norms = [
             GroupNormBp(; groups = 2),
             InstanceNormBp()
         ]
-#dw, revs = pres = [true false]
+#dwise, revs = pres = [true false]
 for n in norms, r in [true false], p in [true false], d in [true false]
-    c = cyanotype(conv; norm=n, preact=p, revnorm=r, dw=d)
+    c = cyanotype(conv; norm=n, preact=p, revnorm=r, dwise=d)
     layers = flatten_layers(make(c, 3, 8 => 16))
     m = Chain(layers...)
     @test Flux.outputsize(m, (32, 32, 8, 16)) == (32, 32, 16, 16)
@@ -62,7 +62,7 @@ model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 bp = DepthwiseConvBp(norm=BatchNormBp())
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
-bp = DepthwiseConvBp(norm=BatchNormBp(), dw=false, init=Flux.glorot_normal)
+bp = DepthwiseConvBp(norm=BatchNormBp(), dwise=false, init=Flux.glorot_normal)
 model = Chain(make(bp, 3, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 16, 16)
 

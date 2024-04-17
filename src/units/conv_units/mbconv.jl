@@ -6,7 +6,7 @@
         skip
         #dropout
         expansion
-        dw
+        dwise
         excitation
         projection
     end
@@ -22,7 +22,7 @@ function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, act=re
                                          norm=norm,
                                          kwargs...)
 
-    dw = DepthwiseConvBp(; act=act,
+    dwise = DepthwiseConvBp(; act=act,
                                   stride=stride,
                                   norm=norm,
                                   kwargs...)
@@ -34,7 +34,7 @@ function MbConvBp(; stride, ch_expansion, se_reduction, skip=stride == 1, act=re
 
     projection = PointwiseConvBp(; norm=norm, kwargs...)
 
-    MbConvBp(skip, expansion, dw, excitation, projection)
+    MbConvBp(skip, expansion, dwise, excitation, projection)
 end
 
 #function make(bp::MbConvBp, ksize, channels, dropout=0.0)
@@ -50,7 +50,7 @@ function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stocha
     layers = flatten_layers(
         [
             make(bp.expansion, in_chs),
-            make(bp.dw, ksize, mid_chs),
+            make(bp.dwise, ksize, mid_chs),
             make(bp.excitation, mid_chs),
             make(bp.projection, mid_chs => out_chs)
         ]
@@ -78,7 +78,7 @@ function _mblayers(bp::MbConvBp, ksize, channels)
     flatten_layers(
         [
             make(bp.expansion, in_chs),
-            make(bp.dw, ksize, mid_chs),
+            make(bp.dwise, ksize, mid_chs),
             make(bp.excitation, mid_chs),
             make(bp.projection, mid_chs => out_chs)
         ]

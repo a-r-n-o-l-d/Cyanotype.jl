@@ -13,7 +13,7 @@ function make(bp::EfficientUNetBp)
     effnet = bp.backbone
 
     bdg_chs = effnet.backbone[end].outchannels
-    get_stride(conv::MbConvBp) = conv.dw.conv.stride
+    get_stride(conv::MbConvBp) = conv.dwise.conv.stride
     get_stride(conv::FusedMbConvBp) = conv.conv.stride
     nlevel = 1
     for s in effnet.backbone

@@ -20,9 +20,9 @@
         """
         norm::N = nothing
         """
-        `dw`:
+        `dwise`:
         """
-        dw = false
+        dwise = false
         """
         `revnorm`:
         """
@@ -44,7 +44,7 @@ make(bp::ConvBp, ksize, channels::Int) = make(bp, ksize, channels => channels)
 function make(bp::ConvBp{<:Nothing}, ksize, channels::Pair)
     k = genk(ksize, bp.vol)
     kw = kwargs(bp)
-    if bp.dw
+    if bp.dwise
         kw[:groups] = first(channels)
     end
     Conv(k, channels, bp.act; kw...) #|> flatten_layers
@@ -57,7 +57,7 @@ function make(bp::ConvBp{<:AbstractNormBp}, ksize, channels::Pair)
     in_chs, out_chs = channels
     act = bp.act
     kw = kwargs(bp)
-    if bp.dw
+    if bp.dwise
         kw[:groups] = in_chs
     end
     # Normalization first
