@@ -7,7 +7,7 @@ include("uchain.jl")
 
     """
     struct UEncoderBp
-        convolution
+        conv
         downsampler
     end
 end
@@ -15,7 +15,7 @@ end
 make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     [
         _make(bp.downsampler, channels), #_make(bp.downsampler, channels),
-        make(bp.convolution, ksize, channels)
+        make(bp.conv, ksize, channels)
     ]
 )
 
@@ -24,14 +24,14 @@ make(bp::UEncoderBp, ksize, channels) = flatten_layers(
 
     """
     struct UDecoderBp
-        convolution
+        conv
         upsampler
     end
 end
 
 make(bp::UDecoderBp, ksize, channels) = flatten_layers(
     [
-        make(bp.convolution, ksize, channels),
+        make(bp.conv, ksize, channels),
         _make(bp.upsampler, channels)
     ]
 )
@@ -41,7 +41,7 @@ make(bp::UDecoderBp, ksize, channels) = flatten_layers(
 
     """
     struct UBridgeBp
-        convolution
+        conv
         downsampler
         upsampler
     end
@@ -50,7 +50,7 @@ end
 make(bp::UBridgeBp, ksize, channels) = flatten_layers(
     [
         _make(bp.downsampler, channels),
-        make(bp.convolution, ksize, channels),
+        make(bp.conv, ksize, channels),
         _make(bp.upsampler, channels)
     ]
 )
@@ -207,7 +207,7 @@ function _level_encodec(bp, ksize, level) #
     # number of channels (input, middle, output)
     enc_chs, dec_chs = _level_channels(bp, level)
     if level == 1
-        c = spread(bp.encoder.convolution; stride=1)
+        c = spread(bp.encoder.conv; stride=1)
         enc = [
                 make(bp.stem, ksize, bp.inchannels => first(enc_chs)),
                 make(c, ksize, enc_chs)
@@ -216,18 +216,18 @@ function _level_encodec(bp, ksize, level) #
         if !isnothing(bp.stem)
             enc = [
                     make(bp.stem, ksize, bp.inchannels => last(enc_chs)),
-                    make(bp.encoder.convolution, ksize, enc_chs)
+                    make(bp.encoder.conv, ksize, enc_chs)
                   ]
         elseif isnothing(bp.encoder.downsampler) && isnothing(bp.stem)
             # if downsampling is done with a strided convolution
             e = spread(bp.encoder; stride=1)
             enc = make(e, ksize, enc_chs)
         else
-            enc = make(bp.encoder.convolution, ksize, enc_chs)
+            enc = make(bp.encoder.conv, ksize, enc_chs)
         end
         =#
         dec = [
-                make(bp.decoder.convolution, ksize, dec_chs),
+                make(bp.decoder.conv, ksize, dec_chs),
                 make(bp.head, ksize, last(dec_chs)),
                 make(bp.top, last(dec_chs))
               ]
@@ -242,9 +242,9 @@ function _level_encodec2(bp, ksize, level)
     # number of channels (input, middle, output)
     enc_chs, dec_chs = _level_channels(bp, level)
     if level == 1
-        c = spread(bp.encoder.convolution; stride=1)
+        c = spread(bp.encoder.conv; stride=1)
         enc = make(c, ksize, enc_chs)
-        dec = make(bp.decoder.convolution, ksize, dec_chs)
+        dec = make(bp.decoder.conv, ksize, dec_chs)
     else
         enc = make(bp.encoder, ksize, enc_chs)
         dec = make(bp.decoder, ksize, dec_chs)

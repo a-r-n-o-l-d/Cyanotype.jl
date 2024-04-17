@@ -1,12 +1,12 @@
 #ResidualBp
 @cyanotype begin
     struct ResidualConvBp <: AbstractConvBp
-        convolution
+        conv
         connector = +
     end
 end
 
 make(bp::ResidualConvBp, ksize, channels) = SkipConnection(
-    Chain(make(bp.convolution, ksize, channels)...),
+    Chain(make(bp.conv, ksize, channels)...),
     bp.connector
 )

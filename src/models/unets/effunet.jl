@@ -14,10 +14,10 @@ function make(bp::EfficientUNetBp)
 
     bdg_chs = effnet.backbone[end].outchannels
     get_stride(conv::MbConvBp) = conv.dw.conv.stride
-    get_stride(conv::FusedMbConvBp) = conv.convolution.stride
+    get_stride(conv::FusedMbConvBp) = conv.conv.stride
     nlevel = 1
     for s in effnet.backbone
-        if get_stride(s.convolution) == 2
+        if get_stride(s.conv) == 2
             nlevel = nlevel + 1
         end
     end
@@ -31,7 +31,7 @@ function make(bp::EfficientUNetBp)
     level = 1
     for s in effnet.backbone
         stage = make(s, out_chs)
-        if get_stride(s.convolution) == 1
+        if get_stride(s.conv) == 1
             push!(last(encoders), stage)
         else
             push!(encoders, Any[stage])

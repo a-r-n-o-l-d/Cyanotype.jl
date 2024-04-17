@@ -5,7 +5,7 @@ abstract type AbstractBpClassifier end #<: AbstractConvBp
     """
     struct PixelClassifierBp <: AbstractConvBp
         nclasses
-        convolution
+        conv
     end
 end
 
@@ -15,17 +15,17 @@ function PixelClassifierBp(; nclasses, act=nclasses > 2 ? identity : sigmoid, kw
 end
 
 function make(bp::PixelClassifierBp, channels)
-    k = genk(1, bp.convolution.conv.vol)
+    k = genk(1, bp.conv.conv.vol)
     layers = []
     if bp.nclasses > 2
-        push!(layers, make(bp.convolution, channels => bp.nclasses))
+        push!(layers, make(bp.conv, channels => bp.nclasses))
         push!(layers, chsoftmax)
         # x -> softmax(x; dims=length(k))
         # chcat(x...) = cat(x...; dims=(x[1] |> size |> length) - 1)
         # chsoftmax(x) = softmax(x; dims=ndims(x) - 1)
         #[Conv(k, channels => bp.nclasses), x -> softmax(x; dims = length(k))]
     else #if bp.nclasses == 2
-        push!(layers, make(bp.convolution, channels => 1))
+        push!(layers, make(bp.conv, channels => 1))
         #[Conv(k, channels=>1, sigmoid)]
     end #else Conv(k, channels=>1, sigmoid)
     flatten_layers(layers)

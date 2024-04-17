@@ -46,7 +46,7 @@ make(bp::ChannelAttentionBp, channels::Pair) = make(bp, first(channels))
 
     """
     struct SpatialAttentionBp <: AbstractConvBp
-        convolution
+        conv
     end
 end
 
@@ -57,7 +57,7 @@ SpatialAttentionBp(; gate_act=sigmoid, kwargs...) = SpatialAttentionBp(
 make(bp::SpatialAttentionBp, ksize) = SkipConnection(
     Chain(
         Parallel(chcat, chmeanpool, chmaxpool),
-        flatten_layers(make(bp.convolution, ksize, 2 => 1))...
+        flatten_layers(make(bp.conv, ksize, 2 => 1))...
     ),
     .*
 )

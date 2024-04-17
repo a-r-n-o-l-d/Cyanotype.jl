@@ -5,7 +5,7 @@
     struct FusedMbConvBp <: AbstractConvBp
         skip
         ch_expansion
-        convolution
+        conv
         #dropout
         projection
     end
@@ -31,7 +31,7 @@ function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
     end=#
     layers = flatten_layers(
         [
-            make(bp.convolution, ksize, in_chs => mid_chs),
+            make(bp.conv, ksize, in_chs => mid_chs),
             make(bp.projection, mid_chs => out_chs)
         ]
     )
