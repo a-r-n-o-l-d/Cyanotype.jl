@@ -6,7 +6,7 @@
 
     """
     struct UNet2Bp <: AbstractConvBp
-        inchannels = 3
+        in_chs = 3
         nlevels = 4
         basewidth = 64
         expn = 2
@@ -40,7 +40,7 @@ function make(bp::UNet2Bp)
         bdg = make(bp.bridge, bp.ksize(bp.nlevels + 1), _bridge_channels(bp))
         unet = uchain(encoders=enc, decoders=dec, bridge=bdg, paths=pth)
         enc_chs, dec_chs = _level_channels(bp, 1)
-        stem = make(bp.stem, bp.ksize(1), bp.inchannels => first(enc_chs))
+        stem = make(bp.stem, bp.ksize(1), bp.in_chs => first(enc_chs))
         head = make(bp.head, bp.ksize(1), last(dec_chs))
         top = make(bp.top, last(dec_chs))
         Chain(flatten_layers(stem)..., SkipConnection(unet, +), flatten_layers(head)..., flatten_layers(top)...)
@@ -63,6 +63,6 @@ function make(bp::UNet2Bp)
 end
 
 function make(bp::UNet2Bp, ::Any, channels)
-    tmp = spread(bp, inchannels=channels) #ksize=ksize,
+    tmp = spread(bp, in_chs=channels)
     make(tmp)
 end

@@ -9,17 +9,17 @@ const EFFNETV2 = [:small, :medium, :large, :xlarge]
 
     """
     struct EfficientNetBp
-        inchannels
-        stemchannels
-        headchannels
+        in_chs
+        st_chs
+        hd_chs
         stem
-        backbone
+        bbone
         head
         top
     end
 end
 
-function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280, nclasses=1000,
+function EfficientNetBp(config; in_chs=3, st_chs=32, hd_chs=1280, nclasses=1000,
                         include_stem=true, include_top=true, include_head=include_top) #activation
     # Sanity check
      _check_effnet_config(config)
@@ -53,36 +53,36 @@ function EfficientNetBp(config; inchannels=3, stemchannels=32, headchannels=1280
 
     stem_chs = if config ∈ EFFNETV1
         wsc, _ = _effnetv1_scaling(config)
-        _round_channels(stemchannels * wsc)
+        _round_channels(st_chs * wsc)
     elseif config ∈ EFFNETV2
         first(bb).out_chs
     end
 
-    EfficientNetBp(inchannels, stem_chs, headchannels, stem, bb, head, top)
+    EfficientNetBp(in_chs, stem_chs, hd_chs, stem, bb, head, top)
 end
 
 function make(bp::EfficientNetBp) #dropout
     #
     drop_prob = 0.2
     block_repeats = 0
-    for s in bp.backbone
+    for s in bp.bbone
         block_repeats = block_repeats + s.nrepeat + 1
     end
     dropouts = LinRange(0, drop_prob, block_repeats + 1)[1:block_repeats]
-    out_chs = bp.stemchannels
-    stem = Chain(flatten_layers(make(bp.stem, 3, bp.inchannels => out_chs))...)
+    out_chs = bp.st_chs
+    stem = Chain(flatten_layers(make(bp.stem, 3, bp.in_chs => out_chs))...)
     layers = []
     block_idx = 1
-    for s in bp.backbone
+    for s in bp.bbone
         dps = dropouts[block_idx:block_idx + s.nrepeat]
         push!(layers, Chain(make(s, out_chs, dps))...)
         out_chs = s.out_chs
         block_idx = block_idx + s.nrepeat + 1
     end
-    backbone = Chain(flatten_layers(layers)...)
-    head = Chain(flatten_layers(make(bp.head, 1, out_chs => bp.headchannels))...)
-    top = Chain(flatten_layers(make(bp.top, bp.headchannels))...)
-    Chain(stem=stem, backbone=backbone, head=head, top=top)
+    bbone = Chain(flatten_layers(layers)...)
+    head = Chain(flatten_layers(make(bp.head, 1, out_chs => bp.hd_chs))...)
+    top = Chain(flatten_layers(make(bp.top, bp.hd_chs))...)
+    Chain(stem=stem, bbone=bbone, head=head, top=top)
 end
 
 ############################################################################################

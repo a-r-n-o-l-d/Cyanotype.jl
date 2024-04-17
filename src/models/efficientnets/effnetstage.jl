@@ -7,8 +7,8 @@
         out_chs
         nrepeat
         conv
-        widthscaling = nothing
-        depthscaling = nothing
+        wscaling = nothing
+        dscaling = nothing
     end
 end
 
@@ -29,8 +29,8 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expn, stride, nrepeat,
     ksize=ksize,
     out_chs=_out_channels(wscaling, out_chs),
     nrepeat=_nrepeats(dscaling, nrepeat),
-    widthscaling=wscaling,
-    depthscaling=dscaling,
+    wscaling=wscaling,
+    dscaling=dscaling,
     conv=MbConvBp(
         stride=stride,
         ch_expn=expn,

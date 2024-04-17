@@ -3,20 +3,20 @@
 
     """
     struct EfficientUNetBp
-        backbone
+        bbone
         decoder
         head = nothing
     end
 end
 
 function make(bp::EfficientUNetBp)
-    effnet = bp.backbone
+    effnet = bp.bbone
 
-    bdg_chs = effnet.backbone[end].out_chs
+    bdg_chs = effnet.bbone[end].out_chs
     get_stride(conv::MbConvBp) = conv.dwise.conv.stride
     get_stride(conv::FusedMbConvBp) = conv.conv.stride
     nlevel = 1
-    for s in effnet.backbone
+    for s in effnet.bbone
         if get_stride(s.conv) == 2
             nlevel = nlevel + 1
         end
@@ -24,12 +24,12 @@ function make(bp::EfficientUNetBp)
     nlevel = nlevel - 1
     dec_in_chs(level) = out_chs + dec_out_chs(level + 1) #
     dec_out_chs(level) = level == nlevel + 1 ? bdg_chs : 2^(level + 4)
-    out_chs = effnet.stemchannels
-    stem = make(effnet.stem, 3, effnet.inchannels => out_chs)
+    out_chs = effnet.st_chs
+    stem = make(effnet.stem, 3, effnet.in_chs => out_chs)
     encoders = [Any[stem]]
     decoders = []
     level = 1
-    for s in effnet.backbone
+    for s in effnet.bbone
         stage = make(s, out_chs)
         if get_stride(s.conv) == 1
             push!(last(encoders), stage)
