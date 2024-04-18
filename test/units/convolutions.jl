@@ -101,3 +101,7 @@ model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 bp = AxialDWConvBp(act=gelu)
 model = Chain(make(bp, 7, 4 => 16) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 4)) == (32, 32, 16, 4)
+
+bp = AxialDWConvBp(act=gelu, vol=true)
+model = Chain(make(bp, 7, 4) |> flatten_layers)
+@test Flux.outputsize(model, (32, 32, 32, 4, 4)) == (32, 32, 32, 4, 4)
