@@ -5,16 +5,15 @@
 
     """
     struct ChannelAttentionBp <: AbstractConvBp
-        reduction
-        shared_mlp
+        reduc
+        mlp
         gate_act
     end
 end
 
-function ChannelAttentionBp(; reduction, act=relu, gate_act=sigmoid, 
-                            kwargs...)
+function ChannelAttentionBp(; reduc, act=relu, gate_act=sigmoid, kwargs...)
     ChannelAttentionBp(
-        reduction,
+        reduc,
         DoubleConvBp(
             conv1=PointwiseConvBp(; act=act, kwargs...),
             conv2=PointwiseConvBp(; act=identity, kwargs...)
@@ -24,8 +23,8 @@ function ChannelAttentionBp(; reduction, act=relu, gate_act=sigmoid,
 end
 
 function make(bp::ChannelAttentionBp, channels::Int)
-    mid_chs = channels ÷ bp.reduction
-    shared_mlp = Chain(make(bp.shared_mlp, (channels, mid_chs, channels))...)
+    mid_chs = channels ÷ bp.reduc
+    shared_mlp = Chain(make(bp.mlp, (channels, mid_chs, channels))...)
     SkipConnection(
         Chain(
             Parallel(
@@ -72,9 +71,9 @@ make(bp::SpatialAttentionBp, ksize) = SkipConnection(
     end
 end
 
-CBAMBp(; reduction, act=relu, gate_act=sigmoid, kwargs...) = CBAMBp(
+CBAMBp(; reduc, act=relu, gate_act=sigmoid, kwargs...) = CBAMBp(
     ChannelAttentionBp(;
-        reduction=reduction,
+        reduc=reduc,
         act=act,
         gate_act=gate_act,
         kwargs...
@@ -101,9 +100,9 @@ make(bp::CBAMBp, ksize, channels) = flatten_layers(
     end
 end
 
-ResCBAMBp(; reduction, act=relu, gate_act=sigmoid, kwargs...) = ResCBAMBp(
+ResCBAMBp(; reduc, act=relu, gate_act=sigmoid, kwargs...) = ResCBAMBp(
     CBAMBp(;
-        reduction=reduction,
+        reduc=reduc,
         act=act,
         gate_act=gate_act,
         kwargs...

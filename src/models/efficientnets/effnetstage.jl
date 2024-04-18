@@ -25,7 +25,7 @@ EfficientNetStageBp(::Type{FusedMbConvBp}, ksize, out_chs, expn, stride,
 )
 
 EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expn, stride, nrepeat,
-                    reduction, wscaling=nothing, dscaling=nothing) = EfficientNetStageBp(
+                    reduc, wscaling=nothing, dscaling=nothing) = EfficientNetStageBp(
     ksize=ksize,
     out_chs=_out_channels(wscaling, out_chs),
     nrepeat=_nrepeats(dscaling, nrepeat),
@@ -34,7 +34,7 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expn, stride, nrepeat,
     conv=MbConvBp(
         stride=stride,
         ch_expn=expn,
-        se_reduction=reduction,
+        se_reduction=reduc,
         act=swish
     )
 )

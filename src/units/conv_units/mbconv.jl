@@ -16,7 +16,7 @@ function MbConvBp(; stride, ch_expn, se_reduction, skip=stride == 1, act=relu,
     stride ∈ [1, 2] || error("`stride` has to be 1 or 2 for `MbConvBp`")
     expn = ChannelExpansionConvBp(; act=act, expn=ch_expn, norm=norm, kwargs...)
     dwise = DepthwiseConvBp(; act=act, stride=stride, norm=norm, kwargs...)
-    excn = SqueezeExcitationBp(; act=act, gate_act=hardσ, reduction=se_reduction * ch_expn,
+    excn = SqueezeExcitationBp(; act=act, gate_act=hardσ, reduc=se_reduction * ch_expn,
                                kwargs...)
     proj = PointwiseConvBp(; norm=norm, kwargs...)
     MbConvBp(skip, expn, dwise, excn, proj)

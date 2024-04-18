@@ -5,12 +5,12 @@
     struct AxialDWConvBp <: AbstractConvBp
         @volume
         @activation(identity)
-        stride   = 1
-        pad      = SamePad()
-        dila = 1
-        init     = glorot_uniform
-        norm     = BatchNormBp()
-        skip     = true
+        stride = 1
+        pad    = SamePad()
+        dila   = 1
+        init   = glorot_uniform
+        norm   = BatchNormBp()
+        skip   = true
     end
 end
 

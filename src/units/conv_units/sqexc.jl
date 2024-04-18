@@ -4,13 +4,13 @@
     """
     struct SqueezeExcitationBp
         @volume
-        reduction
+        reduc
         conv1
         conv2
     end
 end
 
-function SqueezeExcitationBp(; vol=false, act=relu, gate_act=sigmoid, reduction, kwargs...)
+function SqueezeExcitationBp(; vol=false, act=relu, gate_act=sigmoid, reduc, kwargs...)
     # Verifier que kwargs ne contient pas activation
     haskey(kwargs, :act) && error(
         """
@@ -18,17 +18,17 @@ function SqueezeExcitationBp(; vol=false, act=relu, gate_act=sigmoid, reduction,
         """)
     SqueezeExcitationBp(
         vol,
-        reduction,
+        reduc,
         PointwiseConvBp(; act=act, kwargs...),
         PointwiseConvBp(; act=gate_act, kwargs...)
     )
 end
 
 function make(bp::SqueezeExcitationBp, channels)
-    #if bp.reduction == 1
+    #if bp.reduc == 1
     #    identity
     #else
-        mid_chs = max(1, channels ÷ bp.reduction)
+        mid_chs = max(1, channels ÷ bp.reduc)
         layers = flatten_layers(
             [
                 GlobalMeanPool(), #AdaptiveMeanPool(genk(1, bp.vol)), #

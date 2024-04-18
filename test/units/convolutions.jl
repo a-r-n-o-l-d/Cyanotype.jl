@@ -74,11 +74,11 @@ bp = MbConvBp(stride=1, ch_expn=6, se_reduction=4, init=Flux.glorot_normal)
 model = Chain(make(bp, 3, 4 => 4) |> flatten_layers)
 @test Flux.outputsize(model, (32, 32, 4, 16)) == (32, 32, 4, 16)
 
-se = SqueezeExcitationBp(; reduction = 4)
+se = SqueezeExcitationBp(; reduc=4)
 layers = Chain(flatten_layers(make(se, 16))...)
 @test Flux.outputsize(layers, (32, 32, 16, 16)) == (32, 32, 16, 16)
 
-ca = ChannelAttentionBp(reduction=2)
+ca = ChannelAttentionBp(reduc=2)
 layers = Chain(flatten_layers(make(ca, 16))...)
 @test Flux.outputsize(layers, (32, 32, 16, 16)) == (32, 32, 16, 16)
 
@@ -86,7 +86,7 @@ sa = SpatialAttentionBp()
 layers = Chain(flatten_layers(make(sa, 3))...)
 @test Flux.outputsize(layers, (32, 32, 16, 16)) == (32, 32, 16, 16)
 
-cbam = CBAMBp(reduction=2)
+cbam = CBAMBp(reduc=2)
 layers = Chain(flatten_layers(make(cbam, 3, 16))...)
 @test Flux.outputsize(layers, (32, 32, 16, 16)) == (32, 32, 16, 16)
 
