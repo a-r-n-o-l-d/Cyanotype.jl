@@ -76,10 +76,8 @@ end
 """
     chcat(x...)
 
-Concatenate the image data along the dimension corresponding to the channels. Image data
-should be stored in WHCN order (width, height, channels, batch) or WHDCN (width, height,
-depth, channels, batch) in a three-dimentional context. Channels are assumed to be the
-penultimate dimension.
+Concatenates the provided data along the channel dimension positioned as the penultimate 
+dimension.
 
 # Example
 ```julia
@@ -96,7 +94,7 @@ chcat(x...) = cat(x...; dims = ndims(x[1]) - 1)
 """
     chsoftmax(x)
 
-Apply a softmax function along channel dimension. This function is useful for pixel
+Apply a softmax function along the channel dimension. This function is useful for pixel
 classification (semantic segmentation).
 
 # Example
@@ -118,7 +116,7 @@ ChainRules.@non_differentiable chsoftmax(x)
 """
     chmeanpool(x)
 
-Pools all channels with the mean function.
+Pools all channels using the mean function.
 
 # Example
 ```julia
@@ -138,7 +136,7 @@ ChainRules.@non_differentiable chmeanpool(x)
 """
     chmaxpool(x)
 
-Pools all channels with the maximum function.
+Pools all channels using the maximum function.
 
 # Example
 ```julia
@@ -158,7 +156,7 @@ ChainRules.@non_differentiable chmaxpool(x)
 """
     flatten_layers(layers...)
 
-Flatten nested Vector/Tuple/Chain into a single Vector. If any layers contains identity
+Flatten a nested Vector/Tuple/Chain into a single Vector. If any layers contains identity
 function it is skipped.
 
 # Example
@@ -178,8 +176,18 @@ function flatten_layers(layers...)
     result
 end
 
+"""
+    genk(k, vol)
+
+Helping function used to generate a kernel tuple (k,k) or (k,k,k) if 'vol' is true.
+"""
 @inline genk(k, vol) = vol ? (k, k, k) : (k, k)
 
+"""
+    @activation(func)
+
+Helping macro used to define an activation function within a blueprint definition.
+"""
 macro activation(func)
     doc = "`act`: activation function (default [`$func`](@ref))"
     esc(
@@ -192,6 +200,11 @@ macro activation(func)
     )
 end
 
+"""
+@volume
+
+Helping macro to define 'vol' field within a blueprint definition.
+"""
 macro volume()
     esc(
         quote
@@ -204,9 +217,9 @@ macro volume()
     )
 end
 
-########################################################################################################################
-#                                               INTERNAL FUNCTIONS                                                     #
-########################################################################################################################
+############################################################################################
+#                                   INTERNAL FUNCTIONS                                     #
+############################################################################################
 
 # Shortcut that do nothing if not an AbstractBlueprint
 _parse_blueprint!(::Any, ::Any, ::Any; kwargs...) = nothing
