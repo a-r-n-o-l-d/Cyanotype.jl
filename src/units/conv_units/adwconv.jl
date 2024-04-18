@@ -5,12 +5,12 @@
     struct AxialDWConvBp <: AbstractConvBp
         @volume
         @activation(identity)
-        stride        = 1
-        pad           = SamePad()
-        dilation      = 1
-        init          = glorot_uniform
-        norm          = BatchNormBp()
-        skip          = true
+        stride   = 1
+        pad      = SamePad()
+        dila = 1
+        init     = glorot_uniform
+        norm     = BatchNormBp()
+        skip     = true
     end
 end
 
@@ -19,7 +19,7 @@ make(bp::AxialDWConvBp, ksize, channels::Int) = make(bp, ksize, channels => chan
 function make(bp::AxialDWConvBp, ksize, channels::Pair)
     in_chs, out_chs = channels
     conv(k) = DepthwiseConv(k, in_chs => in_chs, stride=bp.stride, pad=bp.pad, 
-                            dilation=bp.dilation, init=bp.init, bias=bp.norm isa Nothing)
+                            dilation=bp.dila, init=bp.init, bias=isnothing(bp.norm))
     layers = []
     if bp.vol
         push!(layers, conv((ksize, 1, 1)))
@@ -29,7 +29,7 @@ function make(bp::AxialDWConvBp, ksize, channels::Pair)
         push!(layers, conv((ksize, 1)))
         push!(layers, conv((1, ksize)))
     end
-    norm = bp.norm isa Nothing ? identity : BatchNorm(in_chs)
+    norm = isnothing(bp.norm) ? identity : BatchNorm(in_chs)
     pwc = PointwiseConvBp(act=bp.act, pad=bp.pad, init=bp.init)
     axial = bp.skip ? SkipConnection(Parallel(+, layers...), +) : Parallel(+, layers...)
     flatten_layers(

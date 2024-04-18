@@ -6,23 +6,22 @@
     [example](@ref https://doi-org/10.1109/ICMA54519.2022.9855903)
     """
     struct HybridAtrouConvBp <: AbstractConvBp #HybridAtrouConvBp
-        dilation_rates
+        dilar
         conv
     end
 end
 
-HybridAtrouConvBp(; dilation_rates=(1, 2, 3), norm=BatchNormBp(), 
-                  kwargs...) = HybridAtrouConvBp(
-    dilation_rates,
+HybridAtrouConvBp(; dilar=(1, 2, 3), norm=BatchNormBp(), kwargs...) = HybridAtrouConvBp(
+    dilar,
     ConvBp(; norm=norm, kwargs...)
 )
 
 function make(bp::HybridAtrouConvBp, ksize, channels::Pair)
-    check_dilation_rates(ksize, bp.dilation_rates) || error("Invalid dilation rates.")
+    check_dilation_rates(ksize, bp.dilar) || error("Invalid dilation rates.")
     layers = []
     in_chs, out_chs = channels
-    for dr in bp.dilation_rates
-        c = cyanotype(bp.conv; dilation = dr)
+    for dr in bp.dilar
+        c = cyanotype(bp.conv; dila=dr)
         push!(layers, flatten_layers(make(c, ksize, in_chs=>out_chs)))
         in_chs = out_chs
     end

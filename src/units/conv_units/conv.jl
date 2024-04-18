@@ -1,7 +1,7 @@
 @cyanotype begin
     KwargsMapping(
             flfunc = :Conv,
-            fnames = (:stride, :pad,      :dilation, :groups, :init),
+            fnames = (:stride, :pad,      :dila,     :groups, :init),
             flargs = (:stride, :pad,      :dilation, :groups, :init),
             defval = (1,       SamePad(), 1,         1,       glorot_uniform)
     )
