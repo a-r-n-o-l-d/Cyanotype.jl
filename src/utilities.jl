@@ -6,16 +6,16 @@ to modify all nested blueprint at once.
 
 # Example
 ```julia
-julia> # Create a blueprint for a Hybrid A-trou Convolution unit. By default activation functions
-       # are `identity`.
+julia> # Create a blueprint for a Hybrid A-trou Convolution unit. By default activation
+       # functions are `identity`.
 
 julia> hac = HybridAtrouConvBp();
 
 julia> hac.conv.act |> println
 identity
 
-julia> # Create a blueprint for a double convolution unit a the second convolution as a usual
-       # convolutionnal layer. By default activation function is `identity`.
+julia> # Create a blueprint for a double convolution unit a the second convolution as a
+       # usual convolutionnal layer. By default activation function is `identity`.
 
 julia> conv = DoubleConvBp(; conv1 = hac, conv2 = ConvBp());
 
@@ -43,16 +43,16 @@ Create a new blueprint from `bp` for the given `fieldname`, and replace each occ
 
 # Example
 ```julia
-julia> # Create a blueprint for a Hybrid A-trou Convolution unit. By default activation functions
-       # are identity.
+julia> # Create a blueprint for a Hybrid A-trou Convolution unit. By default activation
+       # functions are identity.
 
 julia> hac = HybridAtrouConvBp();
 
 julia> hac.conv.act |> println
 identity
 
-julia> # Create a blueprint for a double convolution unit with a second convolution as a usual
-       # convolutionnal layer with `relu` as activation.
+julia> # Create a blueprint for a double convolution unit with a second convolution as a
+       # usual convolutionnal layer with `relu` as activation.
 
 julia> conv = DoubleConvBp(; conv1 = hac, conv2 = ConvBp(act = relu));
 
@@ -76,7 +76,7 @@ end
 """
     chcat(x...)
 
-Concatenates the provided data along the channel dimension positioned as the penultimate 
+Concatenates the provided data along the channel dimension positioned as the penultimate
 dimension.
 
 # Example
@@ -179,7 +179,7 @@ end
 """
     genk(k, vol)
 
-Helping function used to generate a kernel tuple (k,k) or (k,k,k) if 'vol' is true.
+Helping function used to generate a kernel tuple (k,k) or (k,k,k) if `vol` is true.
 """
 @inline genk(k, vol) = vol ? (k, k, k) : (k, k)
 
