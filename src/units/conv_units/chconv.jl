@@ -18,8 +18,8 @@ end
 
 function make(bp::ChannelExpansionConvBp, channels)
     if bp.expn <= 1
-        identity
+        return identity
     else
-        make(bp.conv, channels => channels * bp.expn)
+        return make(bp.conv, channels => channels * bp.expn)
     end
 end

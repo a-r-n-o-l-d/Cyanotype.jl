@@ -7,6 +7,6 @@
 end
 
 make(bp::ResidualConvBp, ksize, channels) = SkipConnection(
-    Chain(make(bp.conv, ksize, channels)...),
+    Chain(flatten_layers(make(bp.conv, ksize, channels))...),
     bp.connector
 )

@@ -22,7 +22,7 @@ function MbConvBp(; stride, ch_expn, se_reduction, skip=stride == 1, act=relu,
     MbConvBp(skip, expn, dwise, excn, proj)
 end
 
-function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stochastic depth
+function make(bp::MbConvBp, ksize, channels; dropout=0) # add dropout for stochastic depth
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.expn.expn
     layers = flatten_layers(
@@ -35,29 +35,16 @@ function make(bp::MbConvBp, ksize, channels, dropout=0) # add dropout for stocha
     )
     if bp.skip && in_chs == out_chs
         if iszero(dropout)
-            SkipConnection(Chain(layers...), +)
+            return SkipConnection(Chain(layers...), +)
         else
             d = bp.proj.conv.vol ? 5 : 4
-            Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
+            return Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
         end
     else
-        layers
+        return layers
     end
 end
 
-make(bp::MbConvBp, ksize, channels::Int, dropout=0) = make(
-    bp, ksize, channels => channels, dropout
+make(bp::MbConvBp, ksize, channels::Int; dropout=0) = make(
+    bp, ksize, channels => channels, dropout=dropout
 )
-
-function _mblayers(bp::MbConvBp, ksize, channels)
-    in_chs, out_chs = channels
-    mid_chs = in_chs * bp.expn.expn
-    flatten_layers(
-        [
-            make(bp.expn, in_chs),
-            make(bp.dwise, ksize, mid_chs),
-            make(bp.excn, mid_chs),
-            make(bp.proj, mid_chs => out_chs)
-        ]
-    )
-end

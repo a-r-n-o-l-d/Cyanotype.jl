@@ -18,7 +18,7 @@ FusedMbConvBp(; stride, exch, skip=(stride == 1), act=relu, norm=BatchNormBp(act
     exch <= 1 ? nothing : PointwiseConvBp(; norm=norm, kwargs...)
 )
 
-function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
+function make(bp::FusedMbConvBp, ksize, channels; dropout=0)
     in_chs, out_chs = channels
     mid_chs = in_chs * bp.exch
     layers = flatten_layers(
@@ -29,12 +29,12 @@ function make(bp::FusedMbConvBp, ksize, channels, dropout=0)
     )
     if bp.skip && in_chs == out_chs
         if iszero(dropout)
-            SkipConnection(Chain(layers...), +)
+            return SkipConnection(Chain(layers...), +)
         else
             d = bp.proj.conv.vol ? 5 : 4
-            Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
+            return Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
         end
     else
-        layers
+        return layers
     end
 end

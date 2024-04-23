@@ -1,3 +1,7 @@
+sp = MeanMaxDownsamplerBp()
+m = Chain(make(sp, 4)...)
+@test m(ones(Float32, 4, 4, 4, 2)) |> size == (2, 2, 4, 2)
+
 sp = MaxDownsamplerBp()
 m = make(sp)
 @test m(ones(4, 4, 4, 2)) |> size == (2, 2, 4, 2)
