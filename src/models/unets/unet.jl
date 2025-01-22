@@ -14,7 +14,7 @@ end
 
 make(bp::UEncoderBp, ksize, channels) = flatten_layers(
     [
-        _make(bp.down, channels),
+        _make(bp.down, first(channels)),
         make(bp.conv, ksize, channels)
     ]
 )
@@ -105,17 +105,17 @@ end
 
 _make(bp, ksize, channels) = make(bp, ksize, channels)
 
-_make(bp::ChannelAttentionBp, ksize, channels) = make(bp, channels)
+#_make(bp::ChannelAttentionBp, ksize, channels) = make(bp, channels)
 
 _make(bp::PixelShuffleUpsamplerBp, channels) = make(bp, last(channels))
 
-_make(bp::ConvTransposeUpsamplerBp, channels) = make(bp, last(channels) => last(channels) ÷ 2)
+_make(bp::ConvTransposeUpsamplerBp, channels) = make(bp, last(channels))#last(channels) => last(channels) ÷ 2
 
 _make(bp, channels) = make(bp)
 
 _make(bp::AbstractBpDownsampler, ::Any) = make(bp)
 
-_make(bp::MeanMaxDownsamplerBp, ::Any) = make(bp, channels)
+_make(bp::MeanMaxDownsamplerBp, channels) = make(bp, channels)
 
 # Compute encoder/decoder number of channels at a given level (lvl)
 # return two tuples one for encoder and one for decoder
@@ -139,7 +139,7 @@ function _level_channels(bp, level)
         mid_enc = out_enc = bp.expn * in_enc
         in_dec = 2 * out_enc
         mid_dec = in_dec ÷ bp.expn
-        out_dec = bp.dec.up isa ConvTransposeUpsamplerBp ? mid_dec : mid_dec ÷ 2
+        out_dec = mid_dec ÷ 2 #bp.dec.up isa ConvTransposeUpsamplerBp ? 2 * (mid_dec - mid_dec ÷ 2) : mid_dec ÷ 2
     end
     (in_enc, mid_enc, out_enc), (in_dec, mid_dec, out_dec)
 #=
@@ -178,7 +178,8 @@ function _bridge_channels(bp)
     in_chs, mid_chs, _ = enc
     out_chs, _, _ = dec
     #println(dec)
-    out_chs = bp.dec.up isa ConvTransposeUpsamplerBp ? out_chs : out_chs ÷ 2
+    out_chs = out_chs ÷ 2 #bp.dec.up isa ConvTransposeUpsamplerBp ? out_chs : out_chs ÷ 2
+    #println(out_chs)
     in_chs, mid_chs, out_chs
 end
 

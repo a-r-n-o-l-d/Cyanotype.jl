@@ -32,7 +32,7 @@ leakyrelu
 """
 function spread(bp; kwargs...)
     stack = _parse_blueprint!([], :top, bp; kwargs...)
-    _blueprint_gen(stack)
+    return _blueprint_gen(stack)
 end
 
 """
@@ -70,7 +70,7 @@ relu
 function spread(bp, fieldname, old_new)
     old, new = old_new
     stack = _parse_blueprint!([], :top, bp, fieldname, old, new)
-    _blueprint_gen(stack)
+    return _blueprint_gen(stack)
 end
 
 """
@@ -240,7 +240,7 @@ function _parse_blueprint!(stack, name, bp::AbstractBlueprint; kwargs...)
     for (n, f) in fields
         _parse_blueprint!(stack, n, f; kwargs...)
     end
-    stack
+    return stack
 end
 
 # Parses a AbstractBlueprint bp and returns a stack
@@ -256,7 +256,7 @@ function _parse_blueprint!(stack, name, bp::AbstractBlueprint, fieldname, old, n
     for (n, f) in fields
         _parse_blueprint!(stack, n, f, fieldname, old, new)
     end
-    stack
+    return stack
 end
 
 # Generate a new blueprint from a stack
@@ -264,18 +264,21 @@ function _blueprint_gen(stack)
     # Stores blueprints generated from the stack
     blueprints = Dict()
     # Evaluates stack from bottom to top
-    for (bp, kw, n) in reverse(stack)
-        for k in keys(kw)
+    for (bp, fd, nm) in reverse(stack)
+        for k in keys(fd)
             # Modify kw if k is in blueprints dictionnary and is actually an AbstractBlueprint
-            if haskey(blueprints, k) && kw[k] isa AbstractBlueprint
+            if haskey(blueprints, k) && fd[k] isa AbstractBlueprint
                 # Consume this blueprint
-                kw[k] = blueprints[k]
+                fd[k] = blueprints[k]
                 delete!(blueprints, k)
             end
         end
         # Generates a new blueprint from kw and store it for the further iterations
-        blueprints[n] = cyanotype(bp; kw...)
+        blueprints[nm] = cyanotype(bp; fd...)
+        #println(nm)
+        #println(blueprints[nm])
     end
+    #println(blueprints)
     blueprints[:top]
 end
 

@@ -31,7 +31,7 @@ function make(bp::FusedMbConvBp, ksize, channels; dropout=0)
         if iszero(dropout)
             return SkipConnection(Chain(layers...), +)
         else
-            d = bp.proj.conv.vol ? 5 : 4
+            d = bp.conv.vol ? 5 : 4
             return Parallel(+, Chain(layers...), Dropout(dropout, dims=d))
         end
     else

@@ -19,7 +19,7 @@ const EFFNETV2 = [:small, :medium, :large, :xlarge]
     end
 end
 
-function EfficientNetBp(config; in_chs=3, st_chs=32, hd_chs=1280, ncls=1000, stem=true, 
+function EfficientNetBp(config; in_chs=3, st_chs=32, hd_chs=1280, ncls=1000, stem=true,
                         top=true, head=top)
     # Sanity check
     _check_effnet_config(config)
@@ -56,7 +56,7 @@ function make(bp::EfficientNetBp) #dropout
     block_idx = 1
     for s in bp.bbone
         dps = dropouts[block_idx:block_idx + s.nrepeat]
-        push!(layers, Chain(make(s, out_chs, dps))...)
+        push!(layers, Chain(make(s, out_chs, dropouts=dps))...)
         out_chs = s.out_chs
         block_idx = block_idx + s.nrepeat + 1
     end

@@ -19,7 +19,7 @@ EfficientNetStageBp(::Type{FusedMbConvBp}, ksize, out_chs, expn, stride,
     nrepeat=_nrepeats(nrepeat),
     conv=FusedMbConvBp(
         stride=stride,
-        ch_expn=expn,
+        exch=expn,
         act=swish
     )
 )
@@ -39,14 +39,26 @@ EfficientNetStageBp(::Type{MbConvBp}, ksize, out_chs, expn, stride, nrepeat,
     )
 )
 
-function make(bp::EfficientNetStageBp, channels::Int, dropouts=zeros(bp.nrepeat + 1))
+function make(bp::EfficientNetStageBp, channels::Int; dropouts=zeros(bp.nrepeat + 1))
     in_chs = _round_channels(channels)
     layers = []
-    push!(layers, make(bp.conv, bp.ksize, in_chs => bp.out_chs, dropouts[1]))
+    push!(layers, make(bp.conv, bp.ksize, in_chs => bp.out_chs, dropout=dropouts[1]))
+    setstride(bp::MbConvBp) = cyanotype(bp, conv=cyanotype(bp.conv, conv=cyanotype(bp.conv.conv, stride=1)), skip=true)
+    setstride(bp::FusedMbConvBp) = cyanotype(bp, conv=cyanotype(bp.conv, stride=1), skip=true)
+    #println(bp.conv.conv.stride)
+    #pst(bp::MbConvBp) = println(bp.conv.conv.stride)
+    #pst(c::FusedMbConvBp) = println(c.conv.stride)
+    #pst(bp.conv)
     for d in dropouts[2:end] #_ in 1:bp.nrepeat
-        conv = spread(bp.conv; stride = 1, skip=true)
-        push!(layers, make(conv, bp.ksize, bp.out_chs => bp.out_chs, d))
+        #conv = spread(bp.conv; stride = 1, skip=true)
+        #conv = cyanotype(bp.conv; stride=1, skip=true)
+        conv = cyanotype(bp.conv, conv=cyanotype(bp.conv.conv; stride=1, skip=true)) #
+        conv = setstride(bp.conv)
+        #pst(conv)
+        #if bp.conv isa FusedMbConvBp println(conv.conv.stride) end
+        push!(layers, make(conv, bp.ksize, bp.out_chs => bp.out_chs, dropout=d))
     end
+    #println("---")
     flatten_layers(layers)
 end
 

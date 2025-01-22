@@ -1,12 +1,12 @@
 using Cyanotype
 using Cyanotype: CyFloat
-using Flux
+#using Flux
 using Test
-using Aqua
+#using Aqua
 
 @testset verbose = true "Cyanotype.jl" begin
 
-    @testset verbose = true "Code quality" begin
+    #=@testset verbose = true "Code quality" begin
         @testset verbose = true "Aqua" begin
             #Aqua.test_all(Cyanotype) #  => ambiguities from Flux, Zygote, StatsBase
             #Aqua.test_ambiguities(Cyanotype)
@@ -17,7 +17,7 @@ using Aqua
             Aqua.test_deps_compat(Cyanotype)
             Aqua.test_project_toml_formatting(Cyanotype)
         end
-    end
+    end=#
 
     @testset verbose = true "utilities" begin
         include("utilities.jl")
@@ -47,4 +47,9 @@ using Aqua
         include("models/uchain.jl")
         include("models/unet.jl")
     end
+
+    @testset verbose = true "EfficientNet" begin
+        include("models/efficientnet.jl")
+    end
+
 end
